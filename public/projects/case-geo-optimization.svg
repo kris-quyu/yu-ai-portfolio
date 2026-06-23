@@ -1,0 +1,36 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="900" fill="#090817"/>
+  <rect width="1400" height="900" fill="url(#violet)"/>
+  <rect x="92" y="76" width="1216" height="748" rx="32" fill="#0D0B20" stroke="#8F7CFF" stroke-opacity=".36"/>
+  <rect x="136" y="128" width="512" height="650" rx="28" fill="#11102A" stroke="#8F7CFF" stroke-opacity=".28"/>
+  <rect x="180" y="174" width="322" height="22" rx="11" fill="#B9AEFF" fill-opacity=".55"/>
+  <rect x="180" y="226" width="392" height="86" rx="22" fill="#8F7CFF" fill-opacity=".14" stroke="#8F7CFF" stroke-opacity=".25"/>
+  <rect x="180" y="346" width="330" height="86" rx="22" fill="#42D6C9" fill-opacity=".1" stroke="#42D6C9" stroke-opacity=".18"/>
+  <rect x="180" y="466" width="392" height="86" rx="22" fill="#8F7CFF" fill-opacity=".12" stroke="#8F7CFF" stroke-opacity=".18"/>
+  <rect x="180" y="586" width="286" height="86" rx="22" fill="#F4D58D" fill-opacity=".1" stroke="#F4D58D" stroke-opacity=".16"/>
+  <g>
+    <rect x="724" y="130" width="542" height="278" rx="28" fill="#11102A" stroke="#8F7CFF" stroke-opacity=".25"/>
+    <rect x="768" y="176" width="242" height="18" rx="9" fill="#B9AEFF" fill-opacity=".55"/>
+    <rect x="768" y="226" width="424" height="24" rx="12" fill="#F1EFFF" fill-opacity=".12"/>
+    <rect x="768" y="276" width="372" height="24" rx="12" fill="#F1EFFF" fill-opacity=".1"/>
+    <rect x="768" y="326" width="184" height="34" rx="17" fill="#8F7CFF" fill-opacity=".24"/>
+    <rect x="978" y="326" width="142" height="34" rx="17" fill="#42D6C9" fill-opacity=".16"/>
+  </g>
+  <g>
+    <rect x="724" y="464" width="542" height="254" rx="28" fill="#11102A" stroke="#8F7CFF" stroke-opacity=".25"/>
+    <circle cx="828" cy="590" r="52" fill="#8F7CFF" fill-opacity=".18" stroke="#B9AEFF" stroke-opacity=".45"/>
+    <circle cx="1048" cy="552" r="42" fill="#42D6C9" fill-opacity=".13" stroke="#42D6C9" stroke-opacity=".35"/>
+    <circle cx="1138" cy="646" r="36" fill="#F4D58D" fill-opacity=".12" stroke="#F4D58D" stroke-opacity=".3"/>
+    <path d="M876 578l130-22M1068 582l46 42M876 612l224 42" stroke="#B9AEFF" stroke-opacity=".45" stroke-width="3"/>
+    <rect x="768" y="496" width="214" height="18" rx="9" fill="#B9AEFF" fill-opacity=".48"/>
+  </g>
+  <text x="136" y="58" fill="#B9AEFF" font-family="Inter, Arial" font-size="22" letter-spacing="6">GEO CONTENT OPTIMIZATION SYSTEM</text>
+  <text x="136" y="810" fill="#F4D58D" font-family="Inter, Arial" font-size="28" letter-spacing="3">AI SEARCH / CONTENT ANALYSIS / RECOMMENDATION FLOW</text>
+  <defs>
+    <radialGradient id="violet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(955 265) rotate(137) scale(700 530)">
+      <stop stop-color="#2E2578"/>
+      <stop offset=".48" stop-color="#090817" stop-opacity=".82"/>
+      <stop offset="1" stop-color="#090817" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

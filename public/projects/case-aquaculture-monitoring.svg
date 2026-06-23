@@ -1,0 +1,38 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="900" fill="#06111F"/>
+  <rect width="1400" height="900" fill="url(#blue)"/>
+  <rect x="88" y="76" width="1224" height="748" rx="30" fill="#07182A" stroke="#3577B8" stroke-opacity=".36"/>
+  <rect x="128" y="124" width="354" height="238" rx="24" fill="#0A2036" stroke="#3AA8FF" stroke-opacity=".32"/>
+  <text x="162" y="178" fill="#8BD4FF" font-family="Inter, Arial" font-size="24" letter-spacing="4">DO</text>
+  <text x="162" y="266" fill="#F2F8FF" font-family="Inter, Arial" font-size="76">7.8</text>
+  <path d="M162 316c52-68 106 38 162-18 48-48 86-36 116-4" stroke="#3AA8FF" stroke-width="5" stroke-linecap="round"/>
+  <rect x="524" y="124" width="354" height="238" rx="24" fill="#0A2036" stroke="#3AA8FF" stroke-opacity=".28"/>
+  <text x="558" y="178" fill="#8BD4FF" font-family="Inter, Arial" font-size="24" letter-spacing="4">pH</text>
+  <text x="558" y="266" fill="#F2F8FF" font-family="Inter, Arial" font-size="76">8.2</text>
+  <path d="M558 316c48-34 82-22 118-4 62 30 96-58 158-18" stroke="#64D6C0" stroke-width="5" stroke-linecap="round"/>
+  <rect x="920" y="124" width="354" height="238" rx="24" fill="#0A2036" stroke="#3AA8FF" stroke-opacity=".28"/>
+  <text x="954" y="178" fill="#8BD4FF" font-family="Inter, Arial" font-size="24" letter-spacing="4">ORP</text>
+  <text x="954" y="266" fill="#F2F8FF" font-family="Inter, Arial" font-size="76">312</text>
+  <path d="M954 316c74-26 112-76 178-24 34 27 66 24 102-8" stroke="#F4D58D" stroke-width="5" stroke-linecap="round"/>
+  <rect x="128" y="414" width="744" height="334" rx="28" fill="#07192A" stroke="#2B6AA4" stroke-opacity=".32"/>
+  <g opacity=".5">
+    <path d="M166 682h646M166 610h646M166 538h646M166 466h646" stroke="#2A6697"/>
+    <path d="M242 452v252M366 452v252M490 452v252M614 452v252M738 452v252" stroke="#244F78"/>
+  </g>
+  <path d="M170 652c108-120 192 18 288-62 108-91 194-2 318-106" stroke="#3AA8FF" stroke-width="6" stroke-linecap="round"/>
+  <path d="M170 604c118-42 176-72 290-20 130 60 202-78 322-22" stroke="#64D6C0" stroke-width="4" stroke-linecap="round" stroke-opacity=".82"/>
+  <rect x="922" y="414" width="352" height="334" rx="28" fill="#07192A" stroke="#2B6AA4" stroke-opacity=".32"/>
+  <rect x="962" y="460" width="272" height="48" rx="14" fill="#3AA8FF" fill-opacity=".18"/>
+  <rect x="962" y="532" width="226" height="48" rx="14" fill="#64D6C0" fill-opacity=".14"/>
+  <rect x="962" y="604" width="250" height="48" rx="14" fill="#F4D58D" fill-opacity=".12"/>
+  <circle cx="1196" cy="684" r="34" fill="#3AA8FF" fill-opacity=".16" stroke="#3AA8FF" stroke-opacity=".5"/>
+  <text x="128" y="58" fill="#8BD4FF" font-family="Inter, Arial" font-size="22" letter-spacing="6">AQUACULTURE MONITORING SYSTEM</text>
+  <text x="128" y="792" fill="#F4D58D" font-family="Inter, Arial" font-size="28" letter-spacing="3">WATER QUALITY / SENSOR STATUS / ALERT CENTER</text>
+  <defs>
+    <radialGradient id="blue" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(990 250) rotate(135) scale(690 520)">
+      <stop stop-color="#123E68"/>
+      <stop offset=".5" stop-color="#06111F" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#06111F" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
