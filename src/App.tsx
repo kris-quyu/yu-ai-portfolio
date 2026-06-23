@@ -3,12 +3,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import ProjectShowcase from "./components/ProjectShowcase";
+import ProjectCoverPreview from "./components/ProjectCoverPreview";
 import SmoothScrollProvider from "./components/SmoothScrollProvider";
 import { advantages } from "./data/advantages";
 import { projects } from "./data/projects";
 import { site } from "./data/site";
 import { timeline } from "./data/timeline";
 import { toolkit } from "./data/toolkit";
+import { assetPath } from "./utils/assetPath";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -95,7 +97,17 @@ function Profile() {
       <div className="section-index">02</div>
       <div className="about__grid">
         <div className="portrait-frame">
-          <img src={site.portrait} alt="黑金杂志风个人肖像" />
+          <img
+            src={assetPath(site.portrait)}
+            alt="黑金杂志风个人肖像"
+            onError={(event) => {
+              event.currentTarget.hidden = true;
+              event.currentTarget.nextElementSibling?.removeAttribute("hidden");
+            }}
+          />
+          <div className="portrait-fallback" hidden>
+            <span>YU</span>
+          </div>
           <div className="portrait-caption">
             <span>THE PERSONA</span>
             <p>Quiet power. Refined presence. System builder.</p>
@@ -144,7 +156,17 @@ function Works() {
         {projects.map((project) => (
           <article className="project-card" key={project.title}>
             <div className="project-card__cover">
-              <img src={project.cover} alt={project.title} />
+              <img
+                src={assetPath(project.cover)}
+                alt={project.title}
+                onError={(event) => {
+                  event.currentTarget.hidden = true;
+                  event.currentTarget.nextElementSibling?.removeAttribute("hidden");
+                }}
+              />
+              <div className="project-card__fallback" hidden>
+                <ProjectCoverPreview project={project} compact />
+              </div>
             </div>
             <div className="project-card__body">
               <span className="project-card__num">{project.id}</span>

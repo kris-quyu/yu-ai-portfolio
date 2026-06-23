@@ -1294,6 +1294,29 @@ img {
   filter: saturate(0.88) contrast(1.04);
 }
 
+.portrait-fallback {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  place-items: center;
+  background:
+    radial-gradient(circle at 52% 30%, rgba(244, 213, 141, 0.14), transparent 26%),
+    linear-gradient(145deg, rgba(214, 181, 109, 0.12), rgba(255, 255, 255, 0.02)),
+    #070706;
+}
+
+.portrait-fallback[hidden],
+.project-card__fallback[hidden] {
+  display: none;
+}
+
+.portrait-fallback span {
+  color: rgba(244, 213, 141, 0.66);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(72px, 10vw, 150px);
+  letter-spacing: 0.08em;
+}
+
 .portrait-caption {
   position: absolute;
   right: 24px;
@@ -1476,6 +1499,10 @@ img {
   transition:
     transform 420ms ease,
     filter 420ms ease;
+}
+
+.project-card__fallback {
+  height: 100%;
 }
 
 .project-card:hover .project-card__cover {
