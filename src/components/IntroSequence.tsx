@@ -2,12 +2,11 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 import { projects } from "../data/projects";
+import { site } from "../data/site";
 
 type IntroSequenceProps = {
   onComplete: () => void;
 };
-
-const keywords = ["AI VIDEO", "GEO OPTIMIZATION", "CONTENT WORKFLOW", "SMART SYSTEM"];
 
 export default function IntroSequence({ onComplete }: IntroSequenceProps) {
   const introRef = useRef<HTMLDivElement>(null);
@@ -22,7 +21,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
   useEffect(() => {
     const fallback = window.setTimeout(finish, 4600);
     return () => window.clearTimeout(fallback);
-  });
+  }, []);
 
   useGSAP(
     () => {
@@ -38,6 +37,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         defaults: { ease: "power3.out" },
         onComplete: finish,
       });
+      const overlay = introRef.current;
 
       timeline
         .fromTo(".intro-kicker", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.55 })
@@ -46,7 +46,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         .to(".intro-keyword", { autoAlpha: 0, y: -10, duration: 0.22, stagger: 0.06 }, "+=0.15")
         .fromTo(".intro-title span", { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 0.72, stagger: 0.08 })
         .fromTo(".intro-subtitle", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.52 }, "-=0.2")
-        .to(".intro-overlay", { autoAlpha: 0, duration: 0.58, ease: "power2.inOut" }, "+=0.45");
+        .to(overlay, { autoAlpha: 0, duration: 0.58, ease: "power2.inOut" }, "+=0.45");
     },
     { scope: introRef },
   );
@@ -60,9 +60,9 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       <div className="intro-line intro-line--left" />
       <div className="intro-line intro-line--right" />
       <div className="intro-center">
-        <p className="intro-kicker">INITIALIZING YU AI CREATIVE LAB</p>
+        <p className="intro-kicker">{site.hero.introLabel}</p>
         <div className="intro-keywords" aria-hidden="true">
-          {keywords.map((keyword) => (
+          {site.hero.keywords.map((keyword) => (
             <span className="intro-keyword" key={keyword}>
               {keyword}
             </span>

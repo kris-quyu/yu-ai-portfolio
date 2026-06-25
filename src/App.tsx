@@ -2,11 +2,11 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+import Manifesto from "./components/Manifesto";
 import ProjectShowcase from "./components/ProjectShowcase";
-import ProjectCoverPreview from "./components/ProjectCoverPreview";
+import ScrollWorks from "./components/ScrollWorks";
 import SmoothScrollProvider from "./components/SmoothScrollProvider";
 import { advantages } from "./data/advantages";
-import { projects } from "./data/projects";
 import { site } from "./data/site";
 import { timeline } from "./data/timeline";
 import { toolkit } from "./data/toolkit";
@@ -144,57 +144,6 @@ function Profile() {
   );
 }
 
-function Works() {
-  return (
-    <section id="works" className="section works page-shell">
-      <div className="section-index">03</div>
-      <div className="section__head">
-        <div className="section__label">SELECTED WORKS</div>
-        <h2>从内容生产到系统原型，项目都围绕“能运行、能复用、能交付”。</h2>
-      </div>
-      <div className="project-grid">
-        {projects.map((project) => (
-          <article className="project-card" key={project.title}>
-            <div className="project-card__cover">
-              <img
-                src={assetPath(project.cover)}
-                alt={project.title}
-                onError={(event) => {
-                  event.currentTarget.hidden = true;
-                  event.currentTarget.nextElementSibling?.removeAttribute("hidden");
-                }}
-              />
-              <div className="project-card__fallback" hidden>
-                <ProjectCoverPreview project={project} compact />
-              </div>
-            </div>
-            <div className="project-card__body">
-              <span className="project-card__num">{project.id}</span>
-              <h3>{project.title}</h3>
-              <p className="project-card__en">{project.englishTitle}</p>
-              <p>{project.description}</p>
-              <div className="project-meta">
-                <dl>
-                  <dt>Role</dt>
-                  <dd>{project.role}</dd>
-                </dl>
-                <dl>
-                  <dt>Status</dt>
-                  <dd>{project.status}</dd>
-                </dl>
-                <dl>
-                  <dt>Stack</dt>
-                  <dd>{project.stack.join(" / ")}</dd>
-                </dl>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Toolkit() {
   return (
     <section id="toolkit" className="section toolkit page-shell">
@@ -235,9 +184,10 @@ export default function App() {
   return (
     <SmoothScrollProvider>
       <ProjectShowcase />
+      <Manifesto />
       <AdvantageSection />
+      <ScrollWorks />
       <Profile />
-      <Works />
       <Toolkit />
       <Contact />
     </SmoothScrollProvider>

@@ -9,11 +9,35 @@ export const site = {
   email: "1282736393@qq.com",
   portrait: "/images/quxy-portrait.png",
   nav: [
-    { label: "WORKS", href: "#showcase" },
+    { label: "WORKS", href: "#works" },
     { label: "ADVANTAGE", href: "#advantage" },
     { label: "PROFILE", href: "#profile" },
     { label: "CONTACT", href: "#contact" },
   ],
+  hero: {
+    titleLines: ["Yu AI", "Creative", "Lab"],
+    introLabel: "INITIALIZING YU AI CREATIVE LAB",
+    keywords: ["AI VIDEO", "GEO OPTIMIZATION", "CONTENT WORKFLOW", "SMART SYSTEM"],
+    description:
+      "我把 AI、自动化工作流和前端交互，做成可以真正运行的内容、营销和智能系统。",
+    primaryAction: "进入作品",
+    secondaryAction: "联系合作",
+    scrollLabel: "Scroll to explore",
+  },
+  manifesto: {
+    label: "WHO I AM / WHAT I DO",
+    titleLines: ["I turn AI", "into working", "systems."],
+    description:
+      "我不是只会使用 AI 工具，而是把内容生产、工作流和业务需求组合成可以落地、复用和持续优化的系统。",
+    method:
+      "从问题定义、流程拆解到界面与自动化实现，让每一次创意都能进入真实业务现场。",
+  },
+  works: {
+    label: "SELECTED WORKS / 2026",
+    title: "Four systems, built around real work.",
+    description:
+      "滚动浏览四个案例：从内容与视频生产，到智能监测与生成式搜索优化。",
+  },
   actions: {
     primary: "查看作品",
     secondary: "联系合作",
