@@ -8,7 +8,6 @@ const EASING_FACTOR = 0.12;
 const MOBILE_BREAKPOINT = 720;
 const MOBILE_DRIFT_X = 30;
 const MOBILE_DRIFT_Y = 18;
-const MOBILE_TILT = 10;
 
 type Point = { x: number; y: number };
 type IntroCustomProperties = CSSProperties & Record<`--intro-${string}`, string>;
@@ -64,15 +63,43 @@ export function PointerIntro() {
 
     const viewport = getViewport(section);
     const center = { x: viewport.width / 2, y: viewport.height / 2 };
+    let measuredViewport = { width: viewport.width, height: viewport.height };
+    let isVisible = true;
+    let observer: IntersectionObserver | null = null;
     targetRef.current = center;
     renderedRef.current = center;
     setTargetVariables(section, center);
     section.style.setProperty('--intro-circle-x', `${formatNumber(center.x)}px`);
     section.style.setProperty('--intro-circle-y', `${formatNumber(center.y)}px`);
 
+    const scheduleFrame = () => {
+      if (!isVisible || animationFrameRef.current !== null) return;
+      animationFrameRef.current = requestAnimationFrame(tick);
+    };
+
     const tick = (time: number) => {
+      animationFrameRef.current = null;
+      if (!isVisible) return;
+
       const currentViewport = getViewport(section);
       const isMobile = currentViewport.width <= MOBILE_BREAKPOINT;
+      const dimensionsChanged =
+        currentViewport.width !== measuredViewport.width ||
+        currentViewport.height !== measuredViewport.height;
+
+      if (dimensionsChanged && activePointerRef.current === null) {
+        const nextCenter = {
+          x: currentViewport.width / 2,
+          y: currentViewport.height / 2,
+        };
+        measuredViewport = {
+          width: currentViewport.width,
+          height: currentViewport.height,
+        };
+        targetRef.current = nextCenter;
+        renderedRef.current = nextCenter;
+        setTargetVariables(section, nextCenter);
+      }
 
       if (isMobile && activePointerRef.current === null) {
         targetRef.current = {
@@ -92,7 +119,7 @@ export function PointerIntro() {
         renderedRef.current.y,
         currentViewport.width,
         currentViewport.height,
-        isMobile ? MOBILE_TILT : 20,
+        20,
       );
 
       section.style.setProperty(
@@ -114,14 +141,32 @@ export function PointerIntro() {
         `${formatNumber(transform.normalizedY * 8)}px`,
       );
 
-      animationFrameRef.current = requestAnimationFrame(tick);
+      scheduleFrame();
     };
 
-    animationFrameRef.current = requestAnimationFrame(tick);
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        const entry = entries.find(({ target }) => target === section);
+        if (!entry) return;
+
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          scheduleFrame();
+        } else if (animationFrameRef.current !== null) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+      });
+      observer.observe(section);
+    }
+
+    scheduleFrame();
 
     return () => {
+      observer?.disconnect();
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
   }, [reducedMotion]);
@@ -194,8 +239,8 @@ export function PointerIntro() {
         </div>
       </div>
 
-      <div className={styles.reveal} aria-label={siteContent.intro.reveal}>
-        <span aria-hidden="true">{siteContent.intro.reveal}</span>
+      <div className={styles.reveal}>
+        <p>{siteContent.intro.reveal}</p>
       </div>
     </section>
   );

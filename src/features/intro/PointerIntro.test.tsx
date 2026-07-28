@@ -1,6 +1,5 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { siteContent } from '../../content/siteContent';
 import { PointerIntro } from './PointerIntro';
 
 function mediaQuery(matches: boolean): MediaQueryList {
@@ -16,11 +15,30 @@ function mediaQuery(matches: boolean): MediaQueryList {
   };
 }
 
+class IntersectionObserverStub {
+  static instances: IntersectionObserverStub[] = [];
+
+  readonly observe = vi.fn();
+  readonly disconnect = vi.fn();
+
+  constructor(readonly callback: IntersectionObserverCallback) {
+    IntersectionObserverStub.instances.push(this);
+  }
+
+  emit(target: Element, isIntersecting: boolean) {
+    this.callback(
+      [{ isIntersecting, target } as IntersectionObserverEntry],
+      this as unknown as IntersectionObserver,
+    );
+  }
+}
+
 describe('PointerIntro', () => {
   let animationFrames: FrameRequestCallback[];
 
   beforeEach(() => {
     animationFrames = [];
+    IntersectionObserverStub.instances = [];
     vi.stubGlobal('innerWidth', 1000);
     vi.stubGlobal('innerHeight', 600);
     vi.stubGlobal('matchMedia', vi.fn(() => mediaQuery(false)));
@@ -42,10 +60,19 @@ describe('PointerIntro', () => {
   it('renders the approved bilingual intro', () => {
     render(<PointerIntro />);
 
-    expect(screen.getByRole('heading', { name: siteContent.intro.title })).toBeInTheDocument();
-    expect(screen.getByText(siteContent.intro.reveal)).toBeInTheDocument();
-    expect(screen.getByText(siteContent.intro.subtitle)).toBeInTheDocument();
-    expect(screen.getByText(siteContent.intro.hint)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: "HELLO, I'M YU" })).toBeInTheDocument();
+    expect(screen.getByText('你好，我是宇')).toBeInTheDocument();
+    expect(screen.getByText('AI CONTENT CREATOR / HANGZHOU')).toBeInTheDocument();
+    expect(screen.getByText('移动鼠标探索 · 向下滚动查看更多')).toBeInTheDocument();
+  });
+
+  it('exposes the visible Chinese reveal to accessibility APIs', () => {
+    render(<PointerIntro />);
+
+    const reveal = screen.getByText('你好，我是宇');
+    expect(reveal).toBeVisible();
+    expect(reveal).not.toHaveAttribute('aria-hidden');
+    expect(reveal.closest('[aria-hidden="true"]')).toBeNull();
   });
 
   it('updates target CSS variables from pointer movement', () => {
@@ -111,6 +138,64 @@ describe('PointerIntro', () => {
       '--intro-circle-x': '196.8987px',
       '--intro-circle-y': '423.9407px',
     });
+  });
+
+  it('retains the exact 20 degree clamp during a mobile edge drag', () => {
+    vi.stubGlobal('innerWidth', 390);
+    vi.stubGlobal('innerHeight', 844);
+    const { container } = render(<PointerIntro />);
+    const section = container.querySelector('#home')!;
+
+    fireEvent.pointerDown(section, { pointerId: 4, clientX: 390, clientY: 0 });
+    for (let frame = 0; frame < 200; frame += 1) {
+      animationFrames.shift()?.(frame * 16);
+    }
+
+    expect(section).toHaveStyle({
+      '--intro-rotate-x': '20deg',
+      '--intro-rotate-y': '20deg',
+    });
+  });
+
+  it('recenters an inactive desktop intro when its dimensions change', () => {
+    const { container } = render(<PointerIntro />);
+    const section = container.querySelector('#home')!;
+    vi.stubGlobal('innerWidth', 800);
+    vi.stubGlobal('innerHeight', 400);
+
+    animationFrames.shift()?.(100);
+
+    expect(section).toHaveStyle({
+      '--intro-pointer-x': '400px',
+      '--intro-pointer-y': '200px',
+      '--intro-circle-x': '400px',
+      '--intro-circle-y': '200px',
+      '--intro-rotate-x': '0deg',
+      '--intro-rotate-y': '0deg',
+    });
+  });
+
+  it('pauses the single frame chain offscreen and resumes it once when visible', () => {
+    vi.stubGlobal('IntersectionObserver', IntersectionObserverStub);
+    const { container, unmount } = render(<PointerIntro />);
+    const section = container.querySelector('#home')!;
+
+    expect(IntersectionObserverStub.instances).toHaveLength(1);
+    const observer = IntersectionObserverStub.instances[0];
+    expect(observer.observe).toHaveBeenCalledWith(section);
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+    act(() => observer.emit(section, false));
+    expect(cancelAnimationFrame).toHaveBeenCalledWith(1);
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+    act(() => observer.emit(section, true));
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(2);
+    animationFrames[1]?.(100);
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(3);
+
+    unmount();
+    expect(observer.disconnect).toHaveBeenCalledTimes(1);
   });
 
   it('keeps a centered zero-tilt reveal without animation for reduced motion', () => {

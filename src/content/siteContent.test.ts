@@ -5,9 +5,9 @@ describe('siteContent', () => {
   it('defines the approved intro and six-section navigation', () => {
     expect(siteContent.intro).toEqual({
       title: "HELLO, I'M YU",
-      reveal: '浣犲ソ锛屾垜鏄畤',
+      reveal: '你好，我是宇',
       subtitle: 'AI CONTENT CREATOR / HANGZHOU',
-      hint: '绉诲姩榧犳爣鎺㈢储 路 鍚戜笅婊氬姩鏌ョ湅鏇村',
+      hint: '移动鼠标探索 · 向下滚动查看更多',
     });
     expect(siteContent.navigation.map(({ id }) => id)).toEqual([
       'home', 'profile', 'film', 'system', 'capabilities', 'contact',

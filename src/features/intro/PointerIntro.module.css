@@ -207,9 +207,10 @@
   border: 1px solid rgb(183 255 42 / 45%);
 }
 
-.reveal span {
+.reveal p {
   position: relative;
   z-index: 1;
+  margin: 0;
   padding: 1rem;
   font-size: 1.5rem;
   font-weight: 800;
@@ -252,7 +253,7 @@
     width: clamp(9.5rem, 42vw, 13rem);
   }
 
-  .reveal span {
+  .reveal p {
     font-size: 1rem;
   }
 }

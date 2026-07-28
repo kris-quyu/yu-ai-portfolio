@@ -46,9 +46,9 @@ export interface SiteContent {
 export const siteContent: SiteContent = {
   intro: {
     title: "HELLO, I'M YU",
-    reveal: '浣犲ソ锛屾垜鏄畤',
+    reveal: '你好，我是宇',
     subtitle: 'AI CONTENT CREATOR / HANGZHOU',
-    hint: '绉诲姩榧犳爣鎺㈢储 路 鍚戜笅婊氬姩鏌ョ湅鏇村',
+    hint: '移动鼠标探索 · 向下滚动查看更多',
   },
   navigation: [
     { id: 'home', label: 'HOME' },

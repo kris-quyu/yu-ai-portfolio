@@ -81,7 +81,7 @@ describe('complete portfolio integration', () => {
 
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
-    ).toEqual(['profile', 'film', 'system', 'capabilities', 'contact']);
+    ).toEqual(['home', 'profile', 'film', 'system', 'capabilities', 'contact']);
   });
 
   it('contains exactly one film, one workflow proof, and three capabilities', () => {
@@ -109,8 +109,8 @@ describe('complete portfolio integration', () => {
     const playButton = container.querySelector('#film button[aria-haspopup="dialog"]');
     const preview = container.querySelector('#film video[aria-label]');
 
-    expect(navigation.querySelectorAll('a[href^="#"]')).toHaveLength(5);
-    expect(container.querySelector('header > a[aria-label]')).toHaveAttribute('href', '#profile');
+    expect(navigation.querySelectorAll('a[href^="#"]')).toHaveLength(6);
+    expect(container.querySelector('header > a[aria-label]')).toHaveAttribute('href', '#home');
     expect(screen.getByAltText(/瞿先生.*人物/)).toBeInTheDocument();
     expect(playButton).toHaveTextContent(/播放 AI 产品视频/);
     expect(preview).toHaveAttribute('aria-label', 'AI 产品视频预览');
