@@ -1,5 +1,9 @@
-import { siteContent } from './content/siteContent';
+import { HeroScrollSequence } from './features/hero/HeroScrollSequence';
 
 export default function App() {
-  return <main><h1>{siteContent.hero.titleLines.join(' ')}</h1></main>;
+  return (
+    <main>
+      <HeroScrollSequence />
+    </main>
+  );
 }
