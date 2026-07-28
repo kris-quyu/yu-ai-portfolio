@@ -240,6 +240,9 @@ export function HeroScrollSequence() {
         </div>
 
         <div className={styles.copy}>
+          <p className={styles.stageAnnouncement} aria-live="polite" aria-atomic="true">
+            {siteContent.hero.stages[visibleStageIndex].label}
+          </p>
           <div className={styles.copyViewport}>
             {siteContent.hero.stages.map((stage, stageIndex) => {
               const isActive = stageIndex === visibleStageIndex;
@@ -260,9 +263,7 @@ export function HeroScrollSequence() {
                   <h1 id={isActive ? 'hero-title' : undefined} className={styles.title}>
                     {stage.title}
                   </h1>
-                  <p className={styles.stageLabel} aria-live={isActive ? 'polite' : undefined}>
-                    {stage.label}
-                  </p>
+                  <p className={styles.stageLabel}>{stage.label}</p>
                   <p className={styles.summary}>{stage.summary}</p>
                 </div>
               );

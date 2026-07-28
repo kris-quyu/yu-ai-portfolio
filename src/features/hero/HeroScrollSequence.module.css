@@ -104,6 +104,18 @@
   transition-delay: 0s;
 }
 
+.stageAnnouncement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .eyebrow {
   margin: 0 0 clamp(0.8rem, 2vh, 1.5rem);
   color: #b7ff2a;
@@ -139,15 +151,34 @@
 }
 
 .reducedStageList {
-  position: absolute;
-  width: 1px;
-  height: 1px;
+  display: grid;
+  gap: 0.8rem;
   padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+  margin: clamp(1.5rem, 4vh, 2.5rem) 0 0;
+  list-style: none;
+}
+
+.reducedStageList li {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(183, 255, 42, 0.3);
+}
+
+.reducedStageList strong,
+.reducedStageList span {
+  display: block;
+}
+
+.reducedStageList strong {
+  color: #f4f7f1;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.reducedStageList span {
+  margin-top: 0.3rem;
+  color: #aeb8b0;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .progress {
@@ -229,10 +260,10 @@
 
   .copy {
     top: clamp(4.5rem, 12svh, 7rem);
-    right: 1rem;
+    right: auto;
     left: 1rem;
-    width: auto;
-    max-width: 24rem;
+    width: min(54vw, 13rem);
+    max-width: none;
     transform: none;
   }
 
@@ -242,9 +273,9 @@
   }
 
   .title {
-    max-width: 22rem;
-    font-size: clamp(2.55rem, 12vw, 3.35rem);
-    line-height: 0.88;
+    max-width: 13rem;
+    font-size: clamp(2rem, 9.5vw, 2.45rem);
+    line-height: 0.9;
   }
 
   .stageLabel {
@@ -253,10 +284,10 @@
   }
 
   .summary {
-    max-width: 24rem;
+    max-width: 13rem;
     margin-top: 0.55rem;
-    font-size: 0.94rem;
-    line-height: 1.55;
+    font-size: 0.88rem;
+    line-height: 1.45;
   }
 
   .progress {
@@ -288,6 +319,17 @@
 
   .stage {
     position: relative;
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .copy {
+    position: relative;
+    top: auto;
+    box-sizing: border-box;
+    min-height: 100svh;
+    padding-block: clamp(5rem, 10svh, 7rem);
+    transform: none;
   }
 
   .poster,

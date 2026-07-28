@@ -120,7 +120,7 @@ describe('HeroScrollSequence', () => {
     render(<HeroScrollSequence />);
 
     expect(screen.getByRole('heading', { name: 'THINK WITH AI.', hidden: true })).toBeInTheDocument();
-    expect(screen.getByText('鐞嗚В宸ュ叿')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getAllByText('鐞嗚В宸ュ叿').length).toBeGreaterThan(0);
     expect(screen.getByText('01 / 04')).toBeInTheDocument();
     expect(document.querySelector('#profile')).toHaveAttribute('aria-labelledby', 'hero-title');
     expect(screen.getByLabelText('滚动控制的动画人物')).toBeInTheDocument();
@@ -177,14 +177,14 @@ describe('HeroScrollSequence', () => {
     expect(
       screen.getByRole('heading', { name: 'BUILD THE WORKFLOW.', hidden: true }),
     ).toBeInTheDocument();
-    expect(screen.getByText('涓茶仈娴佺▼')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getAllByText('涓茶仈娴佺▼').length).toBeGreaterThan(0);
     expect(screen.getByText('03 / 04')).toBeInTheDocument();
 
     act(() => onUpdate({ progress: 0.9 }));
     expect(
       screen.getByRole('heading', { name: 'DELIVER THE RESULT.', hidden: true }),
     ).toBeInTheDocument();
-    expect(screen.getByText('鏈嶅姟杞寲')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getAllByText('鏈嶅姟杞寲').length).toBeGreaterThan(0);
     expect(screen.getByText('04 / 04')).toBeInTheDocument();
   });
 
@@ -203,6 +203,27 @@ describe('HeroScrollSequence', () => {
       screen.getByRole('heading', { name: 'SHAPE THE STORY.', hidden: true }),
     ).toBeInTheDocument();
     expect(screen.getByText('02 / 04')).toBeInTheDocument();
+  });
+
+  it('updates one persistent concise live region across phase changes', async () => {
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    const onUpdate = getScrollUpdate();
+    const liveRegion = document.querySelector<HTMLElement>('[aria-live="polite"]');
+
+    expect(document.querySelectorAll('[aria-live="polite"]')).toHaveLength(1);
+    expect(liveRegion).toHaveTextContent('鐞嗚В宸ュ叿');
+
+    act(() => onUpdate({ progress: 0.56 }));
+    expect(document.querySelector('[aria-live="polite"]')).toBe(liveRegion);
+    expect(liveRegion).toHaveTextContent('涓茶仈娴佺▼');
+
+    act(() => onUpdate({ progress: 0.9 }));
+    expect(document.querySelector('[aria-live="polite"]')).toBe(liveRegion);
+    expect(liveRegion).toHaveTextContent('鏈嶅姟杞寲');
   });
 
   it('loads the composed mobile sequence below 768px', async () => {
@@ -250,6 +271,15 @@ describe('HeroScrollSequence', () => {
       'change',
       expect.any(Function),
     );
+  });
+
+  it('keeps the reduced-motion stage list visibly readable', () => {
+    const listRule = heroCss.match(/\.reducedStageList\s*{([^}]*)}/s)?.[1] ?? '';
+
+    expect(listRule).toMatch(/display:\s*grid;/);
+    expect(listRule).not.toMatch(/width:\s*1px;/);
+    expect(listRule).not.toMatch(/height:\s*1px;/);
+    expect(listRule).not.toMatch(/clip:/);
   });
 
   it('falls back to the poster when the frame failure threshold is exceeded', async () => {
@@ -378,5 +408,18 @@ describe('HeroScrollSequence', () => {
     expect(heroCss).not.toContain('250svh');
     expect(heroCss).not.toContain('260svh');
     expect(heroCss).toMatch(/\.stage\s*{[^}]*height:\s*100svh;/s);
+  });
+
+  it('limits 390px copy to a compact face-safe left column', () => {
+    const mobileCss = heroCss.slice(
+      heroCss.indexOf('@media (max-width: 767px)'),
+      heroCss.indexOf('@media (min-width: 1700px)'),
+    );
+    const copyRule = mobileCss.match(/\.copy\s*{([^}]*)}/s)?.[1] ?? '';
+    const titleRule = mobileCss.match(/\.title\s*{([^}]*)}/s)?.[1] ?? '';
+
+    expect(copyRule).toMatch(/width:\s*min\(54vw,\s*13rem\);/);
+    expect(copyRule).toMatch(/max-width:\s*none;/);
+    expect(titleRule).toMatch(/font-size:\s*clamp\(2rem,\s*9\.5vw,\s*2\.45rem\);/);
   });
 });
