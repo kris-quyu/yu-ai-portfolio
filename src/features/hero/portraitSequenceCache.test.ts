@@ -56,4 +56,39 @@ describe('loadPortraitSequenceCached', () => {
     await expect(loadPortraitSequenceCached(options)).resolves.toHaveLength(1);
     expect(loadFrameSequence).toHaveBeenCalledTimes(2);
   });
+
+  it('keeps the shared request alive when one consumer aborts', async () => {
+    let resolveFrames: ((frames: HTMLImageElement[]) => void) | undefined;
+    let sharedSignal: AbortSignal | undefined;
+    vi.mocked(loadFrameSequence).mockImplementation(({ signal }) => {
+      sharedSignal = signal;
+      return new Promise((resolve) => {
+        resolveFrames = resolve;
+      });
+    });
+    const firstController = new AbortController();
+    const secondController = new AbortController();
+    const options = {
+      posterUrl: '/poster.webp',
+      pattern: '/owned-frame-%04d.webp',
+      count: 120,
+    };
+
+    const first = loadPortraitSequenceCached({ ...options, signal: firstController.signal });
+    const second = loadPortraitSequenceCached({ ...options, signal: secondController.signal });
+    let firstStatus = 'pending';
+    void first.then(() => {
+      firstStatus = 'ready';
+    }, (error: unknown) => {
+      firstStatus = error instanceof DOMException && error.name === 'AbortError' ? 'aborted' : 'failed';
+    });
+
+    firstController.abort();
+    await Promise.resolve();
+
+    expect(firstStatus).toBe('aborted');
+    expect(sharedSignal?.aborted).toBe(false);
+    resolveFrames?.([{ width: 1600, height: 900 } as HTMLImageElement]);
+    await expect(second).resolves.toHaveLength(1);
+  });
 });
