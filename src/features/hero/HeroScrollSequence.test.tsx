@@ -1,7 +1,7 @@
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
-import { loadFrameSequence } from './frameLoader';
+import { loadPortraitSequenceCached } from './portraitSequenceCache';
 import { HeroScrollSequence } from './HeroScrollSequence';
 import heroCss from './HeroScrollSequence.module.css?raw';
 
@@ -22,8 +22,8 @@ vi.mock('../../lib/media', async (importOriginal) => {
   return { ...media, loadMediaManifest: vi.fn() };
 });
 
-vi.mock('./frameLoader', () => ({
-  loadFrameSequence: vi.fn(),
+vi.mock('./portraitSequenceCache', () => ({
+  loadPortraitSequenceCached: vi.fn(),
 }));
 
 const manifest = {
@@ -77,7 +77,7 @@ describe('HeroScrollSequence', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(loadMediaManifest).mockResolvedValue(manifest);
-    vi.mocked(loadFrameSequence).mockImplementation(() => new Promise(() => undefined));
+    vi.mocked(loadPortraitSequenceCached).mockImplementation(() => new Promise(() => undefined));
     vi.stubGlobal('innerWidth', 1440);
     vi.stubGlobal('devicePixelRatio', 1);
     vi.stubGlobal('matchMedia', vi.fn(() => createMediaQuery().mediaQuery));
@@ -145,7 +145,7 @@ describe('HeroScrollSequence', () => {
     render(<HeroScrollSequence />);
 
     await waitFor(() => {
-      expect(loadFrameSequence).toHaveBeenCalledWith(
+      expect(loadPortraitSequenceCached).toHaveBeenCalledWith(
         expect.objectContaining({
           posterUrl: manifest.portrait.poster,
           pattern: manifest.portrait.desktop.pattern,
@@ -161,7 +161,7 @@ describe('HeroScrollSequence', () => {
     render(<HeroScrollSequence />);
 
     await waitFor(() => {
-      expect(loadFrameSequence).toHaveBeenCalledWith(
+      expect(loadPortraitSequenceCached).toHaveBeenCalledWith(
         expect.objectContaining({
           posterUrl: manifest.portrait.poster,
           pattern: manifest.portrait.mobile.pattern,
@@ -182,7 +182,7 @@ describe('HeroScrollSequence', () => {
       manifest.portrait.poster,
     );
     expect(screen.queryByLabelText('滚动控制的动画人物')).not.toBeInTheDocument();
-    expect(loadFrameSequence).not.toHaveBeenCalled();
+    expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
 
     unmount();
     expect(reduced.mediaQuery.removeEventListener).toHaveBeenCalledWith(
@@ -192,7 +192,7 @@ describe('HeroScrollSequence', () => {
   });
 
   it('falls back to the poster when the frame failure threshold is exceeded', async () => {
-    vi.mocked(loadFrameSequence).mockRejectedValue(new Error('Portrait frame loading failed'));
+    vi.mocked(loadPortraitSequenceCached).mockRejectedValue(new Error('Portrait frame loading failed'));
 
     render(<HeroScrollSequence />);
 
@@ -209,7 +209,7 @@ describe('HeroScrollSequence', () => {
   it('aborts loading on unmount and ignores stale asynchronous work', async () => {
     let signal: AbortSignal | undefined;
     let settle: ((frames: HTMLImageElement[]) => void) | undefined;
-    vi.mocked(loadFrameSequence).mockImplementation((options) => {
+    vi.mocked(loadPortraitSequenceCached).mockImplementation((options) => {
       signal = options.signal;
       return new Promise((resolve) => {
         settle = resolve;
@@ -217,7 +217,7 @@ describe('HeroScrollSequence', () => {
     });
 
     const { unmount } = render(<HeroScrollSequence />);
-    await waitFor(() => expect(loadFrameSequence).toHaveBeenCalled());
+    await waitFor(() => expect(loadPortraitSequenceCached).toHaveBeenCalled());
 
     unmount();
     expect(signal?.aborted).toBe(true);
@@ -229,7 +229,7 @@ describe('HeroScrollSequence', () => {
     const kill = vi.fn();
     scrollTrigger.create.mockReturnValue({ kill });
     vi.stubGlobal('devicePixelRatio', 2);
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -254,7 +254,7 @@ describe('HeroScrollSequence', () => {
         return 41;
       }),
     );
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -282,7 +282,7 @@ describe('HeroScrollSequence', () => {
         return 41;
       }),
     );
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -300,7 +300,7 @@ describe('HeroScrollSequence', () => {
 
   it('switches to the poster when Canvas is unavailable', async () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 

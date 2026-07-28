@@ -4,10 +4,12 @@ import { Navigation } from './features/navigation/Navigation';
 import { WorkflowProof } from './features/workflow/WorkflowProof';
 import { CapabilityGrid } from './features/capabilities/CapabilityGrid';
 import { ContactSection } from './features/contact/ContactSection';
+import { PortfolioLoader } from './features/loader/PortfolioLoader';
 
 export default function App() {
   return (
     <>
+      <PortfolioLoader />
       <Navigation />
       <main>
         <HeroScrollSequence />

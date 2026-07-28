@@ -1,9 +1,13 @@
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 
 vi.mock('./features/navigation/Navigation', () => ({
   Navigation: () => <nav aria-label="test navigation" />,
+}));
+
+vi.mock('./features/loader/PortfolioLoader', () => ({
+  PortfolioLoader: () => <div data-testid="portfolio-loader" />,
 }));
 
 vi.mock('./features/hero/HeroScrollSequence', () => ({
@@ -35,5 +39,12 @@ describe('App section order', () => {
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
     ).toEqual(['profile', 'film', 'system', 'capabilities', 'contact']);
+  });
+
+  it('mounts one portfolio loader before navigation and main content', () => {
+    const { container } = render(<App />);
+
+    expect(screen.getByTestId('portfolio-loader')).toBeInTheDocument();
+    expect([...container.children].map((element) => element.tagName)).toEqual(['DIV', 'NAV', 'MAIN']);
   });
 });

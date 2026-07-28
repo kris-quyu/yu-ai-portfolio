@@ -10,7 +10,7 @@ import {
 import { siteContent } from '../../content/siteContent';
 import { loadMediaManifest, resolveMediaUrl, type MediaManifest } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
-import { loadFrameSequence } from './frameLoader';
+import { loadPortraitSequenceCached } from './portraitSequenceCache';
 import { drawHeroFrame, getHeroFrame, getHeroTransform } from './heroMath';
 import styles from './HeroScrollSequence.module.css';
 
@@ -84,7 +84,7 @@ export function HeroScrollSequence() {
     frameDrawn.current = false;
     lastFrame.current = -1;
 
-    void loadFrameSequence({
+    void loadPortraitSequenceCached({
       posterUrl: manifest.portrait.poster,
       pattern: sequence.pattern,
       count: sequence.count,
