@@ -185,7 +185,7 @@
 
   .title {
     max-width: 22rem;
-    font-size: 3.5rem;
+    font-size: clamp(2.7rem, 13vw, 3.5rem);
     line-height: 0.82;
   }
 
