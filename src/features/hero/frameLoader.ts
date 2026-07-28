@@ -1,4 +1,5 @@
 export interface FrameLoadOptions {
+  posterUrl: string;
   pattern: string;
   count: number;
   concurrency?: number;
@@ -12,6 +13,7 @@ const formatFrameUrl = (pattern: string, index: number) =>
 const abortError = () => new DOMException('Aborted', 'AbortError');
 
 export async function loadFrameSequence({
+  posterUrl,
   pattern,
   count,
   concurrency = 6,
@@ -19,8 +21,33 @@ export async function loadFrameSequence({
   onProgress,
 }: FrameLoadOptions): Promise<HTMLImageElement[]> {
   const total = Math.max(0, Math.floor(count));
-  if (total === 0) return [];
   if (signal?.aborted) throw abortError();
+
+  await new Promise<void>((resolve, reject) => {
+    const poster = new Image();
+    let complete = false;
+    const finish = (error?: Error) => {
+      if (complete) return;
+      complete = true;
+      poster.onload = null;
+      poster.onerror = null;
+      signal?.removeEventListener('abort', onAbort);
+      if (error) reject(error);
+      else resolve();
+    };
+    const onAbort = () => finish(abortError());
+
+    signal?.addEventListener('abort', onAbort, { once: true });
+    if (signal?.aborted) {
+      onAbort();
+      return;
+    }
+    poster.onload = () => finish();
+    poster.onerror = () => finish(new Error('Portrait poster loading failed'));
+    poster.src = posterUrl;
+  });
+
+  if (total === 0) return [];
 
   const frames = new Array<HTMLImageElement>(total);
   const workerCount = Math.min(6, total, Math.max(1, Number.isFinite(concurrency) ? Math.floor(concurrency) : 6));

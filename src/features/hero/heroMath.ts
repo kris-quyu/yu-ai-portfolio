@@ -18,7 +18,9 @@ const segment = (value: number, start: number, end: number) => clamp01((value - 
 export function getHeroFrame(progress: number, frameCount: number): number {
   const count = Number.isFinite(frameCount) ? Math.floor(frameCount) : 0;
   if (count < 1) return 0;
-  return Math.min(count - 1, Math.round(clamp01(progress) * count));
+  const sequenceProgress = clamp01(progress);
+  if (sequenceProgress >= 0.82) return count - 1;
+  return Math.min(count - 1, Math.round((sequenceProgress / 0.82) * count));
 }
 
 export function getHeroTransform(progress: number): HeroTransform {

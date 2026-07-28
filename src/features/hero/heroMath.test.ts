@@ -4,10 +4,16 @@ import { drawHeroFrame, getHeroFrame, getHeroTransform } from './heroMath';
 describe('getHeroFrame', () => {
   it('clamps scroll progress to valid frames, including an empty sequence', () => {
     expect(getHeroFrame(-1, 120)).toBe(0);
-    expect(getHeroFrame(0.5, 120)).toBe(60);
+    expect(getHeroFrame(0.5, 120)).toBe(73);
     expect(getHeroFrame(1, 120)).toBe(119);
     expect(getHeroFrame(2, 120)).toBe(119);
     expect(getHeroFrame(0.5, 0)).toBe(0);
+  });
+
+  it('freezes on the final source frame throughout the hold phase', () => {
+    expect(getHeroFrame(0.82, 120)).toBe(119);
+    expect(getHeroFrame(0.9, 120)).toBe(119);
+    expect(getHeroFrame(1, 120)).toBe(119);
   });
 });
 
