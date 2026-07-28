@@ -120,8 +120,8 @@ describe('complete portfolio integration', () => {
     const capabilityButtons = [...capabilitySection.querySelectorAll('button')];
     expect(capabilityButtons).toHaveLength(3);
     capabilityButtons.forEach((button) => {
-      expect(button).toHaveAttribute('aria-expanded', 'false');
-      expect(button).toHaveAttribute('aria-controls');
+      expect(button).toHaveAttribute('aria-pressed', 'false');
+      expect(button).toHaveAccessibleName(/翻转.+技能卡/);
     });
 
     expect(contactSection.querySelector(`a[href="mailto:${siteContent.contact.email}"]`))
