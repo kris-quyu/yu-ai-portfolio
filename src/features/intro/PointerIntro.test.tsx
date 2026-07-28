@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PointerIntro } from './PointerIntro';
+import introCss from './PointerIntro.module.css?raw';
 
 function mediaQuery(matches: boolean): MediaQueryList {
   return {
@@ -75,6 +76,46 @@ describe('PointerIntro', () => {
     expect(reveal.closest('[aria-hidden="true"]')).toBeNull();
   });
 
+  it('keeps the Chinese reveal compact on one line', () => {
+    render(<PointerIntro />);
+
+    expect(screen.getByText('你好，我是宇')).toHaveTextContent(/^你好，我是宇$/);
+    expect(introCss).toMatch(
+      /\.reveal p\s*{[^}]*letter-spacing:\s*0(?:rem|em|px)?;[^}]*white-space:\s*nowrap;/is,
+    );
+  });
+
+  it('uses a center-origin flat rotation without any 3D title treatment', () => {
+    expect(introCss).toMatch(
+      /\.title\s*{[^}]*transform:\s*rotateZ\(var\(--intro-rotate-z\)\);[^}]*transform-origin:\s*center;/is,
+    );
+    expect(introCss).not.toMatch(
+      /\bperspective\b|rotateX\(|rotateY\(|translateZ\(|preserve-3d/i,
+    );
+    expect(introCss).not.toMatch(/--intro-rotate-[xy]\b/i);
+  });
+
+  it('uses a safe responsive single-line title contract at every viewport width', () => {
+    expect(introCss).toMatch(
+      /\.title\s*{[^}]*max-inline-size:\s*100%;[^}]*font-size:\s*clamp\(2\.3rem,\s*8\.75vw,\s*8\.5rem\);[^}]*white-space:\s*nowrap;/is,
+    );
+    expect(introCss).not.toMatch(
+      /@media\s*\([^)]*(?:width)[^)]*\)[\s\S]*?\.title\s*{[^}]*font-size:/i,
+    );
+  });
+
+  it('uses the approved smaller independent reveal-circle ranges', () => {
+    expect(introCss).toMatch(
+      /\.reveal\s*{[^}]*width:\s*clamp\(13\.75rem,\s*18vw,\s*20rem\);/is,
+    );
+    expect(introCss).toMatch(
+      /@media\s*\(max-width:\s*720px\)[\s\S]*?\.reveal\s*{[^}]*width:\s*clamp\(10rem,\s*42vw,\s*13\.75rem\);/is,
+    );
+    expect(introCss).not.toMatch(
+      /\.reveal\s*{[^}]*rotate(?:Z)?\(|\.title\s+\.reveal/is,
+    );
+  });
+
   it('updates target CSS variables from pointer movement', () => {
     const { container } = render(<PointerIntro />);
     const section = container.querySelector('#home')!;
@@ -97,9 +138,10 @@ describe('PointerIntro', () => {
     expect(section).toHaveStyle({
       '--intro-circle-x': '560px',
       '--intro-circle-y': '264px',
-      '--intro-rotate-x': '2.4deg',
-      '--intro-rotate-y': '2.4deg',
+      '--intro-rotate-z': '2.4deg',
     });
+    expect(section.style.getPropertyValue('--intro-rotate-x')).toBe('');
+    expect(section.style.getPropertyValue('--intro-rotate-y')).toBe('');
     expect(requestAnimationFrame).toHaveBeenCalledTimes(2);
   });
 
@@ -152,8 +194,7 @@ describe('PointerIntro', () => {
     }
 
     expect(section).toHaveStyle({
-      '--intro-rotate-x': '20deg',
-      '--intro-rotate-y': '20deg',
+      '--intro-rotate-z': '20deg',
     });
   });
 
@@ -170,8 +211,7 @@ describe('PointerIntro', () => {
       '--intro-pointer-y': '200px',
       '--intro-circle-x': '400px',
       '--intro-circle-y': '200px',
-      '--intro-rotate-x': '0deg',
-      '--intro-rotate-y': '0deg',
+      '--intro-rotate-z': '0deg',
     });
   });
 
@@ -211,9 +251,10 @@ describe('PointerIntro', () => {
       '--intro-pointer-y': '50%',
       '--intro-circle-x': '50%',
       '--intro-circle-y': '50%',
-      '--intro-rotate-x': '0deg',
-      '--intro-rotate-y': '0deg',
+      '--intro-rotate-z': '0deg',
     });
+    expect(section.style.getPropertyValue('--intro-rotate-x')).toBe('');
+    expect(section.style.getPropertyValue('--intro-rotate-y')).toBe('');
     expect(requestAnimationFrame).not.toHaveBeenCalled();
   });
 });

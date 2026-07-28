@@ -17,8 +17,7 @@ const initialStyles: IntroCustomProperties = {
   '--intro-pointer-y': '50%',
   '--intro-circle-x': '50%',
   '--intro-circle-y': '50%',
-  '--intro-rotate-x': '0deg',
-  '--intro-rotate-y': '0deg',
+  '--intro-rotate-z': '0deg',
   '--intro-parallax-x': '0px',
   '--intro-parallax-y': '0px',
 };
@@ -130,8 +129,7 @@ export function PointerIntro() {
         '--intro-circle-y',
         `${formatNumber(renderedRef.current.y)}px`,
       );
-      section.style.setProperty('--intro-rotate-x', `${formatNumber(transform.rotateX)}deg`);
-      section.style.setProperty('--intro-rotate-y', `${formatNumber(transform.rotateY)}deg`);
+      section.style.setProperty('--intro-rotate-z', `${formatNumber(transform.rotateZ)}deg`);
       section.style.setProperty(
         '--intro-parallax-x',
         `${formatNumber(transform.normalizedX * 12)}px`,

@@ -3,8 +3,7 @@
   --intro-pointer-y: 50%;
   --intro-circle-x: 50%;
   --intro-circle-y: 50%;
-  --intro-rotate-x: 0deg;
-  --intro-rotate-y: 0deg;
+  --intro-rotate-z: 0deg;
   --intro-parallax-x: 0px;
   --intro-parallax-y: 0px;
   position: relative;
@@ -132,15 +131,15 @@
   display: grid;
   place-items: center;
   min-height: 48vh;
-  perspective: 900px;
 }
 
 .title {
   margin: 0;
-  transform: rotateX(var(--intro-rotate-x)) rotateY(var(--intro-rotate-y));
-  transform-style: preserve-3d;
+  max-inline-size: 100%;
+  transform: rotateZ(var(--intro-rotate-z));
+  transform-origin: center;
   color: var(--forest);
-  font-size: 7rem;
+  font-size: clamp(2.3rem, 8.75vw, 8.5rem);
   font-weight: 900;
   letter-spacing: -0.075em;
   line-height: 0.82;
@@ -175,7 +174,7 @@
   left: 0;
   display: grid;
   place-items: center;
-  width: clamp(11rem, 25vw, 24rem);
+  width: clamp(13.75rem, 18vw, 20rem);
   aspect-ratio: 1;
   transform: translate3d(
     calc(var(--intro-circle-x) - 50%),
@@ -219,8 +218,9 @@
   padding: 1rem;
   font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   text-align: center;
+  white-space: nowrap;
 }
 
 @media (max-width: 720px) {
@@ -239,11 +239,6 @@
     min-height: 44vh;
   }
 
-  .title {
-    font-size: 4rem;
-    letter-spacing: -0.065em;
-  }
-
   .meta {
     display: grid;
     gap: 0.8rem;
@@ -255,17 +250,11 @@
   }
 
   .reveal {
-    width: clamp(9.5rem, 42vw, 13rem);
+    width: clamp(10rem, 42vw, 13.75rem);
   }
 
   .reveal p {
     font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .title {
-    font-size: 2.75rem;
   }
 }
 
@@ -279,11 +268,6 @@
     min-height: 40svh;
   }
 
-  .title {
-    max-width: 100%;
-    font-size: clamp(2.3rem, 12vw, 2.7rem);
-  }
-
   .meta {
     gap: 0.6rem;
   }
@@ -293,27 +277,6 @@
     font-size: 0.72rem;
   }
 
-  .reveal {
-    width: min(10rem, 44vw);
-  }
-}
-
-@media (min-width: 1024px) {
-  .title {
-    font-size: 8rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .title {
-    font-size: 10rem;
-  }
-}
-
-@media (min-width: 1600px) {
-  .title {
-    font-size: 10.5rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

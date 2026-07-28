@@ -13,7 +13,6 @@ export function getIntroTransform(
   return {
     normalizedX,
     normalizedY,
-    rotateX: normalizedY === 0 ? 0 : -normalizedY * maxTilt,
-    rotateY: normalizedX * maxTilt,
+    rotateZ: normalizedX === 0 ? 0 : normalizedX * maxTilt,
   };
 }
