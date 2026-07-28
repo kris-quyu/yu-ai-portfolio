@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
@@ -64,12 +64,12 @@ describe('FeaturedFilm', () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the one approved film with manifest-resolved media', async () => {
+  it('renders the one approved film poster without eagerly loading the video', async () => {
     render(<FeaturedFilm />);
 
     expect(screen.getAllByRole('heading', { name: 'AI PRODUCT FILM' })).toHaveLength(1);
     const preview = await screen.findByLabelText('AI 产品视频预览');
-    expect(preview).toHaveAttribute('src', manifest.film.src);
+    expect(preview).not.toHaveAttribute('src');
     expect(preview).toHaveAttribute('poster', manifest.film.poster);
     expect(preview).toHaveProperty('muted', true);
     expect(preview).toHaveAttribute('loop');
@@ -129,10 +129,29 @@ describe('FeaturedFilm', () => {
     const observer = IntersectionObserverStub.instances[0];
 
     expect(observer.options).toEqual({ threshold: 0.55 });
+    expect(preview).not.toHaveAttribute('src');
     act(() => observer.emit({ isIntersecting: true, intersectionRatio: 0.55, target: preview }));
+    await waitFor(() => expect(preview).toHaveAttribute('src', manifest.film.src));
     await waitFor(() => expect(play).toHaveBeenCalled());
     act(() => observer.emit({ isIntersecting: false, intersectionRatio: 0, target: preview }));
     expect(pause).toHaveBeenCalled();
+  });
+
+  it('shows an accessible direct-link fallback when the actual preview video errors', async () => {
+    render(<FeaturedFilm />);
+    const preview = await screen.findByLabelText('AI 产品视频预览');
+    const observer = IntersectionObserverStub.instances[0];
+    act(() => observer.emit({ isIntersecting: true, intersectionRatio: 0.55, target: preview }));
+    await waitFor(() => expect(preview).toHaveAttribute('src', manifest.film.src));
+
+    fireEvent.error(preview);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('视频暂时无法在页面内播放');
+    expect(screen.getByRole('link', { name: '直接打开视频' })).toHaveAttribute(
+      'href',
+      manifest.film.src,
+    );
+    expect(screen.queryByRole('button', { name: '播放 AI 产品视频' })).not.toBeInTheDocument();
   });
 
   it('keeps a base-safe poster and play control when the manifest cannot load', async () => {
@@ -140,7 +159,12 @@ describe('FeaturedFilm', () => {
     render(<FeaturedFilm />);
 
     const preview = screen.getByLabelText('AI 产品视频预览');
-    expect(preview).toHaveAttribute('src', resolveMediaUrl('media/film/ai-product-film.mp4'));
+    const observer = IntersectionObserverStub.instances[0];
+    expect(preview).not.toHaveAttribute('src');
+    act(() => observer.emit({ isIntersecting: true, intersectionRatio: 0.55, target: preview }));
+    await waitFor(() => {
+      expect(preview).toHaveAttribute('src', resolveMediaUrl('media/film/ai-product-film.mp4'));
+    });
     expect(preview).toHaveAttribute('poster', resolveMediaUrl('media/film/poster.webp'));
     expect(screen.getByRole('button', { name: '播放 AI 产品视频' })).toBeInTheDocument();
   });

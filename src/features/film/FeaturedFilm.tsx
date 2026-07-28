@@ -12,6 +12,9 @@ export function FeaturedFilm() {
   const [film, setFilm] = useState(fallbackFilm);
   const [open, setOpen] = useState(false);
   const [manifestFailed, setManifestFailed] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   const previewRef = useRef<HTMLVideoElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -48,18 +51,34 @@ export function FeaturedFilm() {
 
   useEffect(() => {
     const video = previewRef.current;
-    if (!video || !('IntersectionObserver' in window)) return;
+    if (!video || videoFailed) return;
+    if (!('IntersectionObserver' in window)) {
+      setPreviewReady(true);
+      setPreviewVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting && entry.intersectionRatio >= 0.55) {
-        void video.play().catch(() => undefined);
+        setPreviewReady(true);
+        setPreviewVisible(true);
       } else {
-        video.pause();
+        setPreviewVisible(false);
       }
     }, { threshold: 0.55 });
     observer.observe(video);
     return () => observer.disconnect();
-  }, []);
+  }, [videoFailed]);
+
+  useEffect(() => {
+    const video = previewRef.current;
+    if (!video || !previewReady || videoFailed) return;
+    if (previewVisible) {
+      void video.play().catch(() => undefined);
+    } else {
+      video.pause();
+    }
+  }, [film.src, previewReady, previewVisible, videoFailed]);
 
   useEffect(() => {
     if (!open) return;
@@ -109,26 +128,39 @@ export function FeaturedFilm() {
       </div>
 
       <div className={styles.mediaFrame}>
-        <video
-          ref={previewRef}
-          className={styles.preview}
-          src={film.src}
-          poster={film.poster}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-label="AI 产品视频预览"
-        />
-        <button
-          ref={triggerRef}
-          className={styles.playButton}
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-haspopup="dialog"
-        >
-          播放 AI 产品视频
-        </button>
+        {videoFailed ? (
+          <div className={styles.mediaFallback} role={open ? undefined : 'alert'}>
+            <img src={film.poster} alt="AI 产品视频封面" />
+            <div className={styles.fallbackCopy}>
+              <p>视频暂时无法在页面内播放。</p>
+              <a href={film.src} target="_blank" rel="noreferrer">直接打开视频</a>
+            </div>
+          </div>
+        ) : (
+          <>
+            <video
+              ref={previewRef}
+              className={styles.preview}
+              src={previewReady ? film.src : undefined}
+              poster={film.poster}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              onError={() => setVideoFailed(true)}
+              aria-label="AI 产品视频预览"
+            />
+            <button
+              ref={triggerRef}
+              className={styles.playButton}
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-haspopup="dialog"
+            >
+              播放 AI 产品视频
+            </button>
+          </>
+        )}
         {manifestFailed && (
           <p className={styles.mediaStatus} role="status">视频预览暂时无法更新，仍可尝试播放。</p>
         )}
@@ -157,16 +189,24 @@ export function FeaturedFilm() {
                 关闭
               </button>
             </div>
-            <video
-              ref={dialogVideoRef}
-              className={styles.dialogVideo}
-              src={film.src}
-              poster={film.poster}
-              controls
-              playsInline
-              preload="metadata"
-              aria-label="AI 产品视频播放器"
-            />
+            {videoFailed ? (
+              <div className={styles.dialogFallback} role="alert">
+                <p>视频暂时无法在页面内播放。</p>
+                <a href={film.src} target="_blank" rel="noreferrer">直接打开视频</a>
+              </div>
+            ) : (
+              <video
+                ref={dialogVideoRef}
+                className={styles.dialogVideo}
+                src={film.src}
+                poster={film.poster}
+                controls
+                playsInline
+                preload="metadata"
+                onError={() => setVideoFailed(true)}
+                aria-label="AI 产品视频播放器"
+              />
+            )}
           </div>
         </div>
       )}
