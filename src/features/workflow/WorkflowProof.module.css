@@ -6,14 +6,11 @@
   padding: clamp(5rem, 12vw, 10rem) var(--page-gutter);
   border-block: 1px solid var(--line);
   background: #080d09;
-  transition:
-    border-color 420ms ease,
-    background-color 420ms ease;
+  transition: border-color 420ms ease;
 }
 
 .active {
   border-color: color-mix(in srgb, var(--accent) 46%, var(--line));
-  background: #0b120d;
 }
 
 .copy {

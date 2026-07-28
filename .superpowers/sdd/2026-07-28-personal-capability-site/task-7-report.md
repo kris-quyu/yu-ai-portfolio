@@ -30,3 +30,11 @@ Complete. Added the `system` workflow proof and `capabilities` grid after the ex
 - No root-hard-coded workflow media URL, fake node art, connector lines, SVG, emoji, production steps, node tutorial, or internal-node annotation was added.
 - Only the requested source sections, styles, tests, app mounting, and this report changed.
 - No known concerns remain.
+
+## Fix Round 1
+
+- Review finding: ScrollTrigger's active state also changed and transitioned the workflow section background, outside the permitted border/text/reveal effects.
+- Correction: removed `background-color` from the section transition and removed the active-state background assignment. The static section background and permitted border, text, tag, and screenshot reveal transitions remain unchanged.
+- TDD red: the new focused CSS boundary test failed on both prohibited background bindings.
+- TDD green: `WorkflowProof.test.tsx` passed 5/5.
+- Full verification: `npm.cmd run test:run` passed 11 files and 50 tests; `npm.cmd run build` passed TypeScript and Vite production compilation.

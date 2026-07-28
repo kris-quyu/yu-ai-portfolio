@@ -2,6 +2,7 @@ import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
 import { WorkflowProof } from './WorkflowProof';
+import workflowCss from './WorkflowProof.module.css?raw';
 
 const scrollTrigger = vi.hoisted(() => ({
   create: vi.fn(),
@@ -117,6 +118,15 @@ describe('WorkflowProof', () => {
     expect(screen.getByAltText('ComfyUI 工作流界面').closest('section')).toHaveAttribute(
       'data-active',
       'true',
+    );
+  });
+
+  it('does not bind the active state to a section background change', () => {
+    expect(workflowCss).not.toMatch(
+      /\.section\s*{[^}]*transition:[^}]*background-color/s,
+    );
+    expect(workflowCss).not.toMatch(
+      /\.active\s*{[^}]*background(?:-color)?:/s,
     );
   });
 });
