@@ -1,9 +1,13 @@
 import { HeroScrollSequence } from './features/hero/HeroScrollSequence';
+import { Navigation } from './features/navigation/Navigation';
 
 export default function App() {
   return (
-    <main>
-      <HeroScrollSequence />
-    </main>
+    <>
+      <Navigation />
+      <main>
+        <HeroScrollSequence />
+      </main>
+    </>
   );
 }
