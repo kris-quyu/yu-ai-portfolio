@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "e2e": "playwright test",
+    "prepare:assets": "node scripts/prepare-assets.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -19,7 +23,13 @@
     "vite": "^7.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^30.0.0",
+    "vitest": "^4.1.10"
   }
 }
