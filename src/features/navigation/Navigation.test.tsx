@@ -78,7 +78,7 @@ describe('Navigation', () => {
       /@media\s*\(max-width:\s*720px\)[\s\S]*\.navigation\s*{[^}]*overflow-x:\s*auto/is,
     );
     expect(navigationCss).toMatch(
-      /\.navigation::after\s*{[^}]*position:\s*sticky[^}]*linear-gradient\([^}]*var\(--navigation-background\)/is,
+      /\.navigation::after\s*{[^}]*position:\s*sticky[^}]*linear-gradient\([^}]*var\(--navigation-background\)[^}]*pointer-events:\s*none/is,
     );
   });
 
