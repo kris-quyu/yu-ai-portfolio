@@ -1,6 +1,7 @@
 import { act, cleanup, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Navigation } from './Navigation';
+import navigationCss from './Navigation.module.css?raw';
 
 class IntersectionObserverStub {
   static instances: IntersectionObserverStub[] = [];
@@ -67,6 +68,18 @@ describe('Navigation', () => {
     expect(within(screen.getByRole('navigation', { name: '主导航' })).getAllByRole('link'))
       .toHaveLength(6);
     expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '#home');
+  });
+
+  it('keeps compact links 44 by 44 pixels with an internal-scroll continuation cue', () => {
+    expect(navigationCss).toMatch(
+      /\.link\s*{[^}]*min-height:\s*2\.75rem[^}]*min-inline-size:\s*2\.75rem/is,
+    );
+    expect(navigationCss).toMatch(
+      /@media\s*\(max-width:\s*720px\)[\s\S]*\.navigation\s*{[^}]*overflow-x:\s*auto/is,
+    );
+    expect(navigationCss).toMatch(
+      /\.navigation::after\s*{[^}]*position:\s*sticky[^}]*linear-gradient\([^}]*var\(--navigation-background\)/is,
+    );
   });
 
   it('marks the most visible observed section as the current location', () => {

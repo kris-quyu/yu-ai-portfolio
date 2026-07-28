@@ -63,6 +63,9 @@
   border-radius: var(--radius-lg);
   background: var(--forest);
   box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--forest) 70%, transparent);
+}
+
+.mediaFrameVisible {
   animation: film-reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -248,7 +251,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mediaFrame {
+  .mediaFrameVisible {
     animation: none;
   }
 }

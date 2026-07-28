@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { siteContent } from './content/siteContent';
@@ -61,6 +61,8 @@ const reducedMotion = {
 } as unknown as MediaQueryList;
 
 class IntersectionObserverStub {
+  static instances: IntersectionObserverStub[] = [];
+
   observe = vi.fn();
   disconnect = vi.fn();
   unobserve = vi.fn();
@@ -68,6 +70,17 @@ class IntersectionObserverStub {
   root = null;
   rootMargin = '0px';
   thresholds = [];
+
+  constructor(
+    readonly callback: IntersectionObserverCallback,
+    readonly options?: IntersectionObserverInit,
+  ) {
+    IntersectionObserverStub.instances.push(this);
+  }
+
+  emit(entry: Partial<IntersectionObserverEntry>) {
+    this.callback([entry as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+  }
 }
 
 const visualCss = [
@@ -84,6 +97,7 @@ const visualCss = [
 
 describe('complete portfolio integration', () => {
   beforeEach(() => {
+    IntersectionObserverStub.instances = [];
     vi.mocked(loadMediaManifest).mockResolvedValue(manifest);
     vi.stubGlobal('matchMedia', vi.fn(() => reducedMotion));
     vi.stubGlobal('IntersectionObserver', IntersectionObserverStub);
@@ -132,6 +146,15 @@ describe('complete portfolio integration', () => {
 
   it('provides distinct restrained reveals and responsive visual safeguards', () => {
     expect(filmCss).toContain('@keyframes film-reveal');
+    expect(filmCss).toMatch(
+      /\.mediaFrameVisible\s*{[^}]*animation:\s*film-reveal/is,
+    );
+    expect(filmCss).not.toMatch(
+      /\.mediaFrame\s*{[^}]*animation:\s*film-reveal/is,
+    );
+    expect(filmCss).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\.mediaFrameVisible\s*{[^}]*animation:\s*none/is,
+    );
     expect(workflowCss).toContain('@keyframes workflow-reveal');
     expect(capabilityCss).toContain('@keyframes capability-reveal');
     expect(contactCss).toContain('@keyframes contact-reveal');
@@ -146,9 +169,45 @@ describe('complete portfolio integration', () => {
     expect(introCss).toContain('backface-visibility: hidden');
     expect(capabilityCss).toContain('-webkit-backface-visibility: hidden');
 
-    expect(navigationCss).toContain('min-height: 2.75rem');
+    expect(navigationCss).toMatch(
+      /\.link\s*{[^}]*min-height:\s*2\.75rem[^}]*min-inline-size:\s*2\.75rem/is,
+    );
+    expect(navigationCss).toMatch(
+      /@media\s*\(max-width:\s*720px\)[\s\S]*\.navigation\s*{[^}]*overflow-x:\s*auto/is,
+    );
+    expect(navigationCss).toMatch(
+      /\.navigation::after\s*{[^}]*linear-gradient\([^}]*var\(--navigation-background\)/is,
+    );
     expect(filmCss).toContain('min-height: 2.75rem');
     expect(contactCss).toContain('min-height: 2.75rem');
+  });
+
+  it('ties the assembled film reveal class to the preview observer state', () => {
+    const { container } = render(<App />);
+    const preview = container.querySelector('#film video[aria-label]') as HTMLVideoElement;
+    const mediaFrame = preview.parentElement as HTMLElement;
+    const initialClassName = mediaFrame.className;
+    const observer = IntersectionObserverStub.instances.find((instance) =>
+      instance.observe.mock.calls.some(([target]) => target === preview),
+    );
+
+    expect(observer).toBeDefined();
+    expect(mediaFrame).toHaveAttribute('data-in-view', 'false');
+    act(() => observer?.emit({
+      isIntersecting: true,
+      intersectionRatio: 0.55,
+      target: preview,
+    }));
+    expect(mediaFrame).toHaveAttribute('data-in-view', 'true');
+    expect(mediaFrame.className).not.toBe(initialClassName);
+
+    act(() => observer?.emit({
+      isIntersecting: false,
+      intersectionRatio: 0,
+      target: preview,
+    }));
+    expect(mediaFrame).toHaveAttribute('data-in-view', 'false');
+    expect(mediaFrame.className).toBe(initialClassName);
   });
 
   it('renders the complete approved section order and IDs', () => {

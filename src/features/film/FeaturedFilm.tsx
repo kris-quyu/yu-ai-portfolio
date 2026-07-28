@@ -127,7 +127,10 @@ export function FeaturedFilm() {
         </ul>
       </div>
 
-      <div className={styles.mediaFrame}>
+      <div
+        className={`${styles.mediaFrame} ${previewVisible ? styles.mediaFrameVisible : ''}`}
+        data-in-view={previewVisible}
+      >
         {videoFailed ? (
           <div className={styles.mediaFallback} role={open ? undefined : 'alert'}>
             <img src={film.poster} alt="AI 产品视频封面" />
