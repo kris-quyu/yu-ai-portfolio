@@ -1,7 +1,11 @@
 .section {
   padding: clamp(5rem, 12vw, 10rem) var(--page-gutter);
   background:
-    linear-gradient(180deg, #0b120d 0%, var(--bg) 45%);
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--forest) 78%, var(--pine)) 0%,
+      var(--bg) 45%
+    );
 }
 
 .section > h2 {
@@ -23,6 +27,7 @@
   min-width: 0;
   border-radius: var(--radius-lg);
   perspective: 75rem;
+  isolation: isolate;
   transition: transform 220ms ease;
 }
 
@@ -33,7 +38,7 @@
 
 .card:hover .flipButton,
 .card:focus-within .flipButton {
-  border-color: #B7FF2A;
+  border-color: var(--acid);
   outline-color: rgb(183 255 42 / 45%);
 }
 
@@ -57,7 +62,7 @@
 }
 
 .flipButton:focus-visible {
-  outline-color: #B7FF2A;
+  outline-color: var(--acid);
 }
 
 .cardInner {
@@ -65,6 +70,8 @@
   display: block;
   min-height: 30rem;
   transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -87,19 +94,19 @@
 }
 
 .front {
-  background: #07160F;
-  color: #F3F1E8;
+  background: var(--forest);
+  color: var(--ivory);
 }
 
 .back {
-  background: #E7EBDD;
-  color: #07160F;
+  background: var(--sage);
+  color: var(--forest);
   transform: rotateY(180deg);
 }
 
 .index,
 .backIndex {
-  color: #B7FF2A;
+  color: var(--acid);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -107,7 +114,7 @@
 
 .title {
   margin: 4rem 0 0.85rem;
-  color: #F3F1E8;
+  color: var(--ivory);
   font-size: clamp(1.4rem, 2.4vw, 2rem);
   font-weight: 800;
   line-height: 1.15;
@@ -133,7 +140,7 @@
   border: 1px solid rgb(183 255 42 / 38%);
   border-radius: 999px;
   padding: 0.4rem 0.65rem;
-  color: #B7FF2A;
+  color: var(--acid);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -142,7 +149,7 @@
 .returnCue {
   margin-top: auto;
   padding-top: 2rem;
-  color: #B7FF2A;
+  color: var(--acid);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -150,7 +157,7 @@
 }
 
 .backIndex {
-  color: #123326;
+  color: var(--pine);
 }
 
 .growthList {
@@ -167,7 +174,7 @@
 }
 
 .growthLabel {
-  color: #123326;
+  color: var(--pine);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -175,14 +182,14 @@
 
 .growthCopy {
   margin: 0;
-  color: #07160F;
+  color: var(--forest);
   font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 700;
   line-height: 1.35;
 }
 
 .returnCue {
-  color: #123326;
+  color: var(--pine);
 }
 
 .returnCue::before {
@@ -191,8 +198,28 @@
   height: 0.65rem;
   margin-right: 0.55rem;
   border-radius: 50%;
-  background: #B7FF2A;
+  background: var(--acid);
   content: '';
+}
+
+@keyframes capability-reveal {
+  from {
+    opacity: 0.65;
+    transform: translateY(1.25rem) rotateX(2deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .card {
+    animation: capability-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 6% cover 30%;
+  }
 }
 
 @media (max-width: 767px) {
@@ -202,6 +229,35 @@
 
   .cardInner {
     min-height: 27rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .card:last-child .cardInner {
+    min-height: 25rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .section > h2 {
+    font-size: clamp(2.35rem, 13vw, 3.2rem);
+  }
+
+  .front,
+  .back {
+    padding: 1.25rem;
+  }
+
+  .cardInner {
+    min-height: 26rem;
   }
 }
 
@@ -220,6 +276,10 @@
   .cardInner,
   .flipped .cardInner {
     transform: none;
+  }
+
+  .card {
+    animation: none;
   }
 
   .front,

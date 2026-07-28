@@ -106,8 +106,8 @@ describe('ContactSection', () => {
     expect(fallback.selectionEnd).toBe(email.length);
   });
 
-  it('uses a dark local focus indicator for contact controls', () => {
-    expect(contactCss).toMatch(/\.section\s+:focus-visible\s*{[^}]*outline:\s*3px solid #050806/s);
+  it('uses the approved high-contrast local focus indicator for contact controls', () => {
+    expect(contactCss).toMatch(/\.section\s+:focus-visible\s*{[^}]*outline:\s*3px solid var\(--acid\)/s);
     expect(contactCss).toMatch(/\.section\s+:focus-visible\s*{[^}]*outline-offset:\s*4px/s);
   });
 

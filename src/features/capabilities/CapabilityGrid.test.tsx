@@ -102,13 +102,13 @@ describe('CapabilityGrid', () => {
   });
 
   it('defines the required face palettes and a non-3D reduced-motion swap', () => {
-    expect(capabilityCss).toMatch(/\.front\s*{[^}]*#07160F/is);
-    expect(capabilityCss).toMatch(/\.front\s*{[^}]*#F3F1E8/is);
-    expect(capabilityCss).toMatch(/\.front[\s\S]*#B7FF2A/i);
-    expect(capabilityCss).toMatch(/\.back\s*{[^}]*#E7EBDD/is);
-    expect(capabilityCss).toMatch(/\.back\s*{[^}]*#07160F/is);
-    expect(capabilityCss).toMatch(/\.back[\s\S]*#123326/i);
-    expect(capabilityCss).toMatch(/\.back[\s\S]*#B7FF2A/i);
+    expect(capabilityCss).toMatch(/\.front\s*{[^}]*var\(--forest\)/is);
+    expect(capabilityCss).toMatch(/\.front\s*{[^}]*var\(--ivory\)/is);
+    expect(capabilityCss).toMatch(/\.front[\s\S]*var\(--acid\)/i);
+    expect(capabilityCss).toMatch(/\.back\s*{[^}]*var\(--sage\)/is);
+    expect(capabilityCss).toMatch(/\.back\s*{[^}]*var\(--forest\)/is);
+    expect(capabilityCss).toMatch(/\.back[\s\S]*var\(--pine\)/i);
+    expect(capabilityCss).toMatch(/\.back[\s\S]*var\(--acid\)/i);
     expect(capabilityCss).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\.cardInner\s*{[^}]*transform:\s*none/is,
     );

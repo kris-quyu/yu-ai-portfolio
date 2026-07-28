@@ -3,8 +3,8 @@
   width: 100vw;
   height: 250vh;
   margin-inline: calc(50% - 50vw);
-  background: #070b08;
-  color: #f4f7f1;
+  background: var(--forest);
+  color: var(--ivory);
 }
 
 .stage {
@@ -14,10 +14,19 @@
   min-height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  border-bottom: 1px solid rgba(183, 255, 42, 0.28);
+  border-bottom: 1px solid color-mix(in srgb, var(--acid) 28%, transparent);
   background:
-    radial-gradient(circle at 76% 45%, rgba(140, 255, 60, 0.13), transparent 30%),
-    linear-gradient(105deg, #070b08 0%, #0b100c 54%, #070a08 100%);
+    radial-gradient(
+      circle at 76% 45%,
+      color-mix(in srgb, var(--acid) 13%, transparent),
+      transparent 30%
+    ),
+    linear-gradient(
+      105deg,
+      var(--forest) 0%,
+      color-mix(in srgb, var(--forest) 82%, var(--pine)) 54%,
+      var(--forest) 100%
+    );
 }
 
 .stage::after {
@@ -118,7 +127,7 @@
 
 .eyebrow {
   margin: 0 0 clamp(0.8rem, 2vh, 1.5rem);
-  color: #b7ff2a;
+  color: var(--acid);
   font-size: 0.78rem;
   font-weight: 750;
   letter-spacing: 0.18em;
@@ -126,7 +135,7 @@
 
 .title {
   margin: 0;
-  color: #b7ff2a;
+  color: var(--acid);
   font-size: clamp(3.5rem, 5.2vw, 6.2rem);
   font-weight: 900;
   letter-spacing: -0.075em;
@@ -136,7 +145,7 @@
 
 .stageLabel {
   margin: clamp(1.2rem, 2.5vh, 2rem) 0 0;
-  color: #f4f7f1;
+  color: var(--ivory);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -145,7 +154,7 @@
 .summary {
   max-width: 35rem;
   margin: 0.7rem 0 0;
-  color: #c7cec8;
+  color: color-mix(in srgb, var(--ivory) 78%, var(--muted-sage));
   font-size: 1.15rem;
   line-height: 1.7;
 }
@@ -160,7 +169,7 @@
 
 .reducedStageList li {
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(183, 255, 42, 0.3);
+  border-top: 1px solid color-mix(in srgb, var(--acid) 30%, transparent);
 }
 
 .reducedStageList strong,
@@ -169,14 +178,14 @@
 }
 
 .reducedStageList strong {
-  color: #f4f7f1;
+  color: var(--ivory);
   font-size: 0.72rem;
   letter-spacing: 0.08em;
 }
 
 .reducedStageList span {
   margin-top: 0.3rem;
-  color: #aeb8b0;
+  color: color-mix(in srgb, var(--muted-sage) 76%, var(--ivory));
   font-size: 0.82rem;
   line-height: 1.45;
 }
@@ -194,14 +203,14 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.65rem;
-  color: #d7ded8;
+  color: color-mix(in srgb, var(--ivory) 84%, var(--muted-sage));
   font-size: 0.66rem;
   font-weight: 750;
   letter-spacing: 0.15em;
 }
 
 .progressMeta span:first-child {
-  color: #b7ff2a;
+  color: var(--acid);
 }
 
 .progressStage {
@@ -210,13 +219,13 @@
 }
 
 .progressStage span:last-child {
-  color: #d7ded8;
+  color: color-mix(in srgb, var(--ivory) 84%, var(--muted-sage));
 }
 
 .progressTrack {
   height: 3px;
   overflow: hidden;
-  background: rgba(178, 192, 181, 0.25);
+  background: color-mix(in srgb, var(--muted-sage) 25%, transparent);
 }
 
 .progressTrack span {
@@ -225,8 +234,8 @@
   display: block;
   transform: scaleX(var(--hero-progress));
   transform-origin: left center;
-  background: #b7ff2a;
-  box-shadow: 0 0 18px rgba(183, 255, 42, 0.5);
+  background: var(--acid);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--acid) 50%, transparent);
 }
 
 .staticHero {
@@ -240,8 +249,12 @@
 @media (max-width: 767px) {
   .stage {
     background:
-      radial-gradient(circle at 68% 56%, rgba(140, 255, 60, 0.12), transparent 37%),
-      #070b08;
+      radial-gradient(
+        circle at 68% 56%,
+        color-mix(in srgb, var(--acid) 12%, transparent),
+        transparent 37%
+      ),
+      var(--forest);
   }
 
   .stage::after {
@@ -302,6 +315,74 @@
 
   .staticHero {
     height: 100svh;
+  }
+}
+
+@media (max-width: 390px) {
+  .media {
+    inset: 24% -18% 0 -18%;
+  }
+
+  .poster {
+    object-position: 69% 50%;
+  }
+
+  .copy {
+    left: max(1rem, env(safe-area-inset-left));
+    width: min(52vw, 12rem);
+  }
+
+  .title {
+    font-size: clamp(1.9rem, 9.2vw, 2.25rem);
+  }
+
+  .summary {
+    max-width: 10.5rem;
+    font-size: 0.82rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .media {
+    inset-inline-start: 40%;
+  }
+
+  .copy {
+    width: min(42vw, 38rem);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .media {
+    inset-inline-start: 43%;
+  }
+
+  .copy {
+    width: min(44vw, 22rem);
+  }
+
+  .title {
+    font-size: clamp(3rem, 6vw, 3.7rem);
+  }
+
+  .summary {
+    max-width: 22rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .media {
+    inset-inline-start: 36%;
+  }
+
+  .copy {
+    left: clamp(4rem, 7vw, 7rem);
+    width: min(39vw, 43rem);
+  }
+
+  .poster {
+    object-position: 64% 50%;
   }
 }
 

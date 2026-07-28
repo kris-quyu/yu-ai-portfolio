@@ -3,6 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { siteContent } from './content/siteContent';
 import { loadMediaManifest } from './lib/media';
+import capabilityCss from './features/capabilities/CapabilityGrid.module.css?raw';
+import contactCss from './features/contact/ContactSection.module.css?raw';
+import filmCss from './features/film/FeaturedFilm.module.css?raw';
+import heroCss from './features/hero/HeroScrollSequence.module.css?raw';
+import introCss from './features/intro/PointerIntro.module.css?raw';
+import loaderCss from './features/loader/PortfolioLoader.module.css?raw';
+import navigationCss from './features/navigation/Navigation.module.css?raw';
+import workflowCss from './features/workflow/WorkflowProof.module.css?raw';
+import globalCss from './styles/global.css?raw';
 
 vi.mock('gsap', () => ({
   default: { registerPlugin: vi.fn() },
@@ -61,6 +70,18 @@ class IntersectionObserverStub {
   thresholds = [];
 }
 
+const visualCss = [
+  globalCss,
+  introCss,
+  loaderCss,
+  navigationCss,
+  heroCss,
+  filmCss,
+  workflowCss,
+  capabilityCss,
+  contactCss,
+].join('\n');
+
 describe('complete portfolio integration', () => {
   beforeEach(() => {
     vi.mocked(loadMediaManifest).mockResolvedValue(manifest);
@@ -74,6 +95,60 @@ describe('complete portfolio integration', () => {
     cleanup();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it('defines the approved palette and maps every shared visual alias to it', () => {
+    expect(globalCss).toContain('--sage: #e7ebdd');
+    expect(globalCss).toContain('--forest: #07160f');
+    expect(globalCss).toContain('--pine: #123326');
+    expect(globalCss).toContain('--acid: #b7ff2a');
+    expect(globalCss).toContain('--muted-sage: #89958a');
+    expect(globalCss).toContain('--ivory: #f3f1e8');
+    expect(globalCss).toContain('--bg: var(--forest)');
+    expect(globalCss).toContain('--panel: var(--pine)');
+    expect(globalCss).toContain('--line: var(--muted-sage)');
+    expect(globalCss).toContain('--text: var(--ivory)');
+    expect(globalCss).toContain('--muted: var(--muted-sage)');
+    expect(globalCss).toContain('--accent: var(--acid)');
+    expect(globalCss).not.toMatch(/#000(?:000)?\b|#fff(?:fff)?\b/i);
+  });
+
+  it('keeps every integrated surface inside the approved palette', () => {
+    const hexColors = [...visualCss.matchAll(/#[\da-f]{3,8}\b/gi)]
+      .map(([color]) => color.toLowerCase());
+
+    expect(new Set(hexColors)).toEqual(new Set([
+      '#e7ebdd',
+      '#07160f',
+      '#123326',
+      '#b7ff2a',
+      '#89958a',
+      '#f3f1e8',
+    ]));
+    expect(visualCss).not.toMatch(
+      /rgba?\(\s*(?:0[\s,]+0[\s,]+0|255[\s,]+255[\s,]+255)(?:\s*[/,]\s*[\d.]+%?)?\s*\)/i,
+    );
+  });
+
+  it('provides distinct restrained reveals and responsive visual safeguards', () => {
+    expect(filmCss).toContain('@keyframes film-reveal');
+    expect(workflowCss).toContain('@keyframes workflow-reveal');
+    expect(capabilityCss).toContain('@keyframes capability-reveal');
+    expect(contactCss).toContain('@keyframes contact-reveal');
+
+    expect(globalCss).toContain('overflow-x: clip');
+    expect(visualCss).toContain('@media (max-width: 390px)');
+    expect(heroCss).toContain('@media (min-width: 768px)');
+    expect(heroCss).toContain('@media (min-width: 768px) and (max-width: 1023px)');
+    expect(heroCss).toContain('@media (min-width: 1440px)');
+    expect(heroCss).toContain('font-size: clamp(3rem, 6vw, 3.7rem)');
+    expect(heroCss).toContain('max-width: 10.5rem');
+    expect(introCss).toContain('backface-visibility: hidden');
+    expect(capabilityCss).toContain('-webkit-backface-visibility: hidden');
+
+    expect(navigationCss).toContain('min-height: 2.75rem');
+    expect(filmCss).toContain('min-height: 2.75rem');
+    expect(contactCss).toContain('min-height: 2.75rem');
   });
 
   it('renders the complete approved section order and IDs', () => {

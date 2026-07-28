@@ -5,8 +5,8 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #07160F;
-  color: #B7FF2A;
+  background: var(--forest);
+  color: var(--acid);
   transition: opacity 700ms ease, transform 700ms cubic-bezier(.22, 1, .36, 1);
 }
 
@@ -46,6 +46,20 @@
   font-weight: 500;
   line-height: .78;
   letter-spacing: -.08em;
+}
+
+@media (max-width: 390px) {
+  .orb {
+    width: 88vw;
+  }
+
+  .copy {
+    max-width: calc(100vw - 2rem);
+  }
+
+  .copy strong {
+    font-size: clamp(4.75rem, 28vw, 7rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

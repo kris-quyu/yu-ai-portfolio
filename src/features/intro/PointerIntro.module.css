@@ -13,11 +13,16 @@
   min-height: calc(100vh - 4.5rem);
   overflow: hidden;
   padding: clamp(1.25rem, 4vw, 4rem) var(--page-gutter);
-  color: #07160f;
+  color: var(--forest);
   background:
     radial-gradient(circle at 14% 18%, rgb(183 255 42 / 20%) 0 0.28rem, transparent 0.34rem),
     radial-gradient(circle at 82% 72%, rgb(18 51 38 / 18%) 0 0.22rem, transparent 0.28rem),
-    linear-gradient(135deg, #e7ebdd 0%, #f3f1e8 48%, #dfe5d5 100%);
+    linear-gradient(
+      135deg,
+      var(--sage) 0%,
+      var(--ivory) 48%,
+      color-mix(in srgb, var(--sage) 86%, var(--muted-sage)) 100%
+    );
   touch-action: pan-y;
 }
 
@@ -79,7 +84,7 @@
   width: 0.65rem;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: #b7ff2a;
+  background: var(--acid);
   box-shadow: 0 0 0 0.35rem rgb(183 255 42 / 18%);
 }
 
@@ -92,7 +97,7 @@
   right: 13%;
   bottom: 24%;
   width: 0.42rem;
-  background: #123326;
+  background: var(--pine);
   box-shadow: 0 0 0 0.32rem rgb(18 51 38 / 14%);
 }
 
@@ -134,7 +139,7 @@
   margin: 0;
   transform: rotateX(var(--intro-rotate-x)) rotateY(var(--intro-rotate-y));
   transform-style: preserve-3d;
-  color: #07160f;
+  color: var(--forest);
   font-size: 7rem;
   font-weight: 900;
   letter-spacing: -0.075em;
@@ -159,7 +164,7 @@
 
 .hint {
   max-width: 28rem;
-  color: #526157;
+  color: color-mix(in srgb, var(--forest) 72%, var(--muted-sage));
   text-align: right;
 }
 
@@ -180,10 +185,10 @@
   overflow: hidden;
   border: 1px solid rgb(183 255 42 / 64%);
   border-radius: 50%;
-  color: #f3f1e8;
+  color: var(--ivory);
   background:
     radial-gradient(circle at 35% 28%, rgb(183 255 42 / 15%), transparent 42%),
-    #123326;
+    var(--pine);
   box-shadow: 0 1.8rem 4rem rgb(18 51 38 / 24%);
   pointer-events: none;
   will-change: transform;
@@ -261,6 +266,35 @@
 @media (max-width: 480px) {
   .title {
     font-size: 2.75rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .intro {
+    min-height: calc(100vh - 7.25rem);
+    padding-block: 1rem 1.25rem;
+  }
+
+  .titleStage {
+    min-height: 40svh;
+  }
+
+  .title {
+    max-width: 100%;
+    font-size: clamp(2.3rem, 12vw, 2.7rem);
+  }
+
+  .meta {
+    gap: 0.6rem;
+  }
+
+  .hint {
+    max-width: 18rem;
+    font-size: 0.72rem;
+  }
+
+  .reveal {
+    width: min(10rem, 44vw);
   }
 }
 
