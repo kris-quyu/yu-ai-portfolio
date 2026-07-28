@@ -9,6 +9,7 @@ const copyFailureMessage = '复制失败，请按 Ctrl+C 手动复制';
 export function ContactSection() {
   const [status, setStatus] = useState('');
   const [fallbackValue, setFallbackValue] = useState<string | null>(null);
+  const [fallbackRequest, setFallbackRequest] = useState(0);
   const fallbackInputRef = useRef<HTMLInputElement>(null);
   const mountedRef = useRef(true);
 
@@ -26,7 +27,7 @@ export function ContactSection() {
     const input = fallbackInputRef.current;
     input?.focus();
     input?.select();
-  }, [fallbackValue]);
+  }, [fallbackRequest, fallbackValue]);
 
   const copy = async (label: ContactLabel, value: string) => {
     try {
@@ -43,6 +44,7 @@ export function ContactSection() {
       if (!mountedRef.current) return;
 
       setFallbackValue(value);
+      setFallbackRequest((request) => request + 1);
       setStatus(copyFailureMessage);
     }
   };

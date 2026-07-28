@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { StrictMode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ContactSection } from './ContactSection';
+import contactCss from './ContactSection.module.css?raw';
 
 const email = '1282736393@qq.com';
 const phone = '13123986103';
@@ -86,6 +87,28 @@ describe('ContactSection', () => {
     expect((fallback as HTMLInputElement).selectionStart).toBe(0);
     expect((fallback as HTMLInputElement).selectionEnd).toBe(phone.length);
     expect(screen.getByRole('status')).toHaveTextContent(failureMessage);
+  });
+
+  it('refocuses and reselects the manual-copy field after repeated failures for the same value', async () => {
+    const user = userEvent.setup();
+    setClipboard(vi.fn().mockRejectedValue(new Error('Permission denied')));
+    render(<ContactSection />);
+
+    const copyEmail = screen.getByRole('button', { name: '复制邮箱' });
+    await user.click(copyEmail);
+    const fallback = screen.getByRole('textbox', { name: '手动复制联系方式' }) as HTMLInputElement;
+    fallback.setSelectionRange(1, 1);
+
+    await user.click(copyEmail);
+
+    expect(fallback).toHaveFocus();
+    expect(fallback.selectionStart).toBe(0);
+    expect(fallback.selectionEnd).toBe(email.length);
+  });
+
+  it('uses a dark local focus indicator for contact controls', () => {
+    expect(contactCss).toMatch(/\.section\s+:focus-visible\s*{[^}]*outline:\s*3px solid #050806/s);
+    expect(contactCss).toMatch(/\.section\s+:focus-visible\s*{[^}]*outline-offset:\s*4px/s);
   });
 
   it('hides a stale manual-copy field after a later successful copy', async () => {

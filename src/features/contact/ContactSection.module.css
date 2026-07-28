@@ -76,6 +76,11 @@
   cursor: pointer;
 }
 
+.section :focus-visible {
+  outline: 3px solid #050806;
+  outline-offset: 4px;
+}
+
 .manualCopy {
   grid-column: 2;
   width: 100%;
