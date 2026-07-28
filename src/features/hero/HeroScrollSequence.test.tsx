@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
 import { loadPortraitSequenceCached } from './portraitSequenceCache';
@@ -73,6 +73,15 @@ const createMediaQuery = (matches = false) => {
   };
 };
 
+const getScrollUpdate = () => {
+  const config = (scrollTrigger.create.mock.calls[0] as unknown[] | undefined)?.[0] as
+    | { onUpdate: (self: { progress: number }) => void }
+    | undefined;
+
+  if (!config) throw new Error('ScrollTrigger configuration was not captured');
+  return config.onUpdate;
+};
+
 describe('HeroScrollSequence', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -107,12 +116,13 @@ describe('HeroScrollSequence', () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the approved copy, canvas, and base-safe poster while frames load', async () => {
-    const { container } = render(<HeroScrollSequence />);
+  it('renders the first approved stage, canvas, and base-safe poster while frames load', async () => {
+    render(<HeroScrollSequence />);
 
-    const heading = container.querySelector<HTMLHeadingElement>('#hero-title');
-    expect(heading).toHaveTextContent('BUILDINGCREATIVEWORKFLOWS.');
-    expect(container.querySelector('#profile')).toHaveAttribute('aria-labelledby', 'hero-title');
+    expect(screen.getByRole('heading', { name: 'THINK WITH AI.', hidden: true })).toBeInTheDocument();
+    expect(screen.getByText('鐞嗚В宸ュ叿')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByText('01 / 04')).toBeInTheDocument();
+    expect(document.querySelector('#profile')).toHaveAttribute('aria-labelledby', 'hero-title');
     expect(screen.getByLabelText('滚动控制的动画人物')).toBeInTheDocument();
     expect(await screen.findByAltText('瞿先生动画人物')).toHaveAttribute(
       'src',
@@ -155,6 +165,46 @@ describe('HeroScrollSequence', () => {
     });
   });
 
+  it('synchronizes capability copy and stage count with forward scroll phases', async () => {
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    const onUpdate = getScrollUpdate();
+
+    act(() => onUpdate({ progress: 0.56 }));
+    expect(
+      screen.getByRole('heading', { name: 'BUILD THE WORKFLOW.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('涓茶仈娴佺▼')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByText('03 / 04')).toBeInTheDocument();
+
+    act(() => onUpdate({ progress: 0.9 }));
+    expect(
+      screen.getByRole('heading', { name: 'DELIVER THE RESULT.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('鏈嶅姟杞寲')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByText('04 / 04')).toBeInTheDocument();
+  });
+
+  it('returns capability copy to the matching earlier phase when scroll reverses', async () => {
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    const onUpdate = getScrollUpdate();
+
+    act(() => onUpdate({ progress: 0.9 }));
+    act(() => onUpdate({ progress: 0.3 }));
+
+    expect(
+      screen.getByRole('heading', { name: 'SHAPE THE STORY.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('02 / 04')).toBeInTheDocument();
+  });
+
   it('loads the composed mobile sequence below 768px', async () => {
     vi.stubGlobal('innerWidth', 390);
 
@@ -183,6 +233,17 @@ describe('HeroScrollSequence', () => {
     );
     expect(screen.queryByLabelText('滚动控制的动画人物')).not.toBeInTheDocument();
     expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('heading', { name: 'DELIVER THE RESULT.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('04 / 04')).toBeInTheDocument();
+
+    const stageList = screen.getByRole('list', { name: '能力阶段概览', hidden: true });
+    expect(within(stageList).getAllByRole('listitem', { hidden: true })).toHaveLength(4);
+    expect(stageList).toHaveTextContent('THINK WITH AI.');
+    expect(stageList).toHaveTextContent('SHAPE THE STORY.');
+    expect(stageList).toHaveTextContent('BUILD THE WORKFLOW.');
+    expect(stageList).toHaveTextContent('DELIVER THE RESULT.');
 
     unmount();
     expect(reduced.mediaQuery.removeEventListener).toHaveBeenCalledWith(
