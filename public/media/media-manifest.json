@@ -1,0 +1,20 @@
+{
+  "portrait": {
+    "poster": "media/portrait/poster.webp",
+    "desktop": {
+      "pattern": "media/portrait/desktop/frame-%04d.webp",
+      "count": 120
+    },
+    "mobile": {
+      "pattern": "media/portrait/mobile/frame-%04d.webp",
+      "count": 96
+    }
+  },
+  "film": {
+    "src": "media/film/ai-product-film.mp4",
+    "poster": "media/film/poster.webp"
+  },
+  "workflow": {
+    "src": "media/workflow/comfyui-workflow.webp"
+  }
+}

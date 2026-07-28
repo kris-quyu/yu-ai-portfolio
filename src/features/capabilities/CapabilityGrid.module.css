@@ -1,0 +1,134 @@
+.section {
+  padding: clamp(5rem, 12vw, 10rem) var(--page-gutter);
+  background:
+    linear-gradient(180deg, #0b120d 0%, var(--bg) 45%);
+}
+
+.section > h2 {
+  max-width: 11ch;
+  margin: 0 0 clamp(2.5rem, 5vw, 5rem);
+  font-size: clamp(2.7rem, 6vw, 6.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  min-width: 0;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  transition:
+    border-color 220ms ease,
+    transform 220ms ease;
+}
+
+.card:hover,
+.card:focus-within,
+.open {
+  border-color: var(--accent);
+  transform: translateY(-0.25rem);
+}
+
+.index {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.card h3 {
+  margin: 2.75rem 0 0.85rem;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  line-height: 1.15;
+}
+
+.summary {
+  min-height: 3.5em;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.toggle {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  margin-top: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  opacity: 0;
+  list-style: none;
+  transform: translateY(0.4rem);
+  transition:
+    max-height 220ms ease,
+    margin 220ms ease,
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.tools li {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.65rem;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.card:hover .tools,
+.card:focus-within .tools,
+.open .tools {
+  max-height: 8rem;
+  margin-top: 1rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .tools {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-within,
+  .open {
+    transform: none;
+  }
+}

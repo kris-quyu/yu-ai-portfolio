@@ -1,0 +1,234 @@
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 250vh;
+  margin-inline: calc(50% - 50vw);
+  background: #070b08;
+  color: #f4f7f1;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid rgba(183, 255, 42, 0.28);
+  background:
+    radial-gradient(circle at 76% 45%, rgba(140, 255, 60, 0.13), transparent 30%),
+    linear-gradient(105deg, #070b08 0%, #0b100c 54%, #070a08 100%);
+}
+
+.stage::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(5, 8, 6, 0.84) 0%, rgba(5, 8, 6, 0.42) 43%, transparent 64%),
+    linear-gradient(0deg, rgba(5, 8, 6, 0.72) 0%, transparent 28%);
+}
+
+.media {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 42%;
+  overflow: hidden;
+}
+
+.poster,
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.poster {
+  z-index: 1;
+  object-fit: cover;
+  object-position: 66% 50%;
+  opacity: 1;
+  transition: opacity 240ms ease;
+}
+
+.posterReady {
+  opacity: 0;
+}
+
+.canvas {
+  z-index: 2;
+}
+
+.copy {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: clamp(1.25rem, 5vw, 5rem);
+  width: min(48%, 47rem);
+  transform: translateY(-54%);
+}
+
+.eyebrow {
+  margin: 0 0 clamp(0.8rem, 2vh, 1.5rem);
+  color: #b7ff2a;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.18em;
+}
+
+.title {
+  margin: 0;
+  color: #b7ff2a;
+  font-size: 5.8rem;
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  line-height: 0.79;
+  text-wrap: balance;
+}
+
+.title span {
+  display: block;
+}
+
+.summary {
+  max-width: 35rem;
+  margin: clamp(1.5rem, 3vh, 2.5rem) 0 0;
+  color: #c7cec8;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.progress {
+  position: absolute;
+  z-index: 3;
+  right: clamp(1.25rem, 5vw, 5rem);
+  bottom: clamp(1.4rem, 4vh, 3rem);
+  left: clamp(1.25rem, 5vw, 5rem);
+}
+
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.65rem;
+  color: #d7ded8;
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.15em;
+}
+
+.progressMeta span:first-child {
+  color: #b7ff2a;
+}
+
+.progressTrack {
+  height: 3px;
+  overflow: hidden;
+  background: rgba(178, 192, 181, 0.25);
+}
+
+.progressTrack span {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: scaleX(var(--hero-progress));
+  transform-origin: left center;
+  background: #b7ff2a;
+  box-shadow: 0 0 18px rgba(183, 255, 42, 0.5);
+}
+
+.staticHero {
+  height: 100svh;
+}
+
+.staticHero .stage {
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  .stage {
+    background:
+      radial-gradient(circle at 68% 56%, rgba(140, 255, 60, 0.12), transparent 37%),
+      #070b08;
+  }
+
+  .stage::after {
+    background:
+      linear-gradient(180deg, rgba(5, 8, 6, 0.94) 0%, rgba(5, 8, 6, 0.45) 36%, transparent 62%),
+      linear-gradient(0deg, rgba(5, 8, 6, 0.7) 0%, transparent 30%);
+  }
+
+  .media {
+    inset: 22% -8% 0 -16%;
+  }
+
+  .poster {
+    object-position: 68% 50%;
+  }
+
+  .copy {
+    top: clamp(4.5rem, 12svh, 7rem);
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    transform: none;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.75rem;
+    font-size: 0.64rem;
+  }
+
+  .title {
+    max-width: 22rem;
+    font-size: clamp(2.7rem, 13vw, 3.5rem);
+    line-height: 0.82;
+  }
+
+  .summary {
+    max-width: 24rem;
+    margin-top: 1.1rem;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .progress {
+    right: 1rem;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    left: 1rem;
+  }
+
+  .progressMeta {
+    font-size: 0.58rem;
+  }
+
+  .staticHero {
+    height: 100svh;
+  }
+}
+
+@media (min-width: 1700px) {
+  .title {
+    font-size: 7.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .stage {
+    position: relative;
+  }
+
+  .poster,
+  .progressTrack span {
+    transition: none;
+  }
+}

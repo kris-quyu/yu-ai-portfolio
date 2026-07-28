@@ -1,0 +1,48 @@
+:root {
+  color-scheme: dark;
+  --bg: #090d0a;
+  --panel: #111713;
+  --line: #313b33;
+  --text: #f4f7f1;
+  --muted: #949f97;
+  --accent: #b7ff2a;
+  --radius-lg: 1.5rem;
+  --page-gutter: clamp(1rem, 4vw, 4rem);
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  background: var(--bg);
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

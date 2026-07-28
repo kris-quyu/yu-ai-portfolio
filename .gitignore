@@ -23,6 +23,7 @@
 
 # local preview artifacts
 qa-*.png
+qa-preview*.log
 vite-dev*.log
 /.worktrees/
 /.superpowers/
