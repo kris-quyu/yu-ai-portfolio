@@ -14,6 +14,7 @@
 - Preserve the existing React/Vite/TypeScript architecture, `base: "/yu-ai-portfolio/"`, GitHub Pages workflow, and compatible GSAP/Lenis patterns.
 - Task 1 must not run `git init`, `npm init`, replace the existing toolchain, or bootstrap a new template. It should add only the missing test dependencies/configuration, typed content contract, and minimal application shell needed by later tasks.
 - Existing files listed as “Create” are “Modify” when already present. Prefer focused incremental replacement of obsolete portfolio sections over unrelated restructuring.
+- The user explicitly authorizes deleting obsolete legacy portfolio components, styles, and media from the original GitHub project when the replacement no longer uses them. Preserve repository history, the GitHub Pages workflow, Vite base configuration, and all assets required by the new site.
 - Asset and manifest URLs must honor Vite’s configured base path so the deployed project works at `/yu-ai-portfolio/`, not only at the domain root.
 - Browser automation is not authorized by default. Unit/component/build checks may run normally; interactive browser verification will use the user’s already-open Codex in-app browser.
 
