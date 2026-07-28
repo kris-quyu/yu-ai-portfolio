@@ -10,6 +10,10 @@ vi.mock('./features/loader/PortfolioLoader', () => ({
   PortfolioLoader: () => <div data-testid="portfolio-loader" />,
 }));
 
+vi.mock('./features/intro/PointerIntro', () => ({
+  PointerIntro: () => <section id="home" />,
+}));
+
 vi.mock('./features/hero/HeroScrollSequence', () => ({
   HeroScrollSequence: () => <section id="profile" />,
 }));
@@ -33,12 +37,12 @@ vi.mock('./features/contact/ContactSection', () => ({
 describe('App section order', () => {
   afterEach(cleanup);
 
-  it('mounts system, capabilities, then contact directly after film', () => {
+  it('mounts the intro before the existing portfolio sections', () => {
     const { container } = render(<App />);
 
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
-    ).toEqual(['profile', 'film', 'system', 'capabilities', 'contact']);
+    ).toEqual(['home', 'profile', 'film', 'system', 'capabilities', 'contact']);
   });
 
   it('mounts one portfolio loader before navigation and main content', () => {
