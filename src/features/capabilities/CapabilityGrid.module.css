@@ -19,6 +19,7 @@
 }
 
 .card {
+  position: relative;
   min-width: 0;
   border-radius: var(--radius-lg);
   perspective: 75rem;
@@ -37,11 +38,10 @@
 }
 
 .flipButton {
-  display: block;
-  width: 100%;
-  min-height: 30rem;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
   padding: 0;
-  overflow: hidden;
   border: 1px solid rgb(243 241 232 / 20%);
   border-radius: var(--radius-lg);
   outline: 3px solid transparent;
@@ -79,7 +79,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  overflow: hidden;
   padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: var(--radius-lg);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -104,7 +106,6 @@
 }
 
 .title {
-  display: block;
   margin: 4rem 0 0.85rem;
   color: #F3F1E8;
   font-size: clamp(1.4rem, 2.4vw, 2rem);
@@ -114,6 +115,7 @@
 
 .summary {
   min-height: 3.5em;
+  margin: 0;
   color: rgb(243 241 232 / 66%);
   line-height: 1.7;
 }
@@ -123,6 +125,8 @@
   flex-wrap: wrap;
   gap: 0.45rem;
   margin-top: 1.5rem;
+  padding: 0;
+  list-style: none;
 }
 
 .tool {
@@ -152,7 +156,7 @@
 .growthList {
   display: grid;
   gap: 1.2rem;
-  margin-top: 2.5rem;
+  margin: 2.5rem 0 0;
 }
 
 .growthItem {
@@ -170,6 +174,7 @@
 }
 
 .growthCopy {
+  margin: 0;
   color: #07160F;
   font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 700;
@@ -195,7 +200,6 @@
     grid-template-columns: 1fr;
   }
 
-  .flipButton,
   .cardInner {
     min-height: 27rem;
   }

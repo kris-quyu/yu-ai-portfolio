@@ -18,9 +18,34 @@ describe('CapabilityGrid', () => {
     expect(within(articles[0]).getByRole('heading', { name: 'AI 内容与自动化' })).toBeInTheDocument();
     expect(within(articles[1]).getByRole('heading', { name: '视频编导与剪辑' })).toBeInTheDocument();
     expect(within(articles[2]).getByRole('heading', { name: '电商内容转化' })).toBeInTheDocument();
-    expect(within(buttons[0]).getByText('ComfyUI')).toBeVisible();
-    expect(within(buttons[0]).getByText('n8n')).toBeVisible();
-    expect(within(buttons[0]).getByText('Codex')).toBeVisible();
+    expect(within(articles[0]).getByText('ComfyUI')).toBeVisible();
+    expect(within(articles[0]).getByText('n8n')).toBeVisible();
+    expect(within(articles[0]).getByText('Codex')).toBeVisible();
+  });
+
+  it('keeps semantic faces outside the button and describes the active visible face', async () => {
+    const user = userEvent.setup();
+    render(<CapabilityGrid />);
+    const article = screen.getAllByRole('article')[0];
+    const button = within(article).getByRole('button', { name: /翻转/ });
+    const heading = within(article).getByRole('heading', { name: 'AI 内容与自动化' });
+    const front = article.querySelector('#capability-automation-front');
+    const back = article.querySelector('#capability-automation-back');
+
+    expect(button).not.toContainElement(heading);
+    expect(button).toHaveAttribute('aria-describedby', 'capability-automation-front');
+    expect(front).toHaveAttribute('aria-hidden', 'false');
+    expect(back).toHaveAttribute('aria-hidden', 'true');
+    expect(button).toHaveAccessibleDescription(/图像生成、视频生成与自动化工作流/);
+
+    await user.click(button);
+
+    expect(button).toHaveAttribute('aria-describedby', 'capability-automation-back');
+    expect(front).toHaveAttribute('aria-hidden', 'true');
+    expect(back).toHaveAttribute('aria-hidden', 'false');
+    expect(button).toHaveAccessibleDescription(
+      /已能独立完成.*AI workflow setup and automation/s,
+    );
   });
 
   it('allows multiple cards to remain flipped', async () => {
@@ -53,7 +78,8 @@ describe('CapabilityGrid', () => {
     const user = userEvent.setup();
     render(<CapabilityGrid />);
     const first = screen.getAllByRole('button', { name: /翻转/ })[0];
-    const faces = first.querySelectorAll('[aria-hidden]');
+    const article = first.closest('article') as HTMLElement;
+    const faces = article.querySelectorAll('[aria-hidden]');
 
     expect(faces).toHaveLength(2);
     expect(faces[0]).toHaveAttribute('aria-hidden', 'false');
