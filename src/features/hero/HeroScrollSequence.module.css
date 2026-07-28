@@ -1,7 +1,7 @@
 .hero {
   position: relative;
   width: 100vw;
-  height: 250svh;
+  height: 250vh;
   margin-inline: calc(50% - 50vw);
   background: #070b08;
   color: #f4f7f1;
@@ -10,6 +10,7 @@
 .stage {
   position: sticky;
   top: 0;
+  height: 100svh;
   min-height: 100svh;
   overflow: hidden;
   isolation: isolate;
@@ -149,10 +150,6 @@
 }
 
 @media (max-width: 767px) {
-  .hero {
-    height: 260svh;
-  }
-
   .stage {
     background:
       radial-gradient(circle at 68% 56%, rgba(140, 255, 60, 0.12), transparent 37%),

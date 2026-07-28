@@ -8,7 +8,7 @@ import {
   type CSSProperties,
 } from 'react';
 import { siteContent } from '../../content/siteContent';
-import { loadMediaManifest, type MediaManifest } from '../../lib/media';
+import { loadMediaManifest, resolveMediaUrl, type MediaManifest } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
 import { loadFrameSequence } from './frameLoader';
 import { drawHeroFrame, getHeroFrame, getHeroTransform } from './heroMath';
@@ -21,6 +21,7 @@ type HeroStyle = CSSProperties & { '--hero-progress': string };
 
 const getSequenceKind = (): SequenceKind =>
   typeof window !== 'undefined' && window.innerWidth < 768 ? 'mobile' : 'desktop';
+const initialPosterUrl = resolveMediaUrl('media/portrait/poster.webp');
 
 export function HeroScrollSequence() {
   const reducedMotion = useReducedMotion();
@@ -29,14 +30,15 @@ export function HeroScrollSequence() {
   const [frames, setFrames] = useState<HTMLImageElement[]>([]);
   const [loadProgress, setLoadProgress] = useState(0);
   const [fallback, setFallback] = useState(false);
+  const [hasDrawnFrame, setHasDrawnFrame] = useState(false);
 
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const posterRef = useRef<HTMLImageElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const targetProgress = useRef(0);
   const currentProgress = useRef(0);
   const lastFrame = useRef(-1);
+  const frameDrawn = useRef(false);
   const raf = useRef(0);
 
   useEffect(() => {
@@ -78,6 +80,8 @@ export function HeroScrollSequence() {
 
     setFrames([]);
     setLoadProgress(0);
+    setHasDrawnFrame(false);
+    frameDrawn.current = false;
     lastFrame.current = -1;
 
     void loadFrameSequence({
@@ -171,10 +175,10 @@ export function HeroScrollSequence() {
           canvas.height,
         );
         lastFrame.current = index;
-        posterRef.current?.classList.add(styles.posterReady);
-        posterRef.current?.setAttribute('aria-hidden', 'true');
-        canvas.removeAttribute('aria-busy');
-        canvas.removeAttribute('aria-hidden');
+        if (!frameDrawn.current) {
+          frameDrawn.current = true;
+          setHasDrawnFrame(true);
+        }
       }
 
       raf.current = requestAnimationFrame(tick);
@@ -190,6 +194,7 @@ export function HeroScrollSequence() {
   }, [fallback, frames, reducedMotion]);
 
   const staticPortrait = reducedMotion || fallback;
+  const posterVisible = staticPortrait || frames.length === 0 || !hasDrawnFrame;
   const loadingLabel = fallback
     ? 'STATIC PORTRAIT'
     : frames.length > 0
@@ -205,22 +210,20 @@ export function HeroScrollSequence() {
     >
       <div className={styles.stage}>
         <div className={styles.media} aria-label="人物动画画面">
-          {manifest && (
-            <img
-              ref={posterRef}
-              className={styles.poster}
-              src={manifest.portrait.poster}
-              alt="瞿先生动画人物"
-            />
-          )}
+          <img
+            className={`${styles.poster} ${posterVisible ? '' : styles.posterReady}`}
+            src={manifest?.portrait.poster ?? initialPosterUrl}
+            alt="瞿先生动画人物"
+            aria-hidden={posterVisible ? undefined : true}
+          />
           {!staticPortrait && (
             <canvas
               ref={canvasRef}
               className={styles.canvas}
               role="img"
               aria-label="滚动控制的动画人物"
-              aria-busy={frames.length === 0 ? 'true' : undefined}
-              aria-hidden="true"
+              aria-busy={hasDrawnFrame ? undefined : 'true'}
+              aria-hidden={hasDrawnFrame ? undefined : true}
             />
           )}
         </div>

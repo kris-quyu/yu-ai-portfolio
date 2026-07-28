@@ -1,8 +1,9 @@
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { loadMediaManifest } from '../../lib/media';
+import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
 import { loadFrameSequence } from './frameLoader';
 import { HeroScrollSequence } from './HeroScrollSequence';
+import heroCss from './HeroScrollSequence.module.css?raw';
 
 const scrollTrigger = vi.hoisted(() => ({
   create: vi.fn(),
@@ -16,9 +17,10 @@ vi.mock('gsap/ScrollTrigger', () => ({
   ScrollTrigger: scrollTrigger,
 }));
 
-vi.mock('../../lib/media', () => ({
-  loadMediaManifest: vi.fn(),
-}));
+vi.mock('../../lib/media', async (importOriginal) => {
+  const media = await importOriginal<typeof import('../../lib/media')>();
+  return { ...media, loadMediaManifest: vi.fn() };
+});
 
 vi.mock('./frameLoader', () => ({
   loadFrameSequence: vi.fn(),
@@ -44,6 +46,8 @@ const manifest = {
     src: '/portfolio/media/workflow/comfyui-workflow.webp',
   },
 };
+
+const initialPosterUrl = resolveMediaUrl('media/portrait/poster.webp');
 
 const createMediaQuery = (matches = false) => {
   let listener: ((event: MediaQueryListEvent) => void) | undefined;
@@ -115,6 +119,26 @@ describe('HeroScrollSequence', () => {
       manifest.portrait.poster,
     );
     expect(screen.getByRole('status')).toHaveTextContent('LOADING 0%');
+  });
+
+  it('renders a base-safe poster before the manifest resolves', () => {
+    vi.mocked(loadMediaManifest).mockImplementation(() => new Promise(() => undefined));
+
+    render(<HeroScrollSequence />);
+
+    expect(screen.getByAltText('瞿先生动画人物')).toHaveAttribute('src', initialPosterUrl);
+    expect(screen.getByAltText('瞿先生动画人物')).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('keeps the initial poster accessible when the manifest request fails', async () => {
+    vi.mocked(loadMediaManifest).mockRejectedValue(new Error('Media manifest failed: 500'));
+
+    render(<HeroScrollSequence />);
+
+    const poster = screen.getByAltText('瞿先生动画人物');
+    expect(poster).toHaveAttribute('src', initialPosterUrl);
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('STATIC PORTRAIT'));
+    expect(poster).not.toHaveAttribute('aria-hidden');
   });
 
   it('loads the desktop sequence with the manifest poster URL', async () => {
@@ -247,6 +271,33 @@ describe('HeroScrollSequence', () => {
     expect(poster).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('restores the poster when reduced motion turns on after a Canvas frame', async () => {
+    const reduced = createMediaQuery(false);
+    let nextFrame: FrameRequestCallback | undefined;
+    vi.stubGlobal('matchMedia', vi.fn(() => reduced.mediaQuery));
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn((callback: FrameRequestCallback) => {
+        nextFrame = callback;
+        return 41;
+      }),
+    );
+    vi.mocked(loadFrameSequence).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+
+    render(<HeroScrollSequence />);
+    const poster = await screen.findByAltText('瞿先生动画人物');
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+
+    act(() => nextFrame?.(16));
+    expect(poster).toHaveAttribute('aria-hidden', 'true');
+
+    act(() => reduced.update(true));
+    expect(poster).not.toHaveAttribute('aria-hidden');
+    expect(screen.queryByLabelText('滚动控制的动画人物')).not.toBeInTheDocument();
+  });
+
   it('switches to the poster when Canvas is unavailable', async () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
     vi.mocked(loadFrameSequence).mockResolvedValue([
@@ -259,5 +310,12 @@ describe('HeroScrollSequence', () => {
     await waitFor(() => {
       expect(screen.queryByLabelText('滚动控制的动画人物')).not.toBeInTheDocument();
     });
+  });
+
+  it('keeps identical 250vh scroll geometry and a 100svh sticky stage at every width', () => {
+    expect(heroCss).toMatch(/\.hero\s*{[^}]*height:\s*250vh;/s);
+    expect(heroCss).not.toContain('250svh');
+    expect(heroCss).not.toContain('260svh');
+    expect(heroCss).toMatch(/\.stage\s*{[^}]*height:\s*100svh;/s);
   });
 });
