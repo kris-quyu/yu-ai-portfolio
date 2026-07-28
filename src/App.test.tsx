@@ -22,14 +22,18 @@ vi.mock('./features/capabilities/CapabilityGrid', () => ({
   CapabilityGrid: () => <section id="capabilities" />,
 }));
 
+vi.mock('./features/contact/ContactSection', () => ({
+  ContactSection: () => <section id="contact" />,
+}));
+
 describe('App section order', () => {
   afterEach(cleanup);
 
-  it('mounts system then capabilities directly after film', () => {
+  it('mounts system, capabilities, then contact directly after film', () => {
     const { container } = render(<App />);
 
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
-    ).toEqual(['profile', 'film', 'system', 'capabilities']);
+    ).toEqual(['profile', 'film', 'system', 'capabilities', 'contact']);
   });
 });
