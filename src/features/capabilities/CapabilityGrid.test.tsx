@@ -104,6 +104,20 @@ describe('CapabilityGrid', () => {
     expect(within(faces[1] as HTMLElement).getByText(/返回正面/)).toBeVisible();
   });
 
+  it('renders three Chinese primary lines and three English secondary lines on every back face', () => {
+    render(<CapabilityGrid />);
+
+    screen.getAllByRole('article').forEach((article) => {
+      const back = article.querySelector('[id$="-back"]') as HTMLElement;
+
+      expect(back.querySelectorAll('[class*="growthPrimary"]')).toHaveLength(3);
+      expect(back.querySelectorAll('[class*="growthSecondary"]')).toHaveLength(3);
+      expect(within(back).getAllByText(/./, { selector: '[class*="growthPrimary"]' })).toHaveLength(3);
+      expect(within(back).getAllByText(/./, { selector: '[class*="growthSecondary"]' })).toHaveLength(3);
+      expect(back.querySelectorAll('[class*="growthSecondary"][lang="en"]')).toHaveLength(3);
+    });
+  });
+
   it('uses click state rather than hover selectors for flipping', () => {
     expect(capabilityCss).toMatch(/\.flipped\s+\.cardInner/s);
     expect(capabilityCss).not.toMatch(/:hover[^,{]*\.cardInner[^}]*rotateY/s);

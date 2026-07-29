@@ -51,48 +51,17 @@ describe('siteContent', () => {
     ]);
   });
 
-  it('defines all six capabilities including the supplied technical and visual skills', () => {
-    expect(siteContent.capabilities).toHaveLength(6);
-    expect(siteContent.capabilities.slice(3)).toEqual([
-      {
-        id: 'programming',
-        index: '04',
-        title: '编程与视觉识别',
-        summary: '掌握 Python、C/C++ 基础，了解 OpenCV 视觉识别与图像处理。',
-        tools: ['Python', 'C/C++', 'OpenCV'],
-        mastered: '基础程序开发与视觉处理',
-        growing: 'AI 辅助编程与视觉识别',
-        next: '将代码能力接入内容自动化流程',
-      },
-      {
-        id: 'hardware',
-        index: '05',
-        title: '硬件开发与数字制造',
-        summary: '单片机开发、传感器调试、UG/NX 建模与 3D 打印。',
-        tools: ['单片机', '传感器', 'UG/NX', '3D 打印'],
-        mastered: '硬件调试与三维建模',
-        growing: '软硬件联动原型',
-        next: '完成可展示的智能设备作品',
-      },
-      {
-        id: 'photography',
-        index: '06',
-        title: '专业摄影与视觉后期',
-        summary: '专业相机摄影，熟悉 PS、PR、LR 与完整后期流程。',
-        tools: ['专业摄影', 'PS', 'PR', 'LR'],
-        mastered: '专业拍摄与后期制作',
-        growing: '商业级灯光与镜头语言',
-        next: '建立稳定的视觉内容风格',
-      },
+  it('defines all 18 approved bilingual capability growth pairs verbatim', () => {
+    expect(siteContent.capabilities.map(({ id, mastered, growing, next }) => ({
+      id, mastered, growing, next,
+    }))).toEqual([
+      { id: 'automation', mastered: { zh: 'AI 工作流搭建与自动化', en: 'AI workflow setup and automation' }, growing: { zh: '稳定的多工具协同', en: 'Reliable multi-tool orchestration' }, next: { zh: '可复用的生产系统', en: 'Reusable production systems' } },
+      { id: 'video', mastered: { zh: '脚本策划与剪辑指导', en: 'Script and edit direction' }, growing: { zh: 'AI 辅助视觉叙事', en: 'AI-assisted visual storytelling' }, next: { zh: '端到端影片制作', en: 'End-to-end film production' } },
+      { id: 'commerce', mastered: { zh: '产品价值表达', en: 'Product value communication' }, growing: { zh: '内容转化策略', en: 'Content conversion strategy' }, next: { zh: '可衡量的电商成果', en: 'Measurable commerce outcomes' } },
+      { id: 'programming', mastered: { zh: '基础程序开发与视觉处理', en: 'Foundational programming and visual processing' }, growing: { zh: 'AI 辅助编程与视觉识别', en: 'AI-assisted programming and visual recognition' }, next: { zh: '将代码能力接入内容自动化流程', en: 'Integrate coding into content automation' } },
+      { id: 'hardware', mastered: { zh: '硬件调试与三维建模', en: 'Hardware debugging and 3D modeling' }, growing: { zh: '软硬件联动原型', en: 'Hardware-software integrated prototyping' }, next: { zh: '完成可展示的智能设备作品', en: 'Build a showcase-ready smart device' } },
+      { id: 'photography', mastered: { zh: '专业拍摄与后期制作', en: 'Professional photography and post-production' }, growing: { zh: '商业级灯光与镜头语言', en: 'Commercial lighting and visual language' }, next: { zh: '建立稳定的视觉内容风格', en: 'Establish a consistent visual style' } },
     ]);
-  });
-
-  it('defines growth copy for every capability back', () => {
-    siteContent.capabilities.forEach((capability) => {
-      expect(capability.mastered).not.toBe('');
-      expect(capability.growing).not.toBe('');
-      expect(capability.next).not.toBe('');
-    });
   });
 
   it('excludes rejected resume content', () => {
