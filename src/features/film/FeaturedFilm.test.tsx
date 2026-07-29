@@ -137,6 +137,31 @@ describe('FeaturedFilm', () => {
     expect(pause).toHaveBeenCalled();
   });
 
+  it('toggles the film reveal class only while the preview is in view', async () => {
+    const { container } = render(<FeaturedFilm />);
+    const preview = container.querySelector('#film video[aria-label]') as HTMLVideoElement;
+    const mediaFrame = preview.parentElement as HTMLElement;
+    const observer = IntersectionObserverStub.instances[0];
+    const initialClassName = mediaFrame.className;
+
+    expect(mediaFrame).toHaveAttribute('data-in-view', 'false');
+    act(() => observer.emit({
+      isIntersecting: true,
+      intersectionRatio: 0.55,
+      target: preview,
+    }));
+    expect(mediaFrame).toHaveAttribute('data-in-view', 'true');
+    expect(mediaFrame.className).not.toBe(initialClassName);
+
+    act(() => observer.emit({
+      isIntersecting: false,
+      intersectionRatio: 0,
+      target: preview,
+    }));
+    expect(mediaFrame).toHaveAttribute('data-in-view', 'false');
+    expect(mediaFrame.className).toBe(initialClassName);
+  });
+
   it('shows an accessible direct-link fallback when the actual preview video errors', async () => {
     render(<FeaturedFilm />);
     const preview = await screen.findByLabelText('AI 产品视频预览');

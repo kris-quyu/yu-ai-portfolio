@@ -1,7 +1,7 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
-import { loadFrameSequence } from './frameLoader';
+import { loadPortraitSequenceCached } from './portraitSequenceCache';
 import { HeroScrollSequence } from './HeroScrollSequence';
 import heroCss from './HeroScrollSequence.module.css?raw';
 
@@ -22,8 +22,8 @@ vi.mock('../../lib/media', async (importOriginal) => {
   return { ...media, loadMediaManifest: vi.fn() };
 });
 
-vi.mock('./frameLoader', () => ({
-  loadFrameSequence: vi.fn(),
+vi.mock('./portraitSequenceCache', () => ({
+  loadPortraitSequenceCached: vi.fn(),
 }));
 
 const manifest = {
@@ -73,11 +73,20 @@ const createMediaQuery = (matches = false) => {
   };
 };
 
+const getScrollUpdate = () => {
+  const config = (scrollTrigger.create.mock.calls[0] as unknown[] | undefined)?.[0] as
+    | { onUpdate: (self: { progress: number }) => void }
+    | undefined;
+
+  if (!config) throw new Error('ScrollTrigger configuration was not captured');
+  return config.onUpdate;
+};
+
 describe('HeroScrollSequence', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(loadMediaManifest).mockResolvedValue(manifest);
-    vi.mocked(loadFrameSequence).mockImplementation(() => new Promise(() => undefined));
+    vi.mocked(loadPortraitSequenceCached).mockImplementation(() => new Promise(() => undefined));
     vi.stubGlobal('innerWidth', 1440);
     vi.stubGlobal('devicePixelRatio', 1);
     vi.stubGlobal('matchMedia', vi.fn(() => createMediaQuery().mediaQuery));
@@ -107,12 +116,14 @@ describe('HeroScrollSequence', () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the approved copy, canvas, and base-safe poster while frames load', async () => {
-    const { container } = render(<HeroScrollSequence />);
+  it('renders the first approved stage, canvas, and base-safe poster while frames load', async () => {
+    render(<HeroScrollSequence />);
 
-    const heading = container.querySelector<HTMLHeadingElement>('#hero-title');
-    expect(heading).toHaveTextContent('BUILDINGCREATIVEWORKFLOWS.');
-    expect(container.querySelector('#profile')).toHaveAttribute('aria-labelledby', 'hero-title');
+    expect(screen.getByRole('heading', { name: 'THINK WITH AI.', hidden: true })).toBeInTheDocument();
+    expect(screen.getAllByText('借助 AI 思考').length).toBeGreaterThan(0);
+    expect(screen.getByText('01 / THINK')).toBeInTheDocument();
+    expect(screen.getByText('01 / 04')).toBeInTheDocument();
+    expect(document.querySelector('#profile')).toHaveAttribute('aria-labelledby', 'hero-title');
     expect(screen.getByLabelText('滚动控制的动画人物')).toBeInTheDocument();
     expect(await screen.findByAltText('瞿先生动画人物')).toHaveAttribute(
       'src',
@@ -145,7 +156,7 @@ describe('HeroScrollSequence', () => {
     render(<HeroScrollSequence />);
 
     await waitFor(() => {
-      expect(loadFrameSequence).toHaveBeenCalledWith(
+      expect(loadPortraitSequenceCached).toHaveBeenCalledWith(
         expect.objectContaining({
           posterUrl: manifest.portrait.poster,
           pattern: manifest.portrait.desktop.pattern,
@@ -155,13 +166,88 @@ describe('HeroScrollSequence', () => {
     });
   });
 
+  it('renders active stage copy in eyebrow, translation, title, summary order', () => {
+    render(<HeroScrollSequence />);
+
+    const title = screen.getByRole('heading', { name: 'THINK WITH AI.', hidden: true });
+    const stage = title.parentElement;
+
+    expect(stage?.children[0]).toHaveTextContent('01 / THINK');
+    expect(stage?.children[1]).toHaveTextContent('借助 AI 思考');
+    expect(stage?.children[2]).toBe(title);
+    expect(stage?.children[3]).toHaveTextContent(
+      '理解 ComfyUI、n8n、Codex 等 AI 工具。',
+    );
+  });
+
+  it('synchronizes capability copy and stage count with forward scroll phases', async () => {
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    const onUpdate = getScrollUpdate();
+
+    act(() => onUpdate({ progress: 0.56 }));
+    expect(
+      screen.getByRole('heading', { name: 'BUILD THE WORKFLOW.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('搭建创作工作流').length).toBeGreaterThan(0);
+    expect(screen.getByText('03 / 04')).toBeInTheDocument();
+
+    act(() => onUpdate({ progress: 0.9 }));
+    expect(
+      screen.getByRole('heading', { name: 'DELIVER THE RESULT.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('交付转化结果').length).toBeGreaterThan(0);
+    expect(screen.getByText('04 / 04')).toBeInTheDocument();
+  });
+
+  it('returns capability copy to the matching earlier phase when scroll reverses', async () => {
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    const onUpdate = getScrollUpdate();
+
+    act(() => onUpdate({ progress: 0.9 }));
+    act(() => onUpdate({ progress: 0.3 }));
+
+    expect(
+      screen.getByRole('heading', { name: 'SHAPE THE STORY.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('02 / 04')).toBeInTheDocument();
+  });
+
+  it('updates one persistent concise live region across phase changes', async () => {
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
+      { width: 1600, height: 900 } as HTMLImageElement,
+    ]);
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    const onUpdate = getScrollUpdate();
+    const liveRegion = document.querySelector<HTMLElement>('[aria-live="polite"]');
+
+    expect(document.querySelectorAll('[aria-live="polite"]')).toHaveLength(1);
+    expect(liveRegion).toHaveTextContent('借助 AI 思考');
+
+    act(() => onUpdate({ progress: 0.56 }));
+    expect(document.querySelector('[aria-live="polite"]')).toBe(liveRegion);
+    expect(liveRegion).toHaveTextContent('搭建创作工作流');
+
+    act(() => onUpdate({ progress: 0.9 }));
+    expect(document.querySelector('[aria-live="polite"]')).toBe(liveRegion);
+    expect(liveRegion).toHaveTextContent('交付转化结果');
+  });
+
   it('loads the composed mobile sequence below 768px', async () => {
     vi.stubGlobal('innerWidth', 390);
 
     render(<HeroScrollSequence />);
 
     await waitFor(() => {
-      expect(loadFrameSequence).toHaveBeenCalledWith(
+      expect(loadPortraitSequenceCached).toHaveBeenCalledWith(
         expect.objectContaining({
           posterUrl: manifest.portrait.poster,
           pattern: manifest.portrait.mobile.pattern,
@@ -182,7 +268,20 @@ describe('HeroScrollSequence', () => {
       manifest.portrait.poster,
     );
     expect(screen.queryByLabelText('滚动控制的动画人物')).not.toBeInTheDocument();
-    expect(loadFrameSequence).not.toHaveBeenCalled();
+    expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('heading', { name: 'DELIVER THE RESULT.', hidden: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('04 / 04')).toBeInTheDocument();
+
+    const stageList = screen.getByRole('list', { name: '能力阶段概览', hidden: true });
+    expect(within(stageList).getAllByRole('listitem', { hidden: true })).toHaveLength(4);
+    expect(stageList).toHaveTextContent('THINK WITH AI.');
+    expect(stageList).toHaveTextContent('借助 AI 思考');
+    expect(stageList).toHaveTextContent('SHAPE THE STORY.');
+    expect(stageList).toHaveTextContent('BUILD THE WORKFLOW.');
+    expect(stageList).toHaveTextContent('DELIVER THE RESULT.');
+    expect(stageList).toHaveTextContent('交付转化结果');
 
     unmount();
     expect(reduced.mediaQuery.removeEventListener).toHaveBeenCalledWith(
@@ -191,8 +290,17 @@ describe('HeroScrollSequence', () => {
     );
   });
 
+  it('keeps the reduced-motion stage list visibly readable', () => {
+    const listRule = heroCss.match(/\.reducedStageList\s*{([^}]*)}/s)?.[1] ?? '';
+
+    expect(listRule).toMatch(/display:\s*grid;/);
+    expect(listRule).not.toMatch(/width:\s*1px;/);
+    expect(listRule).not.toMatch(/height:\s*1px;/);
+    expect(listRule).not.toMatch(/clip:/);
+  });
+
   it('falls back to the poster when the frame failure threshold is exceeded', async () => {
-    vi.mocked(loadFrameSequence).mockRejectedValue(new Error('Portrait frame loading failed'));
+    vi.mocked(loadPortraitSequenceCached).mockRejectedValue(new Error('Portrait frame loading failed'));
 
     render(<HeroScrollSequence />);
 
@@ -209,7 +317,7 @@ describe('HeroScrollSequence', () => {
   it('aborts loading on unmount and ignores stale asynchronous work', async () => {
     let signal: AbortSignal | undefined;
     let settle: ((frames: HTMLImageElement[]) => void) | undefined;
-    vi.mocked(loadFrameSequence).mockImplementation((options) => {
+    vi.mocked(loadPortraitSequenceCached).mockImplementation((options) => {
       signal = options.signal;
       return new Promise((resolve) => {
         settle = resolve;
@@ -217,7 +325,7 @@ describe('HeroScrollSequence', () => {
     });
 
     const { unmount } = render(<HeroScrollSequence />);
-    await waitFor(() => expect(loadFrameSequence).toHaveBeenCalled());
+    await waitFor(() => expect(loadPortraitSequenceCached).toHaveBeenCalled());
 
     unmount();
     expect(signal?.aborted).toBe(true);
@@ -229,7 +337,7 @@ describe('HeroScrollSequence', () => {
     const kill = vi.fn();
     scrollTrigger.create.mockReturnValue({ kill });
     vi.stubGlobal('devicePixelRatio', 2);
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -254,7 +362,7 @@ describe('HeroScrollSequence', () => {
         return 41;
       }),
     );
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -282,7 +390,7 @@ describe('HeroScrollSequence', () => {
         return 41;
       }),
     );
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -300,7 +408,7 @@ describe('HeroScrollSequence', () => {
 
   it('switches to the poster when Canvas is unavailable', async () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
-    vi.mocked(loadFrameSequence).mockResolvedValue([
+    vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
     ]);
 
@@ -317,5 +425,18 @@ describe('HeroScrollSequence', () => {
     expect(heroCss).not.toContain('250svh');
     expect(heroCss).not.toContain('260svh');
     expect(heroCss).toMatch(/\.stage\s*{[^}]*height:\s*100svh;/s);
+  });
+
+  it('limits 390px copy to a compact face-safe left column', () => {
+    const mobileCss = heroCss.slice(
+      heroCss.indexOf('@media (max-width: 767px)'),
+      heroCss.indexOf('@media (min-width: 1700px)'),
+    );
+    const copyRule = mobileCss.match(/\.copy\s*{([^}]*)}/s)?.[1] ?? '';
+    const titleRule = mobileCss.match(/\.title\s*{([^}]*)}/s)?.[1] ?? '';
+
+    expect(copyRule).toMatch(/width:\s*min\(54vw,\s*13rem\);/);
+    expect(copyRule).toMatch(/max-width:\s*none;/);
+    expect(titleRule).toMatch(/font-size:\s*clamp\(2rem,\s*9\.5vw,\s*2\.45rem\);/);
   });
 });

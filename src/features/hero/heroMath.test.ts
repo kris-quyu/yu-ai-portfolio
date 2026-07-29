@@ -1,5 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
-import { drawHeroFrame, getHeroFrame, getHeroTransform } from './heroMath';
+import { drawHeroFrame, getHeroFrame, getHeroStageIndex, getHeroTransform } from './heroMath';
+
+describe('getHeroStageIndex', () => {
+  it('maps clamped progress to the four character phase boundaries', () => {
+    expect(getHeroStageIndex(-1)).toBe(0);
+    expect(getHeroStageIndex(0.199)).toBe(0);
+    expect(getHeroStageIndex(0.2)).toBe(1);
+    expect(getHeroStageIndex(0.549)).toBe(1);
+    expect(getHeroStageIndex(0.55)).toBe(2);
+    expect(getHeroStageIndex(0.819)).toBe(2);
+    expect(getHeroStageIndex(0.82)).toBe(3);
+    expect(getHeroStageIndex(2)).toBe(3);
+  });
+});
 
 describe('getHeroFrame', () => {
   it('clamps scroll progress to valid frames, including an empty sequence', () => {

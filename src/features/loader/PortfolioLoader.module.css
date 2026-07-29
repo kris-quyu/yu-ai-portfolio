@@ -1,0 +1,73 @@
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--forest);
+  color: var(--acid);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.loader[data-state='revealing'] {
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+.orb {
+  position: absolute;
+  width: min(62vw, 760px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(183 255 42 / 20%), transparent 67%);
+  filter: blur(9px);
+}
+
+.copy {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: .6rem;
+  text-align: center;
+  letter-spacing: .12em;
+}
+
+.copy p,
+.copy span {
+  margin: 0;
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.copy strong {
+  font-size: clamp(5rem, 18vw, 15rem);
+  font-weight: 500;
+  line-height: .78;
+  letter-spacing: -.08em;
+}
+
+@media (max-width: 390px) {
+  .orb {
+    width: 88vw;
+  }
+
+  .copy {
+    max-width: calc(100vw - 2rem);
+  }
+
+  .copy strong {
+    font-size: clamp(4.75rem, 28vw, 7rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    transition-property: opacity;
+  }
+
+  .loader[data-state='revealing'] {
+    transform: none;
+  }
+}

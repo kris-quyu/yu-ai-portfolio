@@ -1,9 +1,17 @@
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 
 vi.mock('./features/navigation/Navigation', () => ({
   Navigation: () => <nav aria-label="test navigation" />,
+}));
+
+vi.mock('./features/loader/PortfolioLoader', () => ({
+  PortfolioLoader: () => <div data-testid="portfolio-loader" />,
+}));
+
+vi.mock('./features/intro/PointerIntro', () => ({
+  PointerIntro: () => <section id="home" />,
 }));
 
 vi.mock('./features/hero/HeroScrollSequence', () => ({
@@ -29,11 +37,18 @@ vi.mock('./features/contact/ContactSection', () => ({
 describe('App section order', () => {
   afterEach(cleanup);
 
-  it('mounts system, capabilities, then contact directly after film', () => {
+  it('mounts the intro before the existing portfolio sections', () => {
     const { container } = render(<App />);
 
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
-    ).toEqual(['profile', 'film', 'system', 'capabilities', 'contact']);
+    ).toEqual(['home', 'profile', 'film', 'system', 'capabilities', 'contact']);
+  });
+
+  it('mounts one portfolio loader before navigation and main content', () => {
+    const { container } = render(<App />);
+
+    expect(screen.getByTestId('portfolio-loader')).toBeInTheDocument();
+    expect([...container.children].map((element) => element.tagName)).toEqual(['DIV', 'NAV', 'MAIN']);
   });
 });

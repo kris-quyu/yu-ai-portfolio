@@ -1,0 +1,310 @@
+.intro {
+  --intro-pointer-x: 50%;
+  --intro-pointer-y: 50%;
+  --intro-circle-x: 50%;
+  --intro-circle-y: 50%;
+  --intro-circle-size: clamp(13.75rem, 18vw, 20rem);
+  --intro-rotate-x: 0deg;
+  --intro-rotate-y: 0deg;
+  --intro-parallax-x: 0px;
+  --intro-parallax-y: 0px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: calc(100vh - 4.5rem);
+  overflow: hidden;
+  padding: clamp(1.25rem, 4vw, 4rem) var(--page-gutter);
+  color: var(--forest);
+  background:
+    radial-gradient(circle at 14% 18%, rgb(183 255 42 / 20%) 0 0.28rem, transparent 0.34rem),
+    radial-gradient(circle at 82% 72%, rgb(18 51 38 / 18%) 0 0.22rem, transparent 0.28rem),
+    linear-gradient(
+      135deg,
+      var(--sage) 0%,
+      var(--ivory) 48%,
+      color-mix(in srgb, var(--sage) 86%, var(--muted-sage)) 100%
+    );
+  touch-action: pan-y;
+}
+
+.grid {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  transform: translate3d(
+    calc(var(--intro-parallax-x) * -0.24),
+    calc(var(--intro-parallax-y) * -0.24),
+    0
+  );
+  opacity: 0.55;
+  background-image:
+    linear-gradient(rgb(7 22 15 / 10%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(7 22 15 / 10%) 1px, transparent 1px),
+    radial-gradient(circle, rgb(7 22 15 / 30%) 1px, transparent 1.4px);
+  background-size: 8rem 8rem, 8rem 8rem, 1.4rem 1.4rem;
+  mask-image: linear-gradient(to bottom, rgb(7 22 15 / 58%), transparent 82%);
+}
+
+.orbit {
+  position: absolute;
+  z-index: -1;
+  top: 12%;
+  right: -8%;
+  width: min(49vw, 44rem);
+  aspect-ratio: 1;
+  transform: translate3d(
+    calc(var(--intro-parallax-x) * 0.4),
+    calc(var(--intro-parallax-y) * 0.4),
+    0
+  );
+  border: 1px solid rgb(18 51 38 / 24%);
+  border-radius: 50%;
+}
+
+.orbit::before,
+.orbit::after {
+  content: '';
+  position: absolute;
+  border: 1px solid rgb(18 51 38 / 18%);
+  border-radius: inherit;
+}
+
+.orbit::before {
+  inset: 16%;
+}
+
+.orbit::after {
+  inset: 34%;
+  border-color: rgb(183 255 42 / 55%);
+}
+
+.node,
+.nodeSecondary {
+  position: absolute;
+  display: block;
+  width: 0.65rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 0 0.35rem rgb(183 255 42 / 18%);
+}
+
+.node {
+  top: 19%;
+  left: 9%;
+}
+
+.nodeSecondary {
+  right: 13%;
+  bottom: 24%;
+  width: 0.42rem;
+  background: var(--pine);
+  box-shadow: 0 0 0 0.32rem rgb(18 51 38 / 14%);
+}
+
+.content {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  align-content: space-between;
+  width: 100%;
+  min-width: 0;
+}
+
+.kicker,
+.meta {
+  position: relative;
+  z-index: 4;
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+}
+
+.kicker {
+  width: fit-content;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgb(7 22 15 / 32%);
+  background: rgb(243 241 232 / 48%);
+}
+
+.titleStage {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: clamp(1.25rem, 4vw, 4rem) var(--page-gutter);
+  perspective: 72rem;
+  pointer-events: none;
+}
+
+.headline {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  max-inline-size: 100%;
+  transform: rotateX(var(--intro-rotate-x)) rotateY(var(--intro-rotate-y));
+  transform-origin: center;
+  color: var(--forest);
+  font-size: clamp(2.3rem, 8.75vw, 8.5rem);
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  line-height: 0.82;
+  text-align: center;
+  white-space: nowrap;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.annotation {
+  position: absolute;
+  top: calc(100% + clamp(0.8rem, 1.8vw, 1.35rem));
+  left: 0;
+  width: 100%;
+  margin: 0;
+  color: color-mix(in srgb, var(--forest) 76%, var(--muted-sage));
+  font-size: clamp(0.62rem, 1.1vw, 0.76rem);
+  font-weight: 760;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.meta p {
+  margin: 0;
+}
+
+.hint {
+  max-width: 28rem;
+  color: color-mix(in srgb, var(--forest) 72%, var(--muted-sage));
+  text-align: right;
+}
+
+.circle {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: var(--intro-circle-size);
+  aspect-ratio: 1;
+  transform: translate3d(
+    calc(var(--intro-circle-x) - 50%),
+    calc(var(--intro-circle-y) - 50%),
+    0
+  );
+  border-radius: 50%;
+  background: var(--pine);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.chineseMask {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  clip-path: circle(calc(var(--intro-circle-size) / 2) at var(--intro-circle-x) var(--intro-circle-y));
+  pointer-events: none;
+  will-change: clip-path;
+}
+
+.chineseTitleStage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: clamp(1.25rem, 4vw, 4rem) var(--page-gutter);
+}
+
+.chineseTitle {
+  margin: 0;
+  max-inline-size: 100%;
+  color: var(--ivory);
+  font-size: clamp(2.3rem, 8.75vw, 8.5rem);
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  line-height: 0.82;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .intro {
+    --intro-circle-size: clamp(10rem, 42vw, 13.75rem);
+    min-height: calc(100vh - 7.5rem);
+    padding-block: 1.2rem 1.5rem;
+  }
+
+  .orbit {
+    top: 19%;
+    right: -35%;
+    width: 92vw;
+  }
+
+  .meta {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .hint {
+    max-width: 20rem;
+    text-align: left;
+  }
+
+}
+
+@media (max-width: 390px) {
+  .intro {
+    min-height: calc(100vh - 7.25rem);
+    padding-block: 1rem 1.25rem;
+  }
+
+  .meta {
+    gap: 0.6rem;
+  }
+
+  .hint {
+    max-width: 18rem;
+    font-size: 0.72rem;
+  }
+
+  .annotation {
+    letter-spacing: 0.09em;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid,
+  .orbit,
+  .title {
+    transform: none;
+    will-change: auto;
+  }
+
+  .circle {
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    will-change: auto;
+  }
+
+  .chineseMask {
+    will-change: auto;
+  }
+}

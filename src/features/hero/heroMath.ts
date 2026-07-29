@@ -15,6 +15,14 @@ const clamp01 = (value: number) => {
 const lerp = (from: number, to: number, amount: number) => from + (to - from) * amount;
 const segment = (value: number, start: number, end: number) => clamp01((value - start) / (end - start));
 
+export function getHeroStageIndex(progress: number): 0 | 1 | 2 | 3 {
+  const p = clamp01(progress);
+  if (p < 0.2) return 0;
+  if (p < 0.55) return 1;
+  if (p < 0.82) return 2;
+  return 3;
+}
+
 export function getHeroFrame(progress: number, frameCount: number): number {
   const count = Number.isFinite(frameCount) ? Math.floor(frameCount) : 0;
   if (count < 1) return 0;

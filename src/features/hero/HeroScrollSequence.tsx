@@ -10,8 +10,13 @@ import {
 import { siteContent } from '../../content/siteContent';
 import { loadMediaManifest, resolveMediaUrl, type MediaManifest } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
-import { loadFrameSequence } from './frameLoader';
-import { drawHeroFrame, getHeroFrame, getHeroTransform } from './heroMath';
+import { loadPortraitSequenceCached } from './portraitSequenceCache';
+import {
+  drawHeroFrame,
+  getHeroFrame,
+  getHeroStageIndex,
+  getHeroTransform,
+} from './heroMath';
 import styles from './HeroScrollSequence.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -31,6 +36,7 @@ export function HeroScrollSequence() {
   const [loadProgress, setLoadProgress] = useState(0);
   const [fallback, setFallback] = useState(false);
   const [hasDrawnFrame, setHasDrawnFrame] = useState(false);
+  const [activeStage, setActiveStage] = useState<0 | 1 | 2 | 3>(0);
 
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -84,7 +90,7 @@ export function HeroScrollSequence() {
     frameDrawn.current = false;
     lastFrame.current = -1;
 
-    void loadFrameSequence({
+    void loadPortraitSequenceCached({
       posterUrl: manifest.portrait.poster,
       pattern: sequence.pattern,
       count: sequence.count,
@@ -154,6 +160,10 @@ export function HeroScrollSequence() {
       end: 'bottom bottom',
       onUpdate: ({ progress }) => {
         targetProgress.current = progress;
+        const nextStage = getHeroStageIndex(progress);
+        setActiveStage((currentStage) =>
+          currentStage === nextStage ? currentStage : nextStage,
+        );
         railRef.current?.style.setProperty('--hero-progress', String(progress));
       },
     });
@@ -200,6 +210,7 @@ export function HeroScrollSequence() {
     : frames.length > 0
       ? 'READY · SCROLL TO CONTROL'
       : `LOADING ${loadProgress}%`;
+  const visibleStageIndex = reducedMotion ? 3 : activeStage;
 
   return (
     <section
@@ -229,13 +240,47 @@ export function HeroScrollSequence() {
         </div>
 
         <div className={styles.copy}>
-          <p className={styles.eyebrow}>{siteContent.hero.eyebrow}</p>
-          <h1 id="hero-title" className={styles.title}>
-            {siteContent.hero.titleLines.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </h1>
-          <p className={styles.summary}>{siteContent.hero.summary}</p>
+          <p className={styles.stageAnnouncement} aria-live="polite" aria-atomic="true">
+            {siteContent.hero.stages[visibleStageIndex].translation}
+          </p>
+          <div className={styles.copyViewport}>
+            {siteContent.hero.stages.map((stage, stageIndex) => {
+              const isActive = stageIndex === visibleStageIndex;
+              const positionClass =
+                stageIndex < visibleStageIndex
+                  ? styles.stageCopyBefore
+                  : stageIndex > visibleStageIndex
+                    ? styles.stageCopyAfter
+                    : styles.stageCopyActive;
+
+              return (
+                <div
+                  key={stage.id}
+                  className={`${styles.stageCopy} ${positionClass}`}
+                  aria-hidden={isActive ? undefined : true}
+                >
+                  <p className={styles.eyebrow}>{stage.eyebrow}</p>
+                  <p className={styles.translation}>{stage.translation}</p>
+                  <h1 id={isActive ? 'hero-title' : undefined} className={styles.title}>
+                    {stage.title}
+                  </h1>
+                  <p className={styles.summary}>{stage.summary}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {reducedMotion && (
+            <ol className={styles.reducedStageList} aria-label="能力阶段概览">
+              {siteContent.hero.stages.map((stage) => (
+                <li key={stage.id}>
+                  <span>{stage.translation}</span>
+                  <strong>{stage.title}</strong>
+                  <span>{stage.summary}</span>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
 
         <div
@@ -244,8 +289,11 @@ export function HeroScrollSequence() {
           style={{ '--hero-progress': '0' } as HeroStyle}
         >
           <div className={styles.progressMeta}>
-            <span>SCROLL / CONTROL</span>
-            <span role="status" aria-live="polite">{loadingLabel}</span>
+            <span className={styles.progressStage}>
+              <span>SCROLL / CONTROL</span>
+              <span>{`0${visibleStageIndex + 1} / 04`}</span>
+            </span>
+            <span role="status">{loadingLabel}</span>
           </div>
           <div className={styles.progressTrack} aria-hidden="true">
             <span />

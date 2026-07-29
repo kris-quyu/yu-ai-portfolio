@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { siteContent, type SectionId } from '../../content/siteContent';
 import styles from './Navigation.module.css';
 
-const initialSection: SectionId = 'profile';
+const initialSection: SectionId = 'home';
 
 export function Navigation() {
   const [activeSection, setActiveSection] = useState<SectionId>(initialSection);
@@ -33,8 +33,8 @@ export function Navigation() {
   }, []);
 
   return (
-    <header className={styles.header}>
-      <a className={styles.brand} href="#profile" aria-label="返回首页">
+    <header className={styles.header} data-theme={activeSection === 'home' ? 'light' : 'dark'}>
+      <a className={styles.brand} href="#home" aria-label="返回首页">
         QX / AI LAB
       </a>
       <nav className={styles.navigation} aria-label="主导航">
