@@ -6,7 +6,7 @@ describe('siteContent', () => {
     expect(siteContent.intro).toEqual({
       title: "HELLO, I'M YU",
       reveal: '你好，我是宇',
-      subtitle: 'AI CONTENT CREATOR / HANGZHOU',
+      annotation: 'AI AGENT PORTFOLIO / CREATIVE WORKFLOW SHOWCASE',
       hint: '移动鼠标探索 · 向下滚动查看更多',
     });
     expect(siteContent.navigation.map(({ id }) => id)).toEqual([

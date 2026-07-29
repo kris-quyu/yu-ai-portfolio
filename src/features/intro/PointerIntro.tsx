@@ -17,7 +17,8 @@ const initialStyles: IntroCustomProperties = {
   '--intro-pointer-y': '50%',
   '--intro-circle-x': '50%',
   '--intro-circle-y': '50%',
-  '--intro-rotate-z': '0deg',
+  '--intro-rotate-x': '0deg',
+  '--intro-rotate-y': '0deg',
   '--intro-parallax-x': '0px',
   '--intro-parallax-y': '0px',
 };
@@ -129,7 +130,8 @@ export function PointerIntro() {
         '--intro-circle-y',
         `${formatNumber(renderedRef.current.y)}px`,
       );
-      section.style.setProperty('--intro-rotate-z', `${formatNumber(transform.rotateZ)}deg`);
+      section.style.setProperty('--intro-rotate-x', `${formatNumber(transform.rotateX)}deg`);
+      section.style.setProperty('--intro-rotate-y', `${formatNumber(transform.rotateY)}deg`);
       section.style.setProperty(
         '--intro-parallax-x',
         `${formatNumber(transform.normalizedX * 12)}px`,
@@ -226,19 +228,30 @@ export function PointerIntro() {
 
       <div className={styles.content}>
         <p className={styles.kicker}>QX / CREATIVE SIGNAL 001</p>
-        <div className={styles.titleStage}>
-          <h1 id="intro-title" className={styles.title}>
-            {siteContent.intro.title}
-          </h1>
-        </div>
         <div className={styles.meta}>
-          <p>{siteContent.intro.subtitle}</p>
           <p className={styles.hint}>{siteContent.intro.hint}</p>
         </div>
       </div>
 
-      <div className={styles.reveal}>
-        <p>{siteContent.intro.reveal}</p>
+      <div className={styles.titleStage}>
+        <div className={styles.headline}>
+          <h1 id="intro-title" className={styles.title}>
+            {siteContent.intro.title}
+          </h1>
+          <p className={styles.annotation}>{siteContent.intro.annotation}</p>
+        </div>
+      </div>
+
+      <div
+        className={styles.circle}
+        data-testid="intro-circle"
+        aria-hidden="true"
+      />
+
+      <div className={styles.chineseMask}>
+        <div className={styles.chineseTitleStage}>
+          <p className={styles.chineseTitle}>{siteContent.intro.reveal}</p>
+        </div>
       </div>
     </section>
   );

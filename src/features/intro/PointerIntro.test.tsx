@@ -63,7 +63,10 @@ describe('PointerIntro', () => {
 
     expect(screen.getByRole('heading', { name: "HELLO, I'M YU" })).toBeInTheDocument();
     expect(screen.getByText('你好，我是宇')).toBeInTheDocument();
-    expect(screen.getByText('AI CONTENT CREATOR / HANGZHOU')).toBeInTheDocument();
+    expect(
+      screen.getByText('AI AGENT PORTFOLIO / CREATIVE WORKFLOW SHOWCASE'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('AI CONTENT CREATOR / HANGZHOU')).not.toBeInTheDocument();
     expect(screen.getByText('移动鼠标探索 · 向下滚动查看更多')).toBeInTheDocument();
   });
 
@@ -76,23 +79,24 @@ describe('PointerIntro', () => {
     expect(reveal.closest('[aria-hidden="true"]')).toBeNull();
   });
 
-  it('keeps the Chinese reveal compact on one line', () => {
+  it('clips the fixed Chinese headline with the pointer-positioned circle', () => {
     render(<PointerIntro />);
 
     expect(screen.getByText('你好，我是宇')).toHaveTextContent(/^你好，我是宇$/);
     expect(introCss).toMatch(
-      /\.reveal p\s*{[^}]*letter-spacing:\s*0(?:rem|em|px)?;[^}]*white-space:\s*nowrap;/is,
+      /\.chineseMask\s*{[^}]*clip-path:\s*circle\(calc\(var\(--intro-circle-size\)\s*\/\s*2\)\s+at\s+var\(--intro-circle-x\)\s+var\(--intro-circle-y\)\);/is,
     );
+    expect(introCss).toMatch(/\.chineseTitle\s*{[^}]*white-space:\s*nowrap;/is);
   });
 
-  it('uses a center-origin flat rotation without any 3D title treatment', () => {
+  it('uses pointer-driven 3D only on the English title', () => {
+    expect(introCss).toMatch(/\.titleStage\s*{[^}]*perspective:\s*[^;]+;/is);
     expect(introCss).toMatch(
-      /\.title\s*{[^}]*transform:\s*rotateZ\(var\(--intro-rotate-z\)\);[^}]*transform-origin:\s*center;/is,
+      /\.title\s*{[^}]*transform:\s*rotateX\(var\(--intro-rotate-x\)\)\s+rotateY\(var\(--intro-rotate-y\)\);[^}]*transform-origin:\s*center;/is,
     );
     expect(introCss).not.toMatch(
-      /\bperspective\b|rotateX\(|rotateY\(|translateZ\(|preserve-3d/i,
+      /\.circle\s*{[^}]*rotate[XYZ]?\(|\.chinese(?:Mask|Title|TitleStage)\s*{[^}]*--intro-rotate-[xy]/is,
     );
-    expect(introCss).not.toMatch(/--intro-rotate-[xy]\b/i);
   });
 
   it('uses a safe responsive single-line title contract at every viewport width', () => {
@@ -106,14 +110,38 @@ describe('PointerIntro', () => {
 
   it('uses the approved smaller independent reveal-circle ranges', () => {
     expect(introCss).toMatch(
-      /\.reveal\s*{[^}]*width:\s*clamp\(13\.75rem,\s*18vw,\s*20rem\);/is,
+      /--intro-circle-size:\s*clamp\(13\.75rem,\s*18vw,\s*20rem\);/is,
     );
     expect(introCss).toMatch(
-      /@media\s*\(max-width:\s*720px\)[\s\S]*?\.reveal\s*{[^}]*width:\s*clamp\(10rem,\s*42vw,\s*13\.75rem\);/is,
+      /@media\s*\(max-width:\s*720px\)[\s\S]*?--intro-circle-size:\s*clamp\(10rem,\s*42vw,\s*13\.75rem\);/is,
     );
-    expect(introCss).not.toMatch(
-      /\.reveal\s*{[^}]*rotate(?:Z)?\(|\.title\s+\.reveal/is,
+    expect(introCss).toMatch(
+      /\.circle\s*{[^}]*width:\s*var\(--intro-circle-size\);[^}]*background:\s*var\(--pine\);/is,
     );
+    expect(introCss).not.toMatch(/\.circle::(?:before|after)|\.circle\s*>\s*\*/i);
+  });
+
+  it('keeps the empty flat circle and fixed Chinese layer as section siblings', () => {
+    const { container } = render(<PointerIntro />);
+    const section = container.querySelector('#home');
+    const circle = screen.getByTestId('intro-circle');
+    const chinese = screen.getByText('你好，我是宇');
+
+    expect(circle).toBeEmptyDOMElement();
+    expect(circle).not.toContainElement(chinese);
+    expect(circle.parentElement).toBe(section);
+    expect(chinese.parentElement?.parentElement?.parentElement).toBe(section);
+  });
+
+  it('associates the exact annotation directly with the English headline', () => {
+    render(<PointerIntro />);
+
+    const title = screen.getByRole('heading', { name: "HELLO, I'M YU" });
+    const annotation = screen.getByText(
+      'AI AGENT PORTFOLIO / CREATIVE WORKFLOW SHOWCASE',
+    );
+
+    expect(title.parentElement).toContainElement(annotation);
   });
 
   it('updates target CSS variables from pointer movement', () => {
@@ -138,10 +166,9 @@ describe('PointerIntro', () => {
     expect(section).toHaveStyle({
       '--intro-circle-x': '560px',
       '--intro-circle-y': '264px',
-      '--intro-rotate-z': '2.4deg',
+      '--intro-rotate-x': '2.4deg',
+      '--intro-rotate-y': '2.4deg',
     });
-    expect(section.style.getPropertyValue('--intro-rotate-x')).toBe('');
-    expect(section.style.getPropertyValue('--intro-rotate-y')).toBe('');
     expect(requestAnimationFrame).toHaveBeenCalledTimes(2);
   });
 
@@ -194,7 +221,8 @@ describe('PointerIntro', () => {
     }
 
     expect(section).toHaveStyle({
-      '--intro-rotate-z': '20deg',
+      '--intro-rotate-x': '20deg',
+      '--intro-rotate-y': '20deg',
     });
   });
 
@@ -211,7 +239,8 @@ describe('PointerIntro', () => {
       '--intro-pointer-y': '200px',
       '--intro-circle-x': '400px',
       '--intro-circle-y': '200px',
-      '--intro-rotate-z': '0deg',
+      '--intro-rotate-x': '0deg',
+      '--intro-rotate-y': '0deg',
     });
   });
 
@@ -251,10 +280,9 @@ describe('PointerIntro', () => {
       '--intro-pointer-y': '50%',
       '--intro-circle-x': '50%',
       '--intro-circle-y': '50%',
-      '--intro-rotate-z': '0deg',
+      '--intro-rotate-x': '0deg',
+      '--intro-rotate-y': '0deg',
     });
-    expect(section.style.getPropertyValue('--intro-rotate-x')).toBe('');
-    expect(section.style.getPropertyValue('--intro-rotate-y')).toBe('');
     expect(requestAnimationFrame).not.toHaveBeenCalled();
   });
 });

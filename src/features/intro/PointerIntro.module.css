@@ -3,7 +3,9 @@
   --intro-pointer-y: 50%;
   --intro-circle-x: 50%;
   --intro-circle-y: 50%;
-  --intro-rotate-z: 0deg;
+  --intro-circle-size: clamp(13.75rem, 18vw, 20rem);
+  --intro-rotate-x: 0deg;
+  --intro-rotate-y: 0deg;
   --intro-parallax-x: 0px;
   --intro-parallax-y: 0px;
   position: relative;
@@ -102,7 +104,7 @@
 
 .content {
   position: relative;
-  z-index: 1;
+  z-index: 4;
   display: grid;
   align-content: space-between;
   width: 100%;
@@ -128,15 +130,27 @@
 }
 
 .titleStage {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
   display: grid;
   place-items: center;
-  min-height: 48vh;
+  min-width: 0;
+  padding: clamp(1.25rem, 4vw, 4rem) var(--page-gutter);
+  perspective: 72rem;
+  pointer-events: none;
+}
+
+.headline {
+  position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .title {
   margin: 0;
   max-inline-size: 100%;
-  transform: rotateZ(var(--intro-rotate-z));
+  transform: rotateX(var(--intro-rotate-x)) rotateY(var(--intro-rotate-y));
   transform-origin: center;
   color: var(--forest);
   font-size: clamp(2.3rem, 8.75vw, 8.5rem);
@@ -149,10 +163,24 @@
   will-change: transform;
 }
 
+.annotation {
+  position: absolute;
+  top: calc(100% + clamp(0.8rem, 1.8vw, 1.35rem));
+  left: 0;
+  width: 100%;
+  margin: 0;
+  color: color-mix(in srgb, var(--forest) 76%, var(--muted-sage));
+  font-size: clamp(0.62rem, 1.1vw, 0.76rem);
+  font-weight: 760;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .meta {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -167,64 +195,57 @@
   text-align: right;
 }
 
-.reveal {
+.circle {
   position: absolute;
-  z-index: 3;
+  z-index: 2;
   top: 0;
   left: 0;
-  display: grid;
-  place-items: center;
-  width: clamp(13.75rem, 18vw, 20rem);
+  width: var(--intro-circle-size);
   aspect-ratio: 1;
   transform: translate3d(
     calc(var(--intro-circle-x) - 50%),
     calc(var(--intro-circle-y) - 50%),
     0
   );
-  overflow: hidden;
-  border: 1px solid rgb(183 255 42 / 64%);
   border-radius: 50%;
-  color: var(--ivory);
-  background:
-    radial-gradient(circle at 35% 28%, rgb(183 255 42 / 15%), transparent 42%),
-    var(--pine);
-  box-shadow: 0 1.8rem 4rem rgb(18 51 38 / 24%);
+  background: var(--pine);
   pointer-events: none;
   will-change: transform;
 }
 
-.reveal::before,
-.reveal::after {
-  content: '';
+.chineseMask {
   position: absolute;
-  border-radius: 50%;
+  z-index: 3;
+  inset: 0;
+  clip-path: circle(calc(var(--intro-circle-size) / 2) at var(--intro-circle-x) var(--intro-circle-y));
+  pointer-events: none;
+  will-change: clip-path;
 }
 
-.reveal::before {
-  inset: 11%;
-  border: 1px solid rgb(243 241 232 / 20%);
+.chineseTitleStage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: clamp(1.25rem, 4vw, 4rem) var(--page-gutter);
 }
 
-.reveal::after {
-  width: 38%;
-  aspect-ratio: 1;
-  border: 1px solid rgb(183 255 42 / 45%);
-}
-
-.reveal p {
-  position: relative;
-  z-index: 1;
+.chineseTitle {
   margin: 0;
-  padding: 1rem;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: 0;
+  max-inline-size: 100%;
+  color: var(--ivory);
+  font-size: clamp(2.3rem, 8.75vw, 8.5rem);
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  line-height: 0.82;
   text-align: center;
   white-space: nowrap;
 }
 
 @media (max-width: 720px) {
   .intro {
+    --intro-circle-size: clamp(10rem, 42vw, 13.75rem);
     min-height: calc(100vh - 7.5rem);
     padding-block: 1.2rem 1.5rem;
   }
@@ -233,10 +254,6 @@
     top: 19%;
     right: -35%;
     width: 92vw;
-  }
-
-  .titleStage {
-    min-height: 44vh;
   }
 
   .meta {
@@ -249,23 +266,12 @@
     text-align: left;
   }
 
-  .reveal {
-    width: clamp(10rem, 42vw, 13.75rem);
-  }
-
-  .reveal p {
-    font-size: 1rem;
-  }
 }
 
 @media (max-width: 390px) {
   .intro {
     min-height: calc(100vh - 7.25rem);
     padding-block: 1rem 1.25rem;
-  }
-
-  .titleStage {
-    min-height: 40svh;
   }
 
   .meta {
@@ -277,20 +283,28 @@
     font-size: 0.72rem;
   }
 
+  .annotation {
+    letter-spacing: 0.09em;
+  }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
   .grid,
   .orbit,
-  .title,
-  .reveal {
+  .title {
     transform: none;
     will-change: auto;
   }
 
-  .reveal {
+  .circle {
     top: 50%;
     left: 50%;
     transform: translate3d(-50%, -50%, 0);
+    will-change: auto;
+  }
+
+  .chineseMask {
+    will-change: auto;
   }
 }

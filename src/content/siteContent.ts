@@ -34,7 +34,7 @@ export interface ContactDetails {
 }
 
 export interface SiteContent {
-  intro: { title: string; reveal: string; subtitle: string; hint: string };
+  intro: { title: string; reveal: string; annotation: string; hint: string };
   navigation: readonly { id: SectionId; label: string }[];
   hero: { eyebrow: string; titleLines: readonly string[]; summary: string; stages: readonly HeroStage[] };
   film: { eyebrow: string; title: string; summary: string; tags: readonly string[] };
@@ -47,7 +47,7 @@ export const siteContent: SiteContent = {
   intro: {
     title: "HELLO, I'M YU",
     reveal: '你好，我是宇',
-    subtitle: 'AI CONTENT CREATOR / HANGZHOU',
+    annotation: 'AI AGENT PORTFOLIO / CREATIVE WORKFLOW SHOWCASE',
     hint: '移动鼠标探索 · 向下滚动查看更多',
   },
   navigation: [
