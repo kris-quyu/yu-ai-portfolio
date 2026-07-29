@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PortfolioLoader } from './PortfolioLoader';
 
@@ -12,7 +12,20 @@ describe('PortfolioLoader', () => {
     render(<PortfolioLoader loadCritical={() => new Promise(() => undefined)} />);
     expect(screen.getByText('LOADING CREATIVE SYSTEM')).toBeInTheDocument();
     expect(screen.getByText('0%')).toBeInTheDocument();
-    expect(screen.getByText(/AI 鍐呭/)).toBeInTheDocument();
+    expect(screen.getByText('AI 内容')).toBeInTheDocument();
+  });
+
+  it('cycles through the approved Chinese topics on the existing interval', async () => {
+    vi.useFakeTimers();
+    render(<PortfolioLoader loadCritical={() => new Promise(() => undefined)} />);
+
+    expect(screen.getByText('AI 内容')).toBeInTheDocument();
+    await act(() => vi.advanceTimersByTimeAsync(900));
+    expect(screen.getByText('视频工作流')).toBeInTheDocument();
+    await act(() => vi.advanceTimersByTimeAsync(900));
+    expect(screen.getByText('电商转化')).toBeInTheDocument();
+    await act(() => vi.advanceTimersByTimeAsync(900));
+    expect(screen.getByText('AI 内容')).toBeInTheDocument();
   });
 
   it('becomes non-modal after loading and then unmounts the overlay', async () => {

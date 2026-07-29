@@ -47,3 +47,11 @@ Self-review confirmed the first three capability objects are unchanged, all
 six cards retain independent `Set`-backed flip state and accessible
 front/back descriptions, the four-stage scroll and portrait sequence code is
 untouched, and rejected résumé/work-year content remains absent.
+
+## Correction
+
+A follow-up review found three remaining mojibake labels in the loader's
+rotating topic copy. They were corrected to `AI 内容`, `视频工作流`, and
+`电商转化` without changing loader structure, styling, timing, progress,
+modal, or reveal behavior. A real-component timer test now verifies the exact
+three-label sequence on the existing 900ms interval.

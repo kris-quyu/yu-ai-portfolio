@@ -10,7 +10,7 @@ export interface PortfolioLoaderProps {
   loadCritical?: (report: (loaded: number, total: number) => void) => Promise<void>;
 }
 
-const loadingTopics = ['AI 鍐呭', '瑙嗛宸ヤ綔娴?', '鐢靛晢杞寲'];
+const loadingTopics = ['AI 内容', '视频工作流', '电商转化'];
 
 const preloadImage = (src: string) => new Promise<void>((resolve, reject) => {
   const image = new Image();
