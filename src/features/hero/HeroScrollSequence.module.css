@@ -143,8 +143,8 @@
   text-wrap: balance;
 }
 
-.stageLabel {
-  margin: clamp(1.2rem, 2.5vh, 2rem) 0 0;
+.translation {
+  margin: 0 0 clamp(0.8rem, 2vh, 1.3rem);
   color: var(--ivory);
   font-size: 0.76rem;
   font-weight: 800;

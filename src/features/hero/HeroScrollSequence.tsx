@@ -241,7 +241,7 @@ export function HeroScrollSequence() {
 
         <div className={styles.copy}>
           <p className={styles.stageAnnouncement} aria-live="polite" aria-atomic="true">
-            {siteContent.hero.stages[visibleStageIndex].label}
+            {siteContent.hero.stages[visibleStageIndex].translation}
           </p>
           <div className={styles.copyViewport}>
             {siteContent.hero.stages.map((stage, stageIndex) => {
@@ -260,10 +260,10 @@ export function HeroScrollSequence() {
                   aria-hidden={isActive ? undefined : true}
                 >
                   <p className={styles.eyebrow}>{stage.eyebrow}</p>
+                  <p className={styles.translation}>{stage.translation}</p>
                   <h1 id={isActive ? 'hero-title' : undefined} className={styles.title}>
                     {stage.title}
                   </h1>
-                  <p className={styles.stageLabel}>{stage.label}</p>
                   <p className={styles.summary}>{stage.summary}</p>
                 </div>
               );
@@ -274,6 +274,7 @@ export function HeroScrollSequence() {
             <ol className={styles.reducedStageList} aria-label="能力阶段概览">
               {siteContent.hero.stages.map((stage) => (
                 <li key={stage.id}>
+                  <span>{stage.translation}</span>
                   <strong>{stage.title}</strong>
                   <span>{stage.summary}</span>
                 </li>

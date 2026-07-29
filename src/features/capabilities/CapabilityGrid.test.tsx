@@ -7,20 +7,27 @@ import capabilityCss from './CapabilityGrid.module.css?raw';
 describe('CapabilityGrid', () => {
   afterEach(cleanup);
 
-  it('renders exactly three full-card flip buttons with approved front content', () => {
+  it('renders six full-card flip buttons with the expanded approved content', () => {
     render(<CapabilityGrid />);
 
     const articles = screen.getAllByRole('article');
     const buttons = screen.getAllByRole('button', { name: /翻转.+技能卡/ });
 
-    expect(articles).toHaveLength(3);
-    expect(buttons).toHaveLength(3);
+    expect(screen.getByRole('heading', { name: 'THINGS I DO WELL.' })).toBeInTheDocument();
+    expect(articles).toHaveLength(6);
+    expect(buttons).toHaveLength(6);
     expect(within(articles[0]).getByRole('heading', { name: 'AI 内容与自动化' })).toBeInTheDocument();
     expect(within(articles[1]).getByRole('heading', { name: '视频编导与剪辑' })).toBeInTheDocument();
     expect(within(articles[2]).getByRole('heading', { name: '电商内容转化' })).toBeInTheDocument();
+    expect(within(articles[3]).getByRole('heading', { name: '编程与视觉识别' })).toBeInTheDocument();
+    expect(within(articles[4]).getByRole('heading', { name: '硬件开发与数字制造' })).toBeInTheDocument();
+    expect(within(articles[5]).getByRole('heading', { name: '专业摄影与视觉后期' })).toBeInTheDocument();
     expect(within(articles[0]).getByText('ComfyUI')).toBeVisible();
     expect(within(articles[0]).getByText('n8n')).toBeVisible();
     expect(within(articles[0]).getByText('Codex')).toBeVisible();
+    expect(within(articles[3]).getByText('OpenCV')).toBeVisible();
+    expect(within(articles[4]).getByText('3D 打印')).toBeVisible();
+    expect(within(articles[5]).getByText('LR')).toBeVisible();
   });
 
   it('keeps semantic faces outside the button and describes the active visible face', async () => {
@@ -59,6 +66,7 @@ describe('CapabilityGrid', () => {
     expect(buttons[0]).toHaveAttribute('aria-pressed', 'true');
     expect(buttons[1]).toHaveAttribute('aria-pressed', 'true');
     expect(buttons[2]).toHaveAttribute('aria-pressed', 'false');
+    expect(buttons[5]).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('supports keyboard flipping and can return a card to its front', async () => {
@@ -99,6 +107,19 @@ describe('CapabilityGrid', () => {
   it('uses click state rather than hover selectors for flipping', () => {
     expect(capabilityCss).toMatch(/\.flipped\s+\.cardInner/s);
     expect(capabilityCss).not.toMatch(/:hover[^,{]*\.cardInner[^}]*rotateY/s);
+  });
+
+  it('uses three desktop columns, two tablet columns, and one mobile column', () => {
+    expect(capabilityCss).toMatch(
+      /\.grid\s*{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\);/is,
+    );
+    expect(capabilityCss).toMatch(
+      /@media\s*\(min-width:\s*768px\)\s*and\s*\(max-width:\s*1099px\)[\s\S]*?\.grid\s*{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\);/is,
+    );
+    expect(capabilityCss).toMatch(
+      /@media\s*\(max-width:\s*767px\)[\s\S]*?\.grid\s*{[^}]*grid-template-columns:\s*1fr;/is,
+    );
+    expect(capabilityCss).not.toMatch(/\.card:last-child\s*{[^}]*grid-column/is);
   });
 
   it('defines the required face palettes and a non-3D reduced-motion swap', () => {

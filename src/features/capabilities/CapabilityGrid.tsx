@@ -22,7 +22,7 @@ export function CapabilityGrid() {
       className={styles.section}
       aria-labelledby="capabilities-title"
     >
-      <h2 id="capabilities-title">THREE THINGS I DO WELL.</h2>
+      <h2 id="capabilities-title">THINGS I DO WELL.</h2>
 
       <div className={styles.grid}>
         {siteContent.capabilities.map((capability) => {

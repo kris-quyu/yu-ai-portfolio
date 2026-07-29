@@ -218,12 +218,12 @@ describe('complete portfolio integration', () => {
     ).toEqual(['home', 'profile', 'film', 'system', 'capabilities', 'contact']);
   });
 
-  it('contains exactly one film, one workflow proof, and three capabilities', () => {
+  it('contains exactly one film, one workflow proof, and six capabilities', () => {
     const { container } = render(<App />);
 
     expect(screen.getAllByRole('heading', { name: siteContent.film.title })).toHaveLength(1);
     expect(screen.getAllByAltText(/ComfyUI/)).toHaveLength(1);
-    expect(container.querySelectorAll('#capabilities article')).toHaveLength(3);
+    expect(container.querySelectorAll('#capabilities article')).toHaveLength(6);
   });
 
   it('omits rejected résumé and work-year content', () => {
@@ -252,7 +252,7 @@ describe('complete portfolio integration', () => {
     expect(container.querySelector('#system ul[aria-label="工作流工具"]')).toBeInTheDocument();
 
     const capabilityButtons = [...capabilitySection.querySelectorAll('button')];
-    expect(capabilityButtons).toHaveLength(3);
+    expect(capabilityButtons).toHaveLength(6);
     capabilityButtons.forEach((button) => {
       expect(button).toHaveAttribute('aria-pressed', 'false');
       expect(button).toHaveAccessibleName(/翻转.+技能卡/);

@@ -120,7 +120,8 @@ describe('HeroScrollSequence', () => {
     render(<HeroScrollSequence />);
 
     expect(screen.getByRole('heading', { name: 'THINK WITH AI.', hidden: true })).toBeInTheDocument();
-    expect(screen.getAllByText('鐞嗚В宸ュ叿').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('借助 AI 思考').length).toBeGreaterThan(0);
+    expect(screen.getByText('01 / THINK')).toBeInTheDocument();
     expect(screen.getByText('01 / 04')).toBeInTheDocument();
     expect(document.querySelector('#profile')).toHaveAttribute('aria-labelledby', 'hero-title');
     expect(screen.getByLabelText('滚动控制的动画人物')).toBeInTheDocument();
@@ -165,6 +166,20 @@ describe('HeroScrollSequence', () => {
     });
   });
 
+  it('renders active stage copy in eyebrow, translation, title, summary order', () => {
+    render(<HeroScrollSequence />);
+
+    const title = screen.getByRole('heading', { name: 'THINK WITH AI.', hidden: true });
+    const stage = title.parentElement;
+
+    expect(stage?.children[0]).toHaveTextContent('01 / THINK');
+    expect(stage?.children[1]).toHaveTextContent('借助 AI 思考');
+    expect(stage?.children[2]).toBe(title);
+    expect(stage?.children[3]).toHaveTextContent(
+      '理解 ComfyUI、n8n、Codex 等 AI 工具。',
+    );
+  });
+
   it('synchronizes capability copy and stage count with forward scroll phases', async () => {
     vi.mocked(loadPortraitSequenceCached).mockResolvedValue([
       { width: 1600, height: 900 } as HTMLImageElement,
@@ -177,14 +192,14 @@ describe('HeroScrollSequence', () => {
     expect(
       screen.getByRole('heading', { name: 'BUILD THE WORKFLOW.', hidden: true }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('涓茶仈娴佺▼').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('搭建创作工作流').length).toBeGreaterThan(0);
     expect(screen.getByText('03 / 04')).toBeInTheDocument();
 
     act(() => onUpdate({ progress: 0.9 }));
     expect(
       screen.getByRole('heading', { name: 'DELIVER THE RESULT.', hidden: true }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('鏈嶅姟杞寲').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('交付转化结果').length).toBeGreaterThan(0);
     expect(screen.getByText('04 / 04')).toBeInTheDocument();
   });
 
@@ -215,15 +230,15 @@ describe('HeroScrollSequence', () => {
     const liveRegion = document.querySelector<HTMLElement>('[aria-live="polite"]');
 
     expect(document.querySelectorAll('[aria-live="polite"]')).toHaveLength(1);
-    expect(liveRegion).toHaveTextContent('鐞嗚В宸ュ叿');
+    expect(liveRegion).toHaveTextContent('借助 AI 思考');
 
     act(() => onUpdate({ progress: 0.56 }));
     expect(document.querySelector('[aria-live="polite"]')).toBe(liveRegion);
-    expect(liveRegion).toHaveTextContent('涓茶仈娴佺▼');
+    expect(liveRegion).toHaveTextContent('搭建创作工作流');
 
     act(() => onUpdate({ progress: 0.9 }));
     expect(document.querySelector('[aria-live="polite"]')).toBe(liveRegion);
-    expect(liveRegion).toHaveTextContent('鏈嶅姟杞寲');
+    expect(liveRegion).toHaveTextContent('交付转化结果');
   });
 
   it('loads the composed mobile sequence below 768px', async () => {
@@ -262,9 +277,11 @@ describe('HeroScrollSequence', () => {
     const stageList = screen.getByRole('list', { name: '能力阶段概览', hidden: true });
     expect(within(stageList).getAllByRole('listitem', { hidden: true })).toHaveLength(4);
     expect(stageList).toHaveTextContent('THINK WITH AI.');
+    expect(stageList).toHaveTextContent('借助 AI 思考');
     expect(stageList).toHaveTextContent('SHAPE THE STORY.');
     expect(stageList).toHaveTextContent('BUILD THE WORKFLOW.');
     expect(stageList).toHaveTextContent('DELIVER THE RESULT.');
+    expect(stageList).toHaveTextContent('交付转化结果');
 
     unmount();
     expect(reduced.mediaQuery.removeEventListener).toHaveBeenCalledWith(
