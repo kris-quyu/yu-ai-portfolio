@@ -15,6 +15,11 @@ export interface HeroStage {
   summary: string;
 }
 
+export interface BilingualCopy {
+  readonly zh: string;
+  readonly en: string;
+}
+
 export interface Capability {
   id:
     | 'automation'
@@ -27,9 +32,9 @@ export interface Capability {
   title: string;
   summary: string;
   tools: readonly string[];
-  mastered: string;
-  growing: string;
-  next: string;
+  mastered: BilingualCopy;
+  growing: BilingualCopy;
+  next: BilingualCopy;
 }
 
 export interface ContactDetails {
@@ -119,9 +124,9 @@ export const siteContent: SiteContent = {
     {
       id: 'automation',
       index: '01',
-      mastered: 'AI workflow setup and automation',
-      growing: 'Reliable multi-tool orchestration',
-      next: 'Reusable production systems',
+      mastered: { zh: 'AI 工作流搭建与自动化', en: 'AI workflow setup and automation' },
+      growing: { zh: '稳定的多工具协同', en: 'Reliable multi-tool orchestration' },
+      next: { zh: '可复用的生产系统', en: 'Reusable production systems' },
       title: 'AI 内容与自动化',
       summary: '图像生成、视频生成与自动化工作流。',
       tools: ['ComfyUI', 'n8n', 'Codex'],
@@ -129,9 +134,9 @@ export const siteContent: SiteContent = {
     {
       id: 'video',
       index: '02',
-      mastered: 'Script and edit direction',
-      growing: 'AI-assisted visual storytelling',
-      next: 'End-to-end film production',
+      mastered: { zh: '脚本策划与剪辑指导', en: 'Script and edit direction' },
+      growing: { zh: 'AI 辅助视觉叙事', en: 'AI-assisted visual storytelling' },
+      next: { zh: '端到端影片制作', en: 'End-to-end film production' },
       title: '视频编导与剪辑',
       summary: '脚本、分镜、卖点表达和剪辑包装。',
       tools: ['脚本', '分镜', '剪辑'],
@@ -139,9 +144,9 @@ export const siteContent: SiteContent = {
     {
       id: 'commerce',
       index: '03',
-      mastered: 'Product value communication',
-      growing: 'Content conversion strategy',
-      next: 'Measurable commerce outcomes',
+      mastered: { zh: '产品价值表达', en: 'Product value communication' },
+      growing: { zh: '内容转化策略', en: 'Content conversion strategy' },
+      next: { zh: '可衡量的电商成果', en: 'Measurable commerce outcomes' },
       title: '电商内容转化',
       summary: '理解商品卖点、用户痛点与成交逻辑。',
       tools: ['卖点', '用户痛点', '转化'],
@@ -149,9 +154,9 @@ export const siteContent: SiteContent = {
     {
       id: 'programming',
       index: '04',
-      mastered: '基础程序开发与视觉处理',
-      growing: 'AI 辅助编程与视觉识别',
-      next: '将代码能力接入内容自动化流程',
+      mastered: { zh: '基础程序开发与视觉处理', en: 'Foundational programming and visual processing' },
+      growing: { zh: 'AI 辅助编程与视觉识别', en: 'AI-assisted programming and visual recognition' },
+      next: { zh: '将代码能力接入内容自动化流程', en: 'Integrate coding into content automation' },
       title: '编程与视觉识别',
       summary: '掌握 Python、C/C++ 基础，了解 OpenCV 视觉识别与图像处理。',
       tools: ['Python', 'C/C++', 'OpenCV'],
@@ -159,9 +164,9 @@ export const siteContent: SiteContent = {
     {
       id: 'hardware',
       index: '05',
-      mastered: '硬件调试与三维建模',
-      growing: '软硬件联动原型',
-      next: '完成可展示的智能设备作品',
+      mastered: { zh: '硬件调试与三维建模', en: 'Hardware debugging and 3D modeling' },
+      growing: { zh: '软硬件联动原型', en: 'Hardware-software integrated prototyping' },
+      next: { zh: '完成可展示的智能设备作品', en: 'Build a showcase-ready smart device' },
       title: '硬件开发与数字制造',
       summary: '单片机开发、传感器调试、UG/NX 建模与 3D 打印。',
       tools: ['单片机', '传感器', 'UG/NX', '3D 打印'],
@@ -169,9 +174,9 @@ export const siteContent: SiteContent = {
     {
       id: 'photography',
       index: '06',
-      mastered: '专业拍摄与后期制作',
-      growing: '商业级灯光与镜头语言',
-      next: '建立稳定的视觉内容风格',
+      mastered: { zh: '专业拍摄与后期制作', en: 'Professional photography and post-production' },
+      growing: { zh: '商业级灯光与镜头语言', en: 'Commercial lighting and visual language' },
+      next: { zh: '建立稳定的视觉内容风格', en: 'Establish a consistent visual style' },
       title: '专业摄影与视觉后期',
       summary: '专业相机摄影，熟悉 PS、PR、LR 与完整后期流程。',
       tools: ['专业摄影', 'PS', 'PR', 'LR'],

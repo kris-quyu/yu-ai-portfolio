@@ -53,15 +53,24 @@ export function CapabilityGrid() {
                   <dl className={styles.growthList}>
                     <div className={styles.growthItem}>
                       <dt className={styles.growthLabel}>已能独立完成</dt>
-                      <dd className={styles.growthCopy}>{capability.mastered}</dd>
+                      <dd className={styles.growthCopy}>
+                        <span className={styles.growthPrimary}>{capability.mastered.zh}</span>
+                        <span className={styles.growthSecondary} lang="en">{capability.mastered.en}</span>
+                      </dd>
                     </div>
                     <div className={styles.growthItem}>
                       <dt className={styles.growthLabel}>正在持续强化</dt>
-                      <dd className={styles.growthCopy}>{capability.growing}</dd>
+                      <dd className={styles.growthCopy}>
+                        <span className={styles.growthPrimary}>{capability.growing.zh}</span>
+                        <span className={styles.growthSecondary} lang="en">{capability.growing.en}</span>
+                      </dd>
                     </div>
                     <div className={styles.growthItem}>
                       <dt className={styles.growthLabel}>下一阶段目标</dt>
-                      <dd className={styles.growthCopy}>{capability.next}</dd>
+                      <dd className={styles.growthCopy}>
+                        <span className={styles.growthPrimary}>{capability.next.zh}</span>
+                        <span className={styles.growthSecondary} lang="en">{capability.next.en}</span>
+                      </dd>
                     </div>
                   </dl>
                   <span className={styles.returnCue}>返回正面 ↙</span>

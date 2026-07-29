@@ -181,11 +181,23 @@
 }
 
 .growthCopy {
+  display: grid;
+  gap: 0.3rem;
   margin: 0;
   color: var(--forest);
+}
+
+.growthPrimary {
   font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 700;
   line-height: 1.35;
+}
+
+.growthSecondary {
+  color: color-mix(in srgb, var(--forest) 62%, var(--sage));
+  font-size: clamp(0.74rem, 1.1vw, 0.86rem);
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .returnCue {
