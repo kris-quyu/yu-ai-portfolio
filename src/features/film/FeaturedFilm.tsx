@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { siteContent } from '../../content/siteContent';
 import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
+import { ProjectCaseStudy } from '../projects/ProjectCaseStudy';
 import styles from './FeaturedFilm.module.css';
 
 const fallbackFilm = {
@@ -9,6 +10,7 @@ const fallbackFilm = {
 };
 
 export function FeaturedFilm() {
+  const project = siteContent.projects[0];
   const [film, setFilm] = useState(fallbackFilm);
   const [open, setOpen] = useState(false);
   const [manifestFailed, setManifestFailed] = useState(false);
@@ -117,102 +119,95 @@ export function FeaturedFilm() {
   }, [open]);
 
   return (
-    <section id="film" className={styles.section} aria-labelledby="film-title">
-      <div className={styles.copy}>
-        <p className={styles.eyebrow}>{siteContent.film.eyebrow}</p>
-        <h2 id="film-title">{siteContent.film.title}</h2>
-        <p className={styles.summary}>{siteContent.film.summary}</p>
-        <ul className={styles.tags} aria-label="影片能力标签">
-          {siteContent.film.tags.map((tag) => <li key={tag}>{tag}</li>)}
-        </ul>
-      </div>
-
-      <div
-        className={`${styles.mediaFrame} ${previewVisible ? styles.mediaFrameVisible : ''}`}
-        data-in-view={previewVisible}
-      >
-        {videoFailed ? (
-          <div className={styles.mediaFallback} role={open ? undefined : 'alert'}>
-            <img src={film.poster} alt="AI 产品视频封面" />
-            <div className={styles.fallbackCopy}>
-              <p>视频暂时无法在页面内播放。</p>
-              <a href={film.src} target="_blank" rel="noreferrer">直接打开视频</a>
-            </div>
-          </div>
-        ) : (
-          <>
-            <video
-              ref={previewRef}
-              className={styles.preview}
-              src={previewReady ? film.src : undefined}
-              poster={film.poster}
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              onError={() => setVideoFailed(true)}
-              aria-label="AI 产品视频预览"
-            />
-            <button
-              ref={triggerRef}
-              className={styles.playButton}
-              type="button"
-              onClick={() => setOpen(true)}
-              aria-haspopup="dialog"
-            >
-              播放 AI 产品视频
-            </button>
-          </>
-        )}
-        {manifestFailed && (
-          <p className={styles.mediaStatus} role="status">视频预览暂时无法更新，仍可尝试播放。</p>
-        )}
-      </div>
-
-      {open && (
-        <div className={styles.overlay} data-testid="film-overlay" onClick={(event) => {
-          if (event.target === event.currentTarget) closeDialog();
-        }}>
-          <div
-            ref={dialogRef}
-            className={styles.dialog}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="film-dialog-title"
-          >
-            <div className={styles.dialogHeader}>
-              <p id="film-dialog-title">{siteContent.film.title}</p>
-              <button
-                ref={closeButtonRef}
-                className={styles.closeButton}
-                type="button"
-                onClick={closeDialog}
-                aria-label="关闭视频播放器"
-              >
-                关闭
-              </button>
-            </div>
-            {videoFailed ? (
-              <div className={styles.dialogFallback} role="alert">
+    <ProjectCaseStudy project={project}>
+      <div id="project-01-media" data-testid="project-01-media">
+        <div
+          className={`${styles.mediaFrame} ${previewVisible ? styles.mediaFrameVisible : ''}`}
+          data-in-view={previewVisible}
+        >
+          {videoFailed ? (
+            <div className={styles.mediaFallback} role={open ? undefined : 'alert'}>
+              <img src={film.poster} alt="AI 产品视频封面" />
+              <div className={styles.fallbackCopy}>
                 <p>视频暂时无法在页面内播放。</p>
                 <a href={film.src} target="_blank" rel="noreferrer">直接打开视频</a>
               </div>
-            ) : (
+            </div>
+          ) : (
+            <>
               <video
-                ref={dialogVideoRef}
-                className={styles.dialogVideo}
-                src={film.src}
+                ref={previewRef}
+                className={styles.preview}
+                src={previewReady ? film.src : undefined}
                 poster={film.poster}
-                controls
+                muted
+                loop
                 playsInline
                 preload="metadata"
                 onError={() => setVideoFailed(true)}
-                aria-label="AI 产品视频播放器"
+                aria-label="AI 产品视频预览"
               />
-            )}
-          </div>
+              <button
+                ref={triggerRef}
+                className={styles.playButton}
+                type="button"
+                onClick={() => setOpen(true)}
+                aria-haspopup="dialog"
+              >
+                播放 AI 产品视频
+              </button>
+            </>
+          )}
+          {manifestFailed && (
+            <p className={styles.mediaStatus} role="status">视频预览暂时无法更新，仍可尝试播放。</p>
+          )}
         </div>
-      )}
-    </section>
+
+        {open && (
+          <div className={styles.overlay} data-testid="film-overlay" onClick={(event) => {
+            if (event.target === event.currentTarget) closeDialog();
+          }}>
+            <div
+              ref={dialogRef}
+              className={styles.dialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="film-dialog-title"
+            >
+              <div className={styles.dialogHeader}>
+                <p id="film-dialog-title">{siteContent.film.title}</p>
+                <button
+                  ref={closeButtonRef}
+                  className={styles.closeButton}
+                  type="button"
+                  onClick={closeDialog}
+                  aria-label="关闭视频播放器"
+                >
+                  关闭
+                </button>
+              </div>
+              {videoFailed ? (
+                <div className={styles.dialogFallback} role="alert">
+                  <p>视频暂时无法在页面内播放。</p>
+                  <a href={film.src} target="_blank" rel="noreferrer">直接打开视频</a>
+                </div>
+              ) : (
+                <video
+                  ref={dialogVideoRef}
+                  className={styles.dialogVideo}
+                  src={film.src}
+                  poster={film.poster}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  onError={() => setVideoFailed(true)}
+                  aria-label="AI 产品视频播放器"
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </ProjectCaseStudy>
   );
 }

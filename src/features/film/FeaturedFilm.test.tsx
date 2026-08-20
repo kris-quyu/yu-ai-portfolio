@@ -68,6 +68,11 @@ describe('FeaturedFilm', () => {
     render(<FeaturedFilm />);
 
     expect(screen.getAllByRole('heading', { name: 'AI PRODUCT FILM' })).toHaveLength(1);
+    expect(screen.getByText('COMPLETED')).toBeInTheDocument();
+    expect(screen.getByText(/AI 视频制作需要在参考素材、Prompt、生成、筛选和后期之间频繁切换/)).toBeInTheDocument();
+    expect(screen.getByText('产品资料与卖点分析')).toBeInTheDocument();
+    expect(screen.getByText('后期剪辑与视觉优化')).toBeInTheDocument();
+    expect(screen.getByTestId('project-01-media')).toHaveAttribute('id', 'project-01-media');
     const preview = await screen.findByLabelText('AI 产品视频预览');
     expect(preview).not.toHaveAttribute('src');
     expect(preview).toHaveAttribute('poster', manifest.film.poster);
@@ -139,7 +144,7 @@ describe('FeaturedFilm', () => {
 
   it('toggles the film reveal class only while the preview is in view', async () => {
     const { container } = render(<FeaturedFilm />);
-    const preview = container.querySelector('#film video[aria-label]') as HTMLVideoElement;
+    const preview = container.querySelector('#project-01 video[aria-label]') as HTMLVideoElement;
     const mediaFrame = preview.parentElement as HTMLElement;
     const observer = IntersectionObserverStub.instances[0];
     const initialClassName = mediaFrame.className;
