@@ -159,6 +159,30 @@
   line-height: 1.7;
 }
 
+.positioning {
+  max-width: 38rem;
+  margin: 1.25rem 0 0;
+  color: var(--ivory);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0;
+  margin: 0.9rem 0 0;
+  list-style: none;
+}
+
+.keywords li {
+  color: var(--acid);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
 .reducedStageList {
   display: grid;
   gap: 0.8rem;
@@ -301,6 +325,15 @@
     margin-top: 0.55rem;
     font-size: 0.88rem;
     line-height: 1.45;
+  }
+
+  .positioning {
+    max-width: 30rem;
+    font-size: 0.95rem;
+  }
+
+  .keywords {
+    gap: 0.4rem 0.7rem;
   }
 
   .progress {

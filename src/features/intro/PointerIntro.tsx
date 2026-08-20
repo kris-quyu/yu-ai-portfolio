@@ -238,7 +238,10 @@ export function PointerIntro() {
           <h1 id="intro-title" className={styles.title}>
             {siteContent.intro.title}
           </h1>
-          <p className={styles.annotation}>{siteContent.intro.annotation}</p>
+          <div className={styles.annotationGroup}>
+            <p className={styles.annotation}>{siteContent.intro.annotation}</p>
+            <p className={styles.annotationZh}>{siteContent.intro.annotationZh}</p>
+          </div>
         </div>
       </div>
 

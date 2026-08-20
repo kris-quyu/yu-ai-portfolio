@@ -270,6 +270,13 @@ export function HeroScrollSequence() {
             })}
           </div>
 
+          <p className={styles.positioning}>{siteContent.hero.positioning}</p>
+          <ul className={styles.keywords} aria-label="核心能力关键词">
+            {siteContent.hero.keywords.map((keyword) => (
+              <li key={keyword}>{keyword}</li>
+            ))}
+          </ul>
+
           {reducedMotion && (
             <ol className={styles.reducedStageList} aria-label="能力阶段概览">
               {siteContent.hero.stages.map((stage) => (

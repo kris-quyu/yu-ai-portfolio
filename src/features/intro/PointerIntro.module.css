@@ -163,18 +163,30 @@
   will-change: transform;
 }
 
-.annotation {
+.annotationGroup {
   position: absolute;
   top: calc(100% + clamp(0.8rem, 1.8vw, 1.35rem));
   left: 0;
   width: 100%;
+  text-align: center;
+}
+
+.annotation {
   margin: 0;
   color: color-mix(in srgb, var(--forest) 76%, var(--muted-sage));
   font-size: clamp(0.62rem, 1.1vw, 0.76rem);
   font-weight: 760;
   letter-spacing: 0.14em;
   line-height: 1.4;
-  text-align: center;
+}
+
+.annotationZh {
+  margin: 0.35rem 0 0;
+  color: color-mix(in srgb, var(--forest) 76%, var(--muted-sage));
+  font-size: clamp(0.68rem, 1.2vw, 0.86rem);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
 }
 
 .meta {
