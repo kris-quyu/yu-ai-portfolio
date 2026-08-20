@@ -37,6 +37,7 @@ describe('PortfolioLoader', () => {
   afterEach(() => {
     cleanup();
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('shows the approved loading copy and percentage on every mount', () => {
@@ -97,7 +98,7 @@ describe('PortfolioLoader', () => {
   });
 
   it('loads the poster and four desktop key frames before starting background warming', async () => {
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1440 });
+    vi.stubGlobal('innerWidth', 1440);
     const loadKeyFrames = vi.fn().mockResolvedValue(undefined);
     const preloadImages = vi.fn().mockResolvedValue(undefined);
     const loaders: CriticalAssetLoaders = {
@@ -131,5 +132,21 @@ describe('PortfolioLoader', () => {
     await Promise.resolve();
 
     expect(warmSequence).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not warm the full portrait sequence when reduced motion is preferred', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    const warmSequence = vi.fn().mockResolvedValue(undefined);
+    const loaders: CriticalAssetLoaders = {
+      loadManifest: vi.fn().mockResolvedValue(manifest),
+      waitForFonts: vi.fn().mockResolvedValue(undefined),
+      preloadImages: vi.fn().mockResolvedValue(undefined),
+      loadKeyFrames: vi.fn().mockResolvedValue(undefined),
+      warmSequence,
+    };
+
+    await loadCriticalAssets(vi.fn(), loaders);
+
+    expect(warmSequence).not.toHaveBeenCalled();
   });
 });

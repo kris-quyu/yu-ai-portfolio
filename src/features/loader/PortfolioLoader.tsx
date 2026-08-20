@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { loadPortraitSequenceCached } from '../hero/portraitSequenceCache';
 import { loadMediaManifest, type MediaManifest } from '../../lib/media';
-import { loadPortfolio } from './loadPortfolio';
+import { loadPortfolio, type PortfolioLoadResult } from './loadPortfolio';
 import styles from './PortfolioLoader.module.css';
 
 type LoaderState = 'modal' | 'revealing';
 
 export interface PortfolioLoaderProps {
   loadCritical?: (report: (loaded: number, total: number) => void) => Promise<void>;
+  onSettled?: (result: PortfolioLoadResult) => void;
 }
 
 const loadingTopics = ['AI 内容', '视频工作流', '电商转化'];
@@ -78,15 +79,21 @@ export async function loadCriticalAssets(
   await loaders.preloadImages([manifest.portrait.poster]);
   report(3, 4);
   await loaders.loadKeyFrames(sequence.pattern, indices);
-  try {
-    void loaders.warmSequence().catch(() => undefined);
-  } catch {
-    // Background warming is best-effort and must never block first-screen readiness.
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  if (!reducedMotion) {
+    try {
+      void loaders.warmSequence().catch(() => undefined);
+    } catch {
+      // Background warming is best-effort and must never block first-screen readiness.
+    }
   }
   report(4, 4);
 }
 
-export function PortfolioLoader({ loadCritical = loadCriticalAssets }: PortfolioLoaderProps) {
+export function PortfolioLoader({
+  loadCritical = loadCriticalAssets,
+  onSettled,
+}: PortfolioLoaderProps) {
   const [percent, setPercent] = useState(0);
   const [topic, setTopic] = useState(0);
   const [state, setState] = useState<LoaderState>('modal');
@@ -107,8 +114,9 @@ export function PortfolioLoader({ loadCritical = loadCriticalAssets }: Portfolio
       maximumMs: 6000,
       onProgress: setPercent,
       loadCritical,
-    }).then(() => {
+    }).then((result) => {
       if (!current) return;
+      onSettled?.(result);
       setState('revealing');
       window.setTimeout(() => {
         if (current) setVisible(false);
@@ -118,7 +126,7 @@ export function PortfolioLoader({ loadCritical = loadCriticalAssets }: Portfolio
     return () => {
       current = false;
     };
-  }, [loadCritical]);
+  }, [loadCritical, onSettled]);
 
   useEffect(() => {
     if (state !== 'modal') return;

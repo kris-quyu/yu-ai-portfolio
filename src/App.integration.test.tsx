@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { siteContent } from './content/siteContent';
 import { loadMediaManifest } from './lib/media';
+import { loadPortraitSequenceCached } from './features/hero/portraitSequenceCache';
 import capabilityCss from './features/capabilities/CapabilityGrid.module.css?raw';
 import contactCss from './features/contact/ContactSection.module.css?raw';
 import filmCss from './features/film/FeaturedFilm.module.css?raw';
@@ -27,6 +28,10 @@ vi.mock('./lib/media', async (importOriginal) => {
   const media = await importOriginal<typeof import('./lib/media')>();
   return { ...media, loadMediaManifest: vi.fn() };
 });
+
+vi.mock('./features/hero/portraitSequenceCache', () => ({
+  loadPortraitSequenceCached: vi.fn(),
+}));
 
 const manifest = {
   portrait: {
@@ -99,6 +104,9 @@ describe('complete portfolio integration', () => {
   beforeEach(() => {
     IntersectionObserverStub.instances = [];
     vi.mocked(loadMediaManifest).mockResolvedValue(manifest);
+    vi.mocked(loadPortraitSequenceCached).mockImplementation(
+      () => new Promise(() => undefined),
+    );
     vi.stubGlobal('matchMedia', vi.fn(() => reducedMotion));
     vi.stubGlobal('IntersectionObserver', IntersectionObserverStub);
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
@@ -107,8 +115,80 @@ describe('complete portfolio integration', () => {
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it('keeps the Hero sequence behind Loader critical readiness and then joins the warm cache', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      ...reducedMotion,
+      matches: false,
+    })));
+
+    class DeferredImage {
+      static instances: DeferredImage[] = [];
+
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+
+      constructor() {
+        DeferredImage.instances.push(this);
+      }
+
+      set src(_value: string) {}
+    }
+
+    vi.stubGlobal('Image', DeferredImage);
+    render(<App />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(DeferredImage.instances).toHaveLength(1);
+    expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
+
+    act(() => DeferredImage.instances[0].onload?.());
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(DeferredImage.instances).toHaveLength(5);
+
+    act(() => DeferredImage.instances.slice(1).forEach((image) => image.onload?.()));
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(loadPortraitSequenceCached).toHaveBeenCalledTimes(1);
+
+    await act(() => vi.advanceTimersByTimeAsync(1200));
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(loadPortraitSequenceCached).toHaveBeenCalledTimes(2);
+    expect(loadPortraitSequenceCached).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        posterUrl: manifest.portrait.poster,
+        pattern: manifest.portrait.desktop.pattern,
+        count: 120,
+      }),
+    );
+    expect(loadPortraitSequenceCached).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        posterUrl: manifest.portrait.poster,
+        pattern: manifest.portrait.desktop.pattern,
+        count: 120,
+      }),
+    );
   });
 
   it('defines the approved palette and maps every shared visual alias to it', () => {

@@ -24,11 +24,15 @@ gsap.registerPlugin(ScrollTrigger);
 type SequenceKind = 'desktop' | 'mobile';
 type HeroStyle = CSSProperties & { '--hero-progress': string };
 
+export interface HeroScrollSequenceProps {
+  sequenceEnabled?: boolean;
+}
+
 const getSequenceKind = (): SequenceKind =>
   typeof window !== 'undefined' && window.innerWidth < 768 ? 'mobile' : 'desktop';
 const initialPosterUrl = resolveMediaUrl('media/portrait/poster.webp');
 
-export function HeroScrollSequence() {
+export function HeroScrollSequence({ sequenceEnabled = true }: HeroScrollSequenceProps) {
   const reducedMotion = useReducedMotion();
   const [manifest, setManifest] = useState<MediaManifest | null>(null);
   const [sequenceKind, setSequenceKind] = useState<SequenceKind>(getSequenceKind);
@@ -48,6 +52,8 @@ export function HeroScrollSequence() {
   const raf = useRef(0);
 
   useEffect(() => {
+    if (!sequenceEnabled) return;
+
     let current = true;
 
     void loadMediaManifest()
@@ -61,7 +67,7 @@ export function HeroScrollSequence() {
     return () => {
       current = false;
     };
-  }, []);
+  }, [sequenceEnabled]);
 
   useEffect(() => {
     let resizeRaf = 0;
