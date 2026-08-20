@@ -2,18 +2,34 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { siteContent } from '../../content/siteContent';
-import { loadMediaManifest, resolveMediaUrl } from '../../lib/media';
+import { loadMediaManifest, resolveMediaUrl, type MediaEvidence } from '../../lib/media';
 import { useReducedMotion } from '../../lib/useReducedMotion';
+import { ProjectCaseStudy } from '../projects/ProjectCaseStudy';
+import { ProjectMediaGallery } from '../projects/ProjectMediaGallery';
 import styles from './WorkflowProof.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const initialWorkflowUrl = resolveMediaUrl('media/workflow/comfyui-workflow.webp');
+const fallbackEvidence: readonly MediaEvidence[] = [
+  {
+    src: resolveMediaUrl('media/projects/project-02/comfyui-continuity-workflow.webp'),
+    alt: 'ComfyUI 连续镜头工作流界面',
+  },
+  {
+    src: resolveMediaUrl('media/projects/project-02/scene-development.webp'),
+    alt: 'Seedance 场景参考与画面开发记录',
+  },
+  {
+    src: resolveMediaUrl('media/projects/project-02/continuity-generation.webp'),
+    alt: 'Seedance 连续镜头生成记录',
+  },
+];
 
 export function WorkflowProof() {
+  const project = siteContent.projects[1];
   const reducedMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const [workflowUrl, setWorkflowUrl] = useState(initialWorkflowUrl);
+  const [evidence, setEvidence] = useState(fallbackEvidence);
   const [active, setActive] = useState(reducedMotion);
 
   useEffect(() => {
@@ -21,7 +37,13 @@ export function WorkflowProof() {
 
     void loadMediaManifest()
       .then((manifest) => {
-        if (current) setWorkflowUrl(manifest.workflow.src);
+        if (current) {
+          setEvidence([
+            manifest.projects.project02.workflow,
+            manifest.projects.project02.sceneDevelopment,
+            manifest.projects.project02.continuityGeneration,
+          ]);
+        }
       })
       .catch(() => undefined);
 
@@ -50,24 +72,18 @@ export function WorkflowProof() {
   }, [reducedMotion]);
 
   return (
-    <section
-      ref={sectionRef}
-      id="system"
+    <ProjectCaseStudy
+      project={project}
+      sectionRef={sectionRef}
       className={`${styles.section} ${active ? styles.active : ''}`}
-      data-active={active}
-      aria-labelledby="workflow-title"
+      active={active}
     >
-      <div className={styles.copy}>
-        <h2 id="workflow-title">{siteContent.workflow.title}</h2>
-        <p className={styles.summary}>{siteContent.workflow.summary}</p>
-        <ul className={styles.tags} aria-label="工作流工具">
-          {siteContent.workflow.tags.map((tag) => <li key={tag}>{tag}</li>)}
-        </ul>
-      </div>
-
-      <figure className={styles.mediaFrame}>
-        <img src={workflowUrl} alt="ComfyUI 工作流界面" />
-      </figure>
-    </section>
+      <ProjectMediaGallery items={evidence} />
+      {project.sharedOutput && (
+        <a className={styles.sharedOutput} href={project.sharedOutput.href}>
+          {project.sharedOutput.label}
+        </a>
+      )}
+    </ProjectCaseStudy>
   );
 }
