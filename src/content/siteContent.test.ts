@@ -59,12 +59,22 @@ describe('siteContent', () => {
       label: 'APPLIED OUTPUT · SHARED WITH PROJECT 01',
       href: '#project-01-media',
     });
-    for (const project of siteContent.projects) {
-      expect(project.problem).not.toHaveLength(0);
-      expect(project.solution).not.toHaveLength(0);
-      expect(project.role.length).toBeGreaterThan(0);
-      expect(project.result).not.toHaveLength(0);
-    }
+    const [productFilm, shortFilmWorkflow, contentWorkflow] = siteContent.projects;
+
+    expect(productFilm.problem).toContain('统一的产品表达');
+    expect(productFilm.solution).toContain('生活使用场景');
+    expect(productFilm.role).toContain('后期剪辑与视觉优化');
+    expect(productFilm.result).toContain('最终成片证据');
+
+    expect(shortFilmWorkflow.problem).toContain('服装漂移');
+    expect(shortFilmWorkflow.solution).toContain('角色与场景参考素材');
+    expect(shortFilmWorkflow.role).toContain('角色和场景参考设计');
+    expect(shortFilmWorkflow.result).toContain('应用于产品成片制作');
+
+    expect(contentWorkflow.problem).toContain('可复用、可自动化');
+    expect(contentWorkflow.solution).toContain('已实践、实验中与计划中');
+    expect(contentWorkflow.role).toContain('尝试素材处理和流程串联');
+    expect(contentWorkflow.result).toContain('稳定的端到端自动化输出仍在持续开发');
   });
 
   it('keeps automation claims truthful and removes n8n', () => {
