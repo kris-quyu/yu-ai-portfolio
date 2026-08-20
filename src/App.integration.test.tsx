@@ -102,6 +102,7 @@ const visualCss = [
 
 describe('complete portfolio integration', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     IntersectionObserverStub.instances = [];
     vi.mocked(loadMediaManifest).mockResolvedValue(manifest);
     vi.mocked(loadPortraitSequenceCached).mockImplementation(
@@ -189,6 +190,109 @@ describe('complete portfolio integration', () => {
         count: 120,
       }),
     );
+  });
+
+  it('dismisses after a critical-image failure but keeps Hero on the static fallback', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      ...reducedMotion,
+      matches: false,
+    })));
+
+    class RejectingImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+
+      set src(_value: string) {
+        queueMicrotask(() => this.onerror?.());
+      }
+    }
+
+    vi.stubGlobal('Image', RejectingImage);
+    const { container } = render(<App />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(() => vi.advanceTimersByTimeAsync(1200));
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('portfolio-loader')).toHaveAttribute(
+      'data-state',
+      'revealing',
+    );
+    expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
+    expect(container.querySelector('#profile canvas')).not.toBeInTheDocument();
+    expect(container.querySelector('#profile [role="status"]')).toHaveTextContent(
+      'STATIC PORTRAIT',
+    );
+
+    await act(() => vi.advanceTimersByTimeAsync(700));
+    expect(screen.queryByTestId('portfolio-loader')).not.toBeInTheDocument();
+  });
+
+  it('dismisses after the critical timeout without ever starting the Hero sequence', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      ...reducedMotion,
+      matches: false,
+    })));
+
+    class PendingImage {
+      static instances: PendingImage[] = [];
+
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+
+      constructor() {
+        PendingImage.instances.push(this);
+      }
+
+      set src(_value: string) {}
+    }
+
+    vi.stubGlobal('Image', PendingImage);
+    const { container } = render(<App />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(() => vi.advanceTimersByTimeAsync(6000));
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('portfolio-loader')).toHaveAttribute(
+      'data-state',
+      'revealing',
+    );
+    expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
+    expect(container.querySelector('#profile canvas')).not.toBeInTheDocument();
+    expect(container.querySelector('#profile [role="status"]')).toHaveTextContent(
+      'STATIC PORTRAIT',
+    );
+
+    await act(() => vi.advanceTimersByTimeAsync(700));
+    expect(screen.queryByTestId('portfolio-loader')).not.toBeInTheDocument();
+
+    act(() => PendingImage.instances[0].onload?.());
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    act(() => PendingImage.instances.slice(1).forEach((image) => image.onload?.()));
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(loadPortraitSequenceCached).not.toHaveBeenCalled();
   });
 
   it('defines the approved palette and maps every shared visual alias to it', () => {

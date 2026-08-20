@@ -6,11 +6,17 @@ import { WorkflowProof } from './features/workflow/WorkflowProof';
 import { CapabilityGrid } from './features/capabilities/CapabilityGrid';
 import { ContactSection } from './features/contact/ContactSection';
 import { PortfolioLoader } from './features/loader/PortfolioLoader';
+import type { PortfolioLoadResult } from './features/loader/loadPortfolio';
 import { PointerIntro } from './features/intro/PointerIntro';
 
 export default function App() {
-  const [portfolioReady, setPortfolioReady] = useState(false);
-  const handlePortfolioSettled = useCallback(() => setPortfolioReady(true), []);
+  const [portfolioReadiness, setPortfolioReadiness] = useState<
+    PortfolioLoadResult | 'loading'
+  >('loading');
+  const handlePortfolioSettled = useCallback(
+    (result: PortfolioLoadResult) => setPortfolioReadiness(result),
+    [],
+  );
 
   return (
     <>
@@ -18,7 +24,7 @@ export default function App() {
       <Navigation />
       <main>
         <PointerIntro />
-        <HeroScrollSequence sequenceEnabled={portfolioReady} />
+        <HeroScrollSequence sequenceState={portfolioReadiness} />
         <FeaturedFilm />
         <WorkflowProof />
         <CapabilityGrid />

@@ -25,14 +25,14 @@ type SequenceKind = 'desktop' | 'mobile';
 type HeroStyle = CSSProperties & { '--hero-progress': string };
 
 export interface HeroScrollSequenceProps {
-  sequenceEnabled?: boolean;
+  sequenceState?: 'loading' | 'ready' | 'degraded';
 }
 
 const getSequenceKind = (): SequenceKind =>
   typeof window !== 'undefined' && window.innerWidth < 768 ? 'mobile' : 'desktop';
 const initialPosterUrl = resolveMediaUrl('media/portrait/poster.webp');
 
-export function HeroScrollSequence({ sequenceEnabled = true }: HeroScrollSequenceProps) {
+export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequenceProps) {
   const reducedMotion = useReducedMotion();
   const [manifest, setManifest] = useState<MediaManifest | null>(null);
   const [sequenceKind, setSequenceKind] = useState<SequenceKind>(getSequenceKind);
@@ -52,7 +52,7 @@ export function HeroScrollSequence({ sequenceEnabled = true }: HeroScrollSequenc
   const raf = useRef(0);
 
   useEffect(() => {
-    if (!sequenceEnabled) return;
+    if (sequenceState !== 'ready') return;
 
     let current = true;
 
@@ -67,7 +67,7 @@ export function HeroScrollSequence({ sequenceEnabled = true }: HeroScrollSequenc
     return () => {
       current = false;
     };
-  }, [sequenceEnabled]);
+  }, [sequenceState]);
 
   useEffect(() => {
     let resizeRaf = 0;
@@ -209,9 +209,10 @@ export function HeroScrollSequence({ sequenceEnabled = true }: HeroScrollSequenc
     };
   }, [fallback, frames, reducedMotion]);
 
-  const staticPortrait = reducedMotion || fallback;
+  const forcedFallback = sequenceState === 'degraded';
+  const staticPortrait = reducedMotion || fallback || forcedFallback;
   const posterVisible = staticPortrait || frames.length === 0 || !hasDrawnFrame;
-  const loadingLabel = fallback
+  const loadingLabel = fallback || forcedFallback
     ? 'STATIC PORTRAIT'
     : frames.length > 0
       ? 'READY · SCROLL TO CONTROL'

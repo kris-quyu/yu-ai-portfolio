@@ -4,7 +4,10 @@ export interface LoadPortfolioOptions {
   minimumMs: number;
   maximumMs: number;
   onProgress: (percent: number) => void;
-  loadCritical: (report: (loaded: number, total: number) => void) => Promise<void>;
+  loadCritical: (
+    report: (loaded: number, total: number) => void,
+    signal: AbortSignal,
+  ) => Promise<void>;
 }
 
 const delay = (milliseconds: number) => new Promise<void>((resolve) => {
@@ -17,15 +20,18 @@ export async function loadPortfolio({
   onProgress,
   loadCritical,
 }: LoadPortfolioOptions): Promise<PortfolioLoadResult> {
+  const controller = new AbortController();
+  let finished = false;
   const report = (loaded: number, total: number) => {
+    if (finished) return;
     const percent = total > 0 ? (loaded / total) * 100 : 0;
     onProgress(Math.round(Math.min(100, Math.max(0, percent))));
   };
 
   const critical = Promise.resolve()
-    .then(() => loadCritical(report))
+    .then(() => loadCritical(report, controller.signal))
     .then(() => {
-      onProgress(100);
+      if (!finished) onProgress(100);
       return 'ready' as const;
     })
     .catch(() => 'degraded' as const);
@@ -36,10 +42,13 @@ export async function loadPortfolio({
   });
 
   try {
-    return await Promise.race([
+    const result = await Promise.race([
       Promise.all([critical, minimum]).then(([result]) => result),
       maximum,
     ]);
+    finished = true;
+    if (result === 'degraded') controller.abort();
+    return result;
   } finally {
     if (timeoutId !== undefined) clearTimeout(timeoutId);
   }

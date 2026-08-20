@@ -38,6 +38,24 @@ describe('loadPortfolio', () => {
     await expect(result).resolves.toBe('degraded');
   });
 
+  it('aborts unfinished critical work when the maximum duration is reached', async () => {
+    vi.useFakeTimers();
+    let criticalSignal: AbortSignal | undefined;
+    const result = loadPortfolio({
+      minimumMs: 1200,
+      maximumMs: 6000,
+      onProgress: vi.fn(),
+      loadCritical: (_report, signal) => {
+        criticalSignal = signal;
+        return new Promise(() => undefined);
+      },
+    });
+
+    await vi.advanceTimersByTimeAsync(6000);
+    await expect(result).resolves.toBe('degraded');
+    expect(criticalSignal?.aborted).toBe(true);
+  });
+
   it('enters degraded mode when a critical poster or key frame fails', async () => {
     const result = loadPortfolio({
       minimumMs: 0,

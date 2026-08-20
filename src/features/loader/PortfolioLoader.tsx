@@ -7,7 +7,10 @@ import styles from './PortfolioLoader.module.css';
 type LoaderState = 'modal' | 'revealing';
 
 export interface PortfolioLoaderProps {
-  loadCritical?: (report: (loaded: number, total: number) => void) => Promise<void>;
+  loadCritical?: (
+    report: (loaded: number, total: number) => void,
+    signal: AbortSignal,
+  ) => Promise<void>;
   onSettled?: (result: PortfolioLoadResult) => void;
 }
 
@@ -60,11 +63,29 @@ const createDefaultCriticalAssetLoaders = (): CriticalAssetLoaders => {
   };
 };
 
+const isAbortSignal = (
+  value: CriticalAssetLoaders | AbortSignal,
+): value is AbortSignal =>
+  typeof AbortSignal !== 'undefined' && value instanceof AbortSignal;
+
 export async function loadCriticalAssets(
   report: (loaded: number, total: number) => void,
-  loaders: CriticalAssetLoaders = createDefaultCriticalAssetLoaders(),
+  loadersOrSignal: CriticalAssetLoaders | AbortSignal = createDefaultCriticalAssetLoaders(),
+  explicitSignal?: AbortSignal,
 ) {
+  const receivedSignal = isAbortSignal(loadersOrSignal);
+  const loaders: CriticalAssetLoaders = receivedSignal
+    ? createDefaultCriticalAssetLoaders()
+    : loadersOrSignal;
+  const signal: AbortSignal | undefined = receivedSignal
+    ? loadersOrSignal
+    : explicitSignal;
+  const stopIfAborted = () => {
+    if (signal?.aborted) throw new DOMException('Critical asset loading aborted', 'AbortError');
+  };
+
   const manifest = await loaders.loadManifest();
+  stopIfAborted();
   const sequence = window.innerWidth < 768 ? manifest.portrait.mobile : manifest.portrait.desktop;
   const indices = [
     1,
@@ -75,10 +96,13 @@ export async function loadCriticalAssets(
 
   report(1, 4);
   await loaders.waitForFonts();
+  stopIfAborted();
   report(2, 4);
   await loaders.preloadImages([manifest.portrait.poster]);
+  stopIfAborted();
   report(3, 4);
   await loaders.loadKeyFrames(sequence.pattern, indices);
+  stopIfAborted();
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   if (!reducedMotion) {
     try {
