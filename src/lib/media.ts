@@ -1,3 +1,8 @@
+export interface MediaEvidence {
+  src: string;
+  alt: string;
+}
+
 export interface MediaManifest {
   portrait: {
     poster: string;
@@ -6,6 +11,13 @@ export interface MediaManifest {
   };
   film: { src: string; poster: string };
   workflow: { src: string };
+  projects: {
+    project02: {
+      workflow: MediaEvidence;
+      sceneDevelopment: MediaEvidence;
+      continuityGeneration: MediaEvidence;
+    };
+  };
 }
 
 const absoluteUrl = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i;
@@ -17,6 +29,11 @@ export function resolveMediaUrl(path: string): string {
     : `${import.meta.env.BASE_URL}/`;
   return `${base}${path.replace(/^\/+/, '')}`;
 }
+
+const resolveEvidence = (item: MediaEvidence): MediaEvidence => ({
+  ...item,
+  src: resolveMediaUrl(item.src),
+});
 
 const resolveManifest = (manifest: MediaManifest): MediaManifest => ({
   portrait: {
@@ -35,6 +52,13 @@ const resolveManifest = (manifest: MediaManifest): MediaManifest => ({
     poster: resolveMediaUrl(manifest.film.poster),
   },
   workflow: { src: resolveMediaUrl(manifest.workflow.src) },
+  projects: {
+    project02: {
+      workflow: resolveEvidence(manifest.projects.project02.workflow),
+      sceneDevelopment: resolveEvidence(manifest.projects.project02.sceneDevelopment),
+      continuityGeneration: resolveEvidence(manifest.projects.project02.continuityGeneration),
+    },
+  },
 });
 
 export async function loadMediaManifest(): Promise<MediaManifest> {

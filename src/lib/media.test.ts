@@ -13,7 +13,23 @@ describe('loadMediaManifest', () => {
         mobile: { pattern: 'media/portrait/mobile/frame-%04d.webp', count: 96 },
       },
       film: { src: 'media/film/ai-product-film.mp4', poster: 'media/film/poster.webp' },
-      workflow: { src: 'media/workflow/comfyui-workflow.webp' },
+      workflow: { src: 'media/projects/project-02/comfyui-continuity-workflow.webp' },
+      projects: {
+        project02: {
+          workflow: {
+            src: 'media/projects/project-02/comfyui-continuity-workflow.webp',
+            alt: 'ComfyUI 连续镜头工作流界面',
+          },
+          sceneDevelopment: {
+            src: 'media/projects/project-02/scene-development.webp',
+            alt: 'Seedance 场景参考与画面开发记录',
+          },
+          continuityGeneration: {
+            src: 'media/projects/project-02/continuity-generation.webp',
+            alt: 'Seedance 连续镜头生成记录',
+          },
+        },
+      },
     };
     const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(manifest) });
     vi.stubGlobal('fetch', fetchMock);
@@ -28,7 +44,41 @@ describe('loadMediaManifest', () => {
         src: `${base}media/film/ai-product-film.mp4`,
         poster: `${base}media/film/poster.webp`,
       },
-      workflow: { src: `${base}media/workflow/comfyui-workflow.webp` },
+      workflow: { src: `${base}media/projects/project-02/comfyui-continuity-workflow.webp` },
+      projects: {
+        project02: {
+          workflow: {
+            src: `${base}media/projects/project-02/comfyui-continuity-workflow.webp`,
+            alt: 'ComfyUI 连续镜头工作流界面',
+          },
+          sceneDevelopment: {
+            src: `${base}media/projects/project-02/scene-development.webp`,
+            alt: 'Seedance 场景参考与画面开发记录',
+          },
+          continuityGeneration: {
+            src: `${base}media/projects/project-02/continuity-generation.webp`,
+            alt: 'Seedance 连续镜头生成记录',
+          },
+        },
+      },
+    });
+    expect(await loadMediaManifest()).toMatchObject({
+      projects: {
+        project02: {
+          workflow: {
+            src: `${base}media/projects/project-02/comfyui-continuity-workflow.webp`,
+            alt: 'ComfyUI 连续镜头工作流界面',
+          },
+          sceneDevelopment: {
+            src: `${base}media/projects/project-02/scene-development.webp`,
+            alt: 'Seedance 场景参考与画面开发记录',
+          },
+          continuityGeneration: {
+            src: `${base}media/projects/project-02/continuity-generation.webp`,
+            alt: 'Seedance 连续镜头生成记录',
+          },
+        },
+      },
     });
     expect(fetchMock).toHaveBeenCalledWith(`${base}media/media-manifest.json`);
   });

@@ -117,7 +117,23 @@ export function prepareAssets({ portrait, film, workflow }, projectRoot = proces
       poster: 'media/film/poster.webp',
     },
     workflow: {
-      src: 'media/workflow/comfyui-workflow.webp',
+      src: 'media/projects/project-02/comfyui-continuity-workflow.webp',
+    },
+    projects: {
+      project02: {
+        workflow: {
+          src: 'media/projects/project-02/comfyui-continuity-workflow.webp',
+          alt: 'ComfyUI 连续镜头工作流界面',
+        },
+        sceneDevelopment: {
+          src: 'media/projects/project-02/scene-development.webp',
+          alt: 'Seedance 场景参考与画面开发记录',
+        },
+        continuityGeneration: {
+          src: 'media/projects/project-02/continuity-generation.webp',
+          alt: 'Seedance 连续镜头生成记录',
+        },
+      },
     },
   };
   writeFileSync(join(mediaRoot, 'media-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
