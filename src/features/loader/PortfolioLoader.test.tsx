@@ -1,6 +1,37 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { PortfolioLoader } from './PortfolioLoader';
+import {
+  PortfolioLoader,
+  loadCriticalAssets,
+  type CriticalAssetLoaders,
+} from './PortfolioLoader';
+import type { MediaManifest } from '../../lib/media';
+
+const manifest: MediaManifest = {
+  portrait: {
+    poster: '/yu-ai-portfolio/media/portrait/poster.webp',
+    desktop: {
+      pattern: '/yu-ai-portfolio/media/portrait/desktop/frame-%04d.webp',
+      count: 120,
+    },
+    mobile: {
+      pattern: '/yu-ai-portfolio/media/portrait/mobile/frame-%04d.webp',
+      count: 96,
+    },
+  },
+  film: {
+    src: '/yu-ai-portfolio/media/film/ai-product-film.mp4',
+    poster: '/yu-ai-portfolio/media/film/poster.webp',
+  },
+  workflow: { src: '/yu-ai-portfolio/media/projects/project-02/workflow.webp' },
+  projects: {
+    project02: {
+      workflow: { src: '/workflow.webp', alt: 'workflow' },
+      sceneDevelopment: { src: '/scene.webp', alt: 'scene' },
+      continuityGeneration: { src: '/continuity.webp', alt: 'continuity' },
+    },
+  },
+};
 
 describe('PortfolioLoader', () => {
   afterEach(() => {
@@ -46,5 +77,59 @@ describe('PortfolioLoader', () => {
     await vi.advanceTimersByTimeAsync(1200);
     await vi.advanceTimersByTimeAsync(0);
     expect(document.body.style.overflow).toBe('auto');
+  });
+
+  it('enters after critical assets without waiting for the full portrait sequence', async () => {
+    const report = vi.fn();
+    const warmSequence = vi.fn(() => new Promise<unknown>(() => undefined));
+    const loaders: CriticalAssetLoaders = {
+      loadManifest: vi.fn().mockResolvedValue(manifest),
+      waitForFonts: vi.fn().mockResolvedValue(undefined),
+      preloadImages: vi.fn().mockResolvedValue(undefined),
+      loadKeyFrames: vi.fn().mockResolvedValue(undefined),
+      warmSequence,
+    };
+
+    await expect(loadCriticalAssets(report, loaders)).resolves.toBeUndefined();
+
+    expect(warmSequence).toHaveBeenCalledTimes(1);
+    expect(report).toHaveBeenLastCalledWith(4, 4);
+  });
+
+  it('loads the poster and four desktop key frames before starting background warming', async () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1440 });
+    const loadKeyFrames = vi.fn().mockResolvedValue(undefined);
+    const preloadImages = vi.fn().mockResolvedValue(undefined);
+    const loaders: CriticalAssetLoaders = {
+      loadManifest: vi.fn().mockResolvedValue(manifest),
+      waitForFonts: vi.fn().mockResolvedValue(undefined),
+      preloadImages,
+      loadKeyFrames,
+      warmSequence: vi.fn().mockResolvedValue(undefined),
+    };
+
+    await loadCriticalAssets(vi.fn(), loaders);
+
+    expect(preloadImages).toHaveBeenCalledWith([manifest.portrait.poster]);
+    expect(loadKeyFrames).toHaveBeenCalledWith(
+      manifest.portrait.desktop.pattern,
+      [1, 41, 81, 120],
+    );
+  });
+
+  it('contains a rejected background warm-up after critical readiness', async () => {
+    const warmSequence = vi.fn().mockRejectedValue(new Error('background frame failed'));
+    const loaders: CriticalAssetLoaders = {
+      loadManifest: vi.fn().mockResolvedValue(manifest),
+      waitForFonts: vi.fn().mockResolvedValue(undefined),
+      preloadImages: vi.fn().mockResolvedValue(undefined),
+      loadKeyFrames: vi.fn().mockResolvedValue(undefined),
+      warmSequence,
+    };
+
+    await expect(loadCriticalAssets(vi.fn(), loaders)).resolves.toBeUndefined();
+    await Promise.resolve();
+
+    expect(warmSequence).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { loadPortraitSequenceCached } from '../hero/portraitSequenceCache';
-import { loadMediaManifest } from '../../lib/media';
+import { loadMediaManifest, type MediaManifest } from '../../lib/media';
 import { loadPortfolio } from './loadPortfolio';
 import styles from './PortfolioLoader.module.css';
 
@@ -19,38 +19,74 @@ const preloadImage = (src: string) => new Promise<void>((resolve, reject) => {
   image.src = src;
 });
 
-const warmFilmMetadata = (src: string) => new Promise<void>((resolve) => {
-  const video = document.createElement('video');
-  video.preload = 'metadata';
-  video.onloadedmetadata = () => resolve();
-  video.onerror = () => resolve();
-  video.src = src;
-  video.load();
-});
+export interface CriticalAssetLoaders {
+  loadManifest: typeof loadMediaManifest;
+  waitForFonts: () => Promise<void>;
+  preloadImages: (sources: readonly string[]) => Promise<void>;
+  loadKeyFrames: (pattern: string, indices: readonly number[]) => Promise<void>;
+  warmSequence: () => Promise<unknown>;
+}
 
-const loadDefaultCritical = async (report: (loaded: number, total: number) => void) => {
-  const manifest = await loadMediaManifest();
-  const sequence = window.innerWidth < 768 ? manifest.portrait.mobile : manifest.portrait.desktop;
-  const total = sequence.count + 4;
-  const filmReady = warmFilmMetadata(manifest.film.src);
+const frameUrl = (pattern: string, index: number) =>
+  pattern.replace('%04d', String(index).padStart(4, '0'));
 
-  report(1, total);
-  const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
-  await (fonts?.ready ?? Promise.resolve());
-  report(2, total);
-  await preloadImage(manifest.portrait.poster);
-  report(3, total);
-  await loadPortraitSequenceCached({
-    posterUrl: manifest.portrait.poster,
-    pattern: sequence.pattern,
-    count: sequence.count,
-    onProgress: (loaded) => report(3 + loaded, total),
-  });
-  await filmReady;
-  report(total, total);
+const selectSequence = (manifest: MediaManifest) =>
+  window.innerWidth < 768 ? manifest.portrait.mobile : manifest.portrait.desktop;
+
+const createDefaultCriticalAssetLoaders = (): CriticalAssetLoaders => {
+  const manifestPromise = loadMediaManifest();
+
+  return {
+    loadManifest: () => manifestPromise,
+    waitForFonts: () =>
+      ((document as Document & { fonts?: FontFaceSet }).fonts?.ready ?? Promise.resolve())
+        .then(() => undefined),
+    preloadImages: (sources) =>
+      Promise.all(sources.map((source) => preloadImage(source))).then(() => undefined),
+    loadKeyFrames: (pattern, indices) =>
+      Promise.all(indices.map((index) => preloadImage(frameUrl(pattern, index)))).then(
+        () => undefined,
+      ),
+    warmSequence: async () => {
+      const manifest = await manifestPromise;
+      const sequence = selectSequence(manifest);
+      return loadPortraitSequenceCached({
+        posterUrl: manifest.portrait.poster,
+        pattern: sequence.pattern,
+        count: sequence.count,
+      });
+    },
+  };
 };
 
-export function PortfolioLoader({ loadCritical = loadDefaultCritical }: PortfolioLoaderProps) {
+export async function loadCriticalAssets(
+  report: (loaded: number, total: number) => void,
+  loaders: CriticalAssetLoaders = createDefaultCriticalAssetLoaders(),
+) {
+  const manifest = await loaders.loadManifest();
+  const sequence = window.innerWidth < 768 ? manifest.portrait.mobile : manifest.portrait.desktop;
+  const indices = [
+    1,
+    Math.ceil(sequence.count * 0.34),
+    Math.ceil(sequence.count * 0.67),
+    sequence.count,
+  ];
+
+  report(1, 4);
+  await loaders.waitForFonts();
+  report(2, 4);
+  await loaders.preloadImages([manifest.portrait.poster]);
+  report(3, 4);
+  await loaders.loadKeyFrames(sequence.pattern, indices);
+  try {
+    void loaders.warmSequence().catch(() => undefined);
+  } catch {
+    // Background warming is best-effort and must never block first-screen readiness.
+  }
+  report(4, 4);
+}
+
+export function PortfolioLoader({ loadCritical = loadCriticalAssets }: PortfolioLoaderProps) {
   const [percent, setPercent] = useState(0);
   const [topic, setTopic] = useState(0);
   const [state, setState] = useState<LoaderState>('modal');

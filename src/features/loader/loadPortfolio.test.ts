@@ -1,7 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadPortfolio } from './loadPortfolio';
 
 describe('loadPortfolio', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('reports real critical progress and respects the minimum duration', async () => {
     vi.useFakeTimers();
     const onProgress = vi.fn();
@@ -31,6 +35,17 @@ describe('loadPortfolio', () => {
       loadCritical: () => new Promise(() => undefined),
     });
     await vi.advanceTimersByTimeAsync(6000);
+    await expect(result).resolves.toBe('degraded');
+  });
+
+  it('enters degraded mode when a critical poster or key frame fails', async () => {
+    const result = loadPortfolio({
+      minimumMs: 0,
+      maximumMs: 6000,
+      onProgress: vi.fn(),
+      loadCritical: () => Promise.reject(new Error('critical image failed')),
+    });
+
     await expect(result).resolves.toBe('degraded');
   });
 });
