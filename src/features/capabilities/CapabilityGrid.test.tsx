@@ -7,27 +7,31 @@ import capabilityCss from './CapabilityGrid.module.css?raw';
 describe('CapabilityGrid', () => {
   afterEach(cleanup);
 
-  it('renders six full-card flip buttons with the expanded approved content', () => {
+  it('renders four bilingual tool-combination flip cards without n8n', () => {
     render(<CapabilityGrid />);
 
     const articles = screen.getAllByRole('article');
     const buttons = screen.getAllByRole('button', { name: /翻转.+技能卡/ });
 
-    expect(screen.getByRole('heading', { name: 'THINGS I DO WELL.' })).toBeInTheDocument();
-    expect(articles).toHaveLength(6);
-    expect(buttons).toHaveLength(6);
-    expect(within(articles[0]).getByRole('heading', { name: 'AI 内容与自动化' })).toBeInTheDocument();
-    expect(within(articles[1]).getByRole('heading', { name: '视频编导与剪辑' })).toBeInTheDocument();
-    expect(within(articles[2]).getByRole('heading', { name: '电商内容转化' })).toBeInTheDocument();
-    expect(within(articles[3]).getByRole('heading', { name: '编程与视觉识别' })).toBeInTheDocument();
-    expect(within(articles[4]).getByRole('heading', { name: '硬件开发与数字制造' })).toBeInTheDocument();
-    expect(within(articles[5]).getByRole('heading', { name: '专业摄影与视觉后期' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'TOOLS I COMBINE.' })).toBeInTheDocument();
+    expect(screen.getByText('SKILLS / 工具组合')).toBeInTheDocument();
+    expect(screen.getByText('核心不是会多少软件，而是组合不同工具完成 AI 内容生产。')).toBeInTheDocument();
+    expect(articles).toHaveLength(4);
+    expect(buttons).toHaveLength(4);
+    expect(within(articles[0]).getByRole('heading', { name: 'AI / AIGC' })).toBeInTheDocument();
+    expect(within(articles[1]).getByRole('heading', { name: 'AUTOMATION' })).toBeInTheDocument();
+    expect(within(articles[2]).getByRole('heading', { name: 'CONTENT / DESIGN' })).toBeInTheDocument();
+    expect(within(articles[3]).getByRole('heading', { name: 'OTHER ENGINEERING' })).toBeInTheDocument();
+    expect(within(articles[1]).getByText('自动化')).toBeVisible();
+    expect(within(articles[2]).getByText('内容与设计')).toBeVisible();
+    expect(within(articles[3]).getByText('工程补充')).toBeVisible();
     expect(within(articles[0]).getByText('ComfyUI')).toBeVisible();
-    expect(within(articles[0]).getByText('n8n')).toBeVisible();
-    expect(within(articles[0]).getByText('Codex')).toBeVisible();
-    expect(within(articles[3]).getByText('OpenCV')).toBeVisible();
-    expect(within(articles[4]).getByText('3D 打印')).toBeVisible();
-    expect(within(articles[5]).getByText('LR')).toBeVisible();
+    expect(within(articles[1]).getByText('FFmpeg')).toBeVisible();
+    expect(within(articles[1]).getAllByText(/实验/)).not.toHaveLength(0);
+    expect(within(articles[3]).getByText('CAD / UG/NX')).toBeVisible();
+    expect(articles[0]).toHaveAttribute('data-priority', 'core');
+    expect(articles[3]).toHaveAttribute('data-priority', 'supporting');
+    expect(screen.queryByText(/n8n/i)).not.toBeInTheDocument();
   });
 
   it('keeps semantic faces outside the button and describes the active visible face', async () => {
@@ -35,23 +39,23 @@ describe('CapabilityGrid', () => {
     render(<CapabilityGrid />);
     const article = screen.getAllByRole('article')[0];
     const button = within(article).getByRole('button', { name: /翻转/ });
-    const heading = within(article).getByRole('heading', { name: 'AI 内容与自动化' });
-    const front = article.querySelector('#capability-automation-front');
-    const back = article.querySelector('#capability-automation-back');
+    const heading = within(article).getByRole('heading', { name: 'AI / AIGC' });
+    const front = article.querySelector('#skill-aigc-front');
+    const back = article.querySelector('#skill-aigc-back');
 
     expect(button).not.toContainElement(heading);
-    expect(button).toHaveAttribute('aria-describedby', 'capability-automation-front');
+    expect(button).toHaveAttribute('aria-describedby', 'skill-aigc-front');
     expect(front).toHaveAttribute('aria-hidden', 'false');
     expect(back).toHaveAttribute('aria-hidden', 'true');
-    expect(button).toHaveAccessibleDescription(/图像生成、视频生成与自动化工作流/);
+    expect(button).toHaveAccessibleDescription(/组合图像、视频和语言模型/);
 
     await user.click(button);
 
-    expect(button).toHaveAttribute('aria-describedby', 'capability-automation-back');
+    expect(button).toHaveAttribute('aria-describedby', 'skill-aigc-back');
     expect(front).toHaveAttribute('aria-hidden', 'true');
     expect(back).toHaveAttribute('aria-hidden', 'false');
     expect(button).toHaveAccessibleDescription(
-      /已能独立完成.*AI workflow setup and automation/s,
+      /已能独立完成.*AI image and video generation, prompt design/s,
     );
   });
 
@@ -66,7 +70,7 @@ describe('CapabilityGrid', () => {
     expect(buttons[0]).toHaveAttribute('aria-pressed', 'true');
     expect(buttons[1]).toHaveAttribute('aria-pressed', 'true');
     expect(buttons[2]).toHaveAttribute('aria-pressed', 'false');
-    expect(buttons[5]).toHaveAttribute('aria-pressed', 'false');
+    expect(buttons[3]).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('supports keyboard flipping and can return a card to its front', async () => {
@@ -100,7 +104,7 @@ describe('CapabilityGrid', () => {
     expect(within(faces[1] as HTMLElement).getByText('已能独立完成')).toBeVisible();
     expect(within(faces[1] as HTMLElement).getByText('正在持续强化')).toBeVisible();
     expect(within(faces[1] as HTMLElement).getByText('下一阶段目标')).toBeVisible();
-    expect(within(faces[1] as HTMLElement).getByText('AI workflow setup and automation')).toBeVisible();
+    expect(within(faces[1] as HTMLElement).getByText('AI image and video generation, prompt design')).toBeVisible();
     expect(within(faces[1] as HTMLElement).getByText(/返回正面/)).toBeVisible();
   });
 
@@ -123,7 +127,7 @@ describe('CapabilityGrid', () => {
     expect(capabilityCss).not.toMatch(/:hover[^,{]*\.cardInner[^}]*rotateY/s);
   });
 
-  it('uses three desktop columns, two tablet columns, and one mobile column', () => {
+  it('uses three desktop columns, a compact supporting row, two tablet columns, and one mobile column', () => {
     expect(capabilityCss).toMatch(
       /\.grid\s*{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\);/is,
     );
@@ -133,7 +137,7 @@ describe('CapabilityGrid', () => {
     expect(capabilityCss).toMatch(
       /@media\s*\(max-width:\s*767px\)[\s\S]*?\.grid\s*{[^}]*grid-template-columns:\s*1fr;/is,
     );
-    expect(capabilityCss).not.toMatch(/\.card:last-child\s*{[^}]*grid-column/is);
+    expect(capabilityCss).toMatch(/\.card\[data-priority="supporting"\]\s*{[^}]*grid-column:\s*1\s*\/\s*-1/is);
   });
 
   it('defines the required face palettes and a non-3D reduced-motion swap', () => {
