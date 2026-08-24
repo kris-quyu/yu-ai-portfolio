@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { MediaEvidence } from '../../lib/media';
 import { ProjectMediaGallery } from './ProjectMediaGallery';
+import galleryCss from './ProjectMediaGallery.module.css?raw';
 
 const items: readonly MediaEvidence[] = [
   {
@@ -62,6 +63,25 @@ describe('ProjectMediaGallery', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(document.body.style.overflow).toBe('');
+  });
+
+  it('portals the fixed lightbox to document.body above transformed project content', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<ProjectMediaGallery items={items} />);
+
+    await user.click(screen.getByRole('button', {
+      name: /放大 ComfyUI 连续镜头工作流界面/,
+    }));
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'ComfyUI 连续镜头工作流界面',
+      hidden: true,
+    });
+    const overlay = dialog.parentElement;
+
+    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument();
+    expect(overlay?.parentElement).toBe(document.body);
+    expect(galleryCss).toMatch(/\.overlay\s*{[^}]*z-index:\s*120;/s);
   });
 
   it('replaces a failed thumbnail with a labelled status instead of an empty frame', () => {

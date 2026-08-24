@@ -217,7 +217,7 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
     : frames.length > 0
       ? 'READY · SCROLL TO CONTROL'
       : `LOADING ${loadProgress}%`;
-  const visibleStageIndex = reducedMotion ? 3 : activeStage;
+  const visibleStageIndex = staticPortrait ? 3 : activeStage;
 
   return (
     <section
@@ -225,6 +225,7 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
       id="profile"
       aria-labelledby="hero-title"
       className={`${styles.hero} ${staticPortrait ? styles.staticHero : ''}`}
+      data-layout={staticPortrait ? 'static-overview' : 'scroll-sequence'}
     >
       <div className={styles.stage}>
         <div className={styles.media} aria-label="人物动画画面">
@@ -284,7 +285,7 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
             ))}
           </ul>
 
-          {reducedMotion && (
+          {staticPortrait && (
             <ol className={styles.reducedStageList} aria-label="能力阶段概览">
               {siteContent.hero.stages.map((stage) => (
                 <li key={stage.id}>

@@ -263,11 +263,24 @@
 }
 
 .staticHero {
-  height: 100svh;
+  height: auto;
+  min-height: 100svh;
 }
 
 .staticHero .stage {
   position: relative;
+  height: auto;
+  min-height: 100svh;
+  overflow: visible;
+}
+
+.staticHero .copy {
+  position: relative;
+  top: auto;
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding-block: clamp(5rem, 10svh, 7rem);
+  transform: none;
 }
 
 @media (max-width: 767px) {

@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   PortfolioLoader,
@@ -47,6 +47,64 @@ describe('PortfolioLoader', () => {
     expect(screen.getByText('AI 内容')).toBeInTheDocument();
   });
 
+  it('owns focus and makes sibling application content inert while the modal is visible', async () => {
+    const previous = document.createElement('button');
+    previous.textContent = 'before loader';
+    document.body.append(previous);
+    previous.focus();
+    const host = document.createElement('div');
+    document.body.append(host);
+
+    const { unmount } = render(
+      <>
+        <PortfolioLoader loadCritical={() => new Promise(() => undefined)} />
+        <button type="button">underlying action</button>
+      </>,
+      { container: host },
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'LOADING CREATIVE SYSTEM' });
+    const underlying = screen.getByRole('button', { name: 'underlying action' });
+    await waitFor(() => expect(dialog).toHaveFocus());
+    expect(underlying).toHaveAttribute('inert');
+    expect(withinStatus(dialog)).toHaveAttribute('aria-live', 'polite');
+
+    unmount();
+
+    expect(underlying).not.toHaveAttribute('inert');
+    expect(previous).toHaveFocus();
+    host.remove();
+    previous.remove();
+  });
+
+  it.each([
+    ['ready', () => Promise.resolve()],
+    ['degraded', () => Promise.reject(new Error('critical asset failed'))],
+  ])('restores focus and inert state after the %s reveal finishes', async (_result, loadCritical) => {
+    vi.useFakeTimers();
+    const previous = document.createElement('button');
+    previous.textContent = `return focus ${_result}`;
+    document.body.append(previous);
+    previous.focus();
+
+    render(
+      <>
+        <PortfolioLoader loadCritical={loadCritical} />
+        <button type="button">application action {_result}</button>
+      </>,
+    );
+    const appAction = screen.getByRole('button', { name: `application action ${_result}` });
+    expect(appAction).toHaveAttribute('inert');
+
+    await act(() => vi.advanceTimersByTimeAsync(1900));
+
+    expect(screen.queryByRole('dialog', { name: 'LOADING CREATIVE SYSTEM' }))
+      .not.toBeInTheDocument();
+    expect(appAction).not.toHaveAttribute('inert');
+    expect(previous).toHaveFocus();
+    previous.remove();
+  });
+
   it('cycles through the approved Chinese topics on the existing interval', async () => {
     vi.useFakeTimers();
     render(<PortfolioLoader loadCritical={() => new Promise(() => undefined)} />);
@@ -65,11 +123,11 @@ describe('PortfolioLoader', () => {
     render(<PortfolioLoader loadCritical={() => Promise.resolve()} />);
     await vi.advanceTimersByTimeAsync(1200);
     expect(screen.getByTestId('portfolio-loader')).toHaveAttribute('data-state', 'revealing');
-    await vi.advanceTimersByTimeAsync(700);
+    await act(() => vi.advanceTimersByTimeAsync(700));
     expect(screen.queryByTestId('portfolio-loader')).not.toBeInTheDocument();
   });
 
-  it('locks body scrolling only while the overlay is modal', async () => {
+  it('locks body scrolling until the visible overlay has finished revealing', async () => {
     vi.useFakeTimers();
     document.body.style.overflow = 'auto';
     render(<PortfolioLoader loadCritical={() => Promise.resolve()} />);
@@ -77,6 +135,8 @@ describe('PortfolioLoader', () => {
     expect(document.body.style.overflow).toBe('hidden');
     await vi.advanceTimersByTimeAsync(1200);
     await vi.advanceTimersByTimeAsync(0);
+    expect(document.body.style.overflow).toBe('hidden');
+    await act(() => vi.advanceTimersByTimeAsync(700));
     expect(document.body.style.overflow).toBe('auto');
   });
 
@@ -150,3 +210,9 @@ describe('PortfolioLoader', () => {
     expect(warmSequence).not.toHaveBeenCalled();
   });
 });
+
+const withinStatus = (dialog: HTMLElement) => {
+  const status = dialog.querySelector<HTMLElement>('[role="status"]');
+  if (!status) throw new Error('Expected a nested live status');
+  return status;
+};

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { MediaEvidence } from '../../lib/media';
 import styles from './ProjectMediaGallery.module.css';
 
@@ -103,7 +104,7 @@ export function ProjectMediaGallery({ items }: ProjectMediaGalleryProps) {
         );
       })}
 
-      {active && (
+      {active && createPortal((
         <div
           className={styles.overlay}
           onClick={(event) => {
@@ -145,7 +146,7 @@ export function ProjectMediaGallery({ items }: ProjectMediaGalleryProps) {
             <p className={styles.dialogCaption}>{evidenceCaption(active)}</p>
           </div>
         </div>
-      )}
+      ), document.body)}
     </div>
   );
 }

@@ -47,31 +47,32 @@ export function ProjectCaseStudy({
       data-active={active}
       aria-labelledby={`${project.id}-title`}
     >
-      <header className={styles.header}>
-        <p className={styles.projectNumber}>PROJECT {project.number}</p>
-        <h2 id={`${project.id}-title`}>
-          <span>{project.title}</span>
-          <span className={styles.titleZh} aria-hidden="true">{project.titleZh}</span>
-        </h2>
-        <p className={styles.status}>{project.status}</p>
-        <p className={styles.summary}>{project.summary}</p>
-        <ul className={styles.tags} aria-label={`${project.title} 标签`}>
-          {project.tags.map((tag) => <li key={tag}>{tag}</li>)}
-        </ul>
-      </header>
+      <div className={styles.shell} data-case-layout="editorial">
+        <header className={styles.header} data-project-metadata>
+          <p className={styles.projectNumber}>PROJECT {project.number}</p>
+          <h2 id={`${project.id}-title`}>
+            <span>{project.title}</span>
+            <span className={styles.titleZh} aria-hidden="true">{project.titleZh}</span>
+          </h2>
+          <p className={styles.status}>{project.status}</p>
+          <p className={styles.summary}>{project.summary}</p>
+          <ul className={styles.tags} aria-label={`${project.title} 标签`}>
+            {project.tags.map((tag) => <li key={tag}>{tag}</li>)}
+          </ul>
+        </header>
 
-      <div className={styles.details}>
-        {detailBlocks(project).map((block) => (
-          <article key={block.id} className={styles.detailBlock}>
-            <h3>{block.heading}</h3>
-            {block.content}
-          </article>
-        ))}
-      </div>
-
-      <div className={styles.evidence}>
-        <h3>06 / 媒体证据 Evidence</h3>
-        {children}
+        <div className={styles.narrative} data-project-narrative>
+          {detailBlocks(project).map((block) => (
+            <article key={block.id} className={styles.detailBlock}>
+              <h3>{block.heading}</h3>
+              {block.content}
+            </article>
+          ))}
+          <div className={styles.evidence}>
+            <h3>06 / 媒体证据 Evidence</h3>
+            {children}
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -303,6 +303,26 @@ describe('HeroScrollSequence', () => {
     expect(listRule).not.toMatch(/clip:/);
   });
 
+  it('shows every stage in a readable auto-height overview when critical loading degrades', () => {
+    const { container } = render(<HeroScrollSequence sequenceState="degraded" />);
+
+    expect(screen.getByAltText('瞿先生动画人物')).toBeInTheDocument();
+    expect(screen.queryByLabelText('滚动控制的动画人物')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', {
+      name: 'CONNECT THE WORKFLOW.',
+      hidden: true,
+    })).toBeInTheDocument();
+    const stageList = screen.getByRole('list', { name: '能力阶段概览' });
+    expect(within(stageList).getAllByRole('listitem')).toHaveLength(4);
+    expect(stageList).toHaveTextContent('UNDERSTAND THE BRIEF.');
+    expect(stageList).toHaveTextContent('DESIGN THE STORY.');
+    expect(stageList).toHaveTextContent('GENERATE THE VISUALS.');
+    expect(stageList).toHaveTextContent('CONNECT THE WORKFLOW.');
+    expect(container.querySelector('#profile')).toHaveAttribute('data-layout', 'static-overview');
+    expect(heroCss).toMatch(/\.staticHero\s*{[^}]*height:\s*auto;/s);
+    expect(heroCss).toMatch(/\.staticHero\s+\.stage\s*{[^}]*height:\s*auto;/s);
+  });
+
   it('falls back to the poster when the frame failure threshold is exceeded', async () => {
     vi.mocked(loadPortraitSequenceCached).mockRejectedValue(new Error('Portrait frame loading failed'));
 

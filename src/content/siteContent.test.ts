@@ -75,6 +75,14 @@ describe('siteContent', () => {
     expect(contentWorkflow.solution).toContain('已实践、实验中与计划中');
     expect(contentWorkflow.role).toContain('尝试素材处理和流程串联');
     expect(contentWorkflow.result).toContain('稳定的端到端自动化输出仍在持续开发');
+    expect(contentWorkflow.tags).toContain('FFMPEG · EXPERIMENTAL');
+    expect(contentWorkflow.tags).toContain('API · PLANNED');
+    expect(contentWorkflow.tags).not.toContain('FFMPEG');
+    expect(contentWorkflow.tags).not.toContain('API');
+    expect(contentWorkflow.tools).toContain('FFmpeg · EXPERIMENTAL');
+    expect(contentWorkflow.tools).toContain('API · PLANNED');
+    expect(contentWorkflow.tools).not.toContain('FFmpeg');
+    expect(contentWorkflow.tools).not.toContain('API');
   });
 
   it('keeps automation claims truthful and removes n8n', () => {

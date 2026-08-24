@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { loadPortraitSequenceCached } from '../hero/portraitSequenceCache';
 import { loadMediaManifest, type MediaManifest } from '../../lib/media';
 import { loadPortfolio, type PortfolioLoadResult } from './loadPortfolio';
@@ -122,16 +122,20 @@ export function PortfolioLoader({
   const [topic, setTopic] = useState(0);
   const [state, setState] = useState<LoaderState>('modal');
   const [visible, setVisible] = useState(true);
+  const loaderRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
+    if (!visible || state !== 'modal') return;
     const interval = window.setInterval(() => {
       setTopic((current) => (current + 1) % loadingTopics.length);
     }, 900);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [state, visible]);
 
   useEffect(() => {
     let current = true;
+    let revealTimeout: number | undefined;
     setPercent(0);
     void loadPortfolio({
       minimumMs: 1200,
@@ -142,40 +146,79 @@ export function PortfolioLoader({
       if (!current) return;
       onSettled?.(result);
       setState('revealing');
-      window.setTimeout(() => {
+      revealTimeout = window.setTimeout(() => {
         if (current) setVisible(false);
       }, 700);
     });
 
     return () => {
       current = false;
+      if (revealTimeout !== undefined) window.clearTimeout(revealTimeout);
     };
   }, [loadCritical, onSettled]);
 
   useEffect(() => {
-    if (state !== 'modal') return;
+    if (!visible) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [state]);
+  }, [visible]);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const loader = loaderRef.current;
+    if (!loader) return;
+    const previousFocus = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const siblings = [...(loader.parentElement?.children ?? [])]
+      .filter((element): element is HTMLElement =>
+        element instanceof HTMLElement && element !== loader,
+      )
+      .map((element) => ({ element, wasInert: element.hasAttribute('inert') }));
+    const keepFocusInside = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      event.preventDefault();
+      loader.focus();
+    };
+
+    siblings.forEach(({ element }) => element.setAttribute('inert', ''));
+    loader.addEventListener('keydown', keepFocusInside);
+    loader.focus();
+
+    return () => {
+      loader.removeEventListener('keydown', keepFocusInside);
+      siblings.forEach(({ element, wasInert }) => {
+        if (!wasInert) element.removeAttribute('inert');
+      });
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [visible]);
 
   if (!visible) return null;
 
   return (
     <div
+      ref={loaderRef}
       className={styles.loader}
       data-testid="portfolio-loader"
       data-state={state}
-      role="status"
-      aria-live="polite"
-      aria-busy={state === 'modal'}
-      aria-modal={state === 'modal' ? 'true' : undefined}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      tabIndex={-1}
     >
       <div className={styles.orb} aria-hidden="true" />
-      <div className={styles.copy}>
-        <p>LOADING CREATIVE SYSTEM</p>
+      <div
+        className={styles.copy}
+        role="status"
+        aria-live="polite"
+        aria-busy={state === 'modal'}
+      >
+        <p id={titleId}>LOADING CREATIVE SYSTEM</p>
         <strong>{percent}%</strong>
         <span>{loadingTopics[topic]}</span>
       </div>
