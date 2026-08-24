@@ -1,5 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
+import { siteContent } from '../../content/siteContent';
 import { ProjectIndex } from './ProjectIndex';
 
 describe('ProjectIndex', () => {
@@ -23,6 +24,22 @@ describe('ProjectIndex', () => {
     const productFilm = screen.getByRole('article', { name: /AI PRODUCT FILM/i });
     expect(within(productFilm).getByRole('list', { name: 'AI PRODUCT FILM 关键词' }))
       .toHaveTextContent('COMFYUI');
+  });
+
+  it('keeps every project number, bilingual title, status, keywords, and case link together', () => {
+    render(<ProjectIndex />);
+
+    siteContent.projects.forEach((project) => {
+      const article = screen.getByRole('article', { name: new RegExp(project.title, 'i') });
+
+      expect(article).toHaveTextContent(project.number);
+      expect(article).toHaveTextContent(project.titleZh);
+      expect(article).toHaveTextContent(project.status);
+      expect(within(article).getByRole('list', { name: `${project.title} 关键词` }).children)
+        .toHaveLength(project.tags.length);
+      expect(within(article).getByRole('link', { name: /VIEW CASE STUDY/i }))
+        .toHaveAttribute('href', `#${project.id}`);
+    });
   });
 
   it('provides the work fragment target with an accessible heading relationship', () => {

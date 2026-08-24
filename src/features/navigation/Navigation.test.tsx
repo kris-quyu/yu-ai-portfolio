@@ -21,7 +21,7 @@ class IntersectionObserverStub {
   }
 }
 
-const sectionIds = ['home', 'profile', 'film', 'system', 'capabilities', 'contact'] as const;
+const sectionIds = ['home', 'about', 'work', 'skills', 'contact'] as const;
 
 function addSections(ids: readonly (typeof sectionIds)[number][] = sectionIds) {
   ids.forEach((id) => {
@@ -60,13 +60,13 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     expect(screen.getByRole('link', { name: 'HOME' })).toHaveAttribute('href', '#home');
-    expect(screen.getByRole('link', { name: 'PROFILE' })).toHaveAttribute('href', '#profile');
-    expect(screen.getByRole('link', { name: 'FILM' })).toHaveAttribute('href', '#film');
-    expect(screen.getByRole('link', { name: 'SYSTEM' })).toHaveAttribute('href', '#system');
-    expect(screen.getByRole('link', { name: 'CAPABILITIES' })).toHaveAttribute('href', '#capabilities');
+    expect(screen.getByRole('link', { name: 'ABOUT' })).toHaveAttribute('href', '#about');
+    expect(screen.getByRole('link', { name: 'WORK' })).toHaveAttribute('href', '#work');
+    expect(screen.getByRole('link', { name: 'SKILLS' })).toHaveAttribute('href', '#skills');
     expect(screen.getByRole('link', { name: 'CONTACT' })).toHaveAttribute('href', '#contact');
     expect(within(screen.getByRole('navigation', { name: '主导航' })).getAllByRole('link'))
-      .toHaveLength(6);
+      .toHaveLength(5);
+    expect(screen.queryByRole('link', { name: 'PROFILE' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '#home');
   });
 
@@ -87,14 +87,14 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     const observer = IntersectionObserverStub.instances[0];
-    const film = document.getElementById('film')!;
-    const system = document.getElementById('system')!;
+    const about = document.getElementById('about')!;
+    const work = document.getElementById('work')!;
     act(() => {
-      observer.emit(intersection(film, 0.25), intersection(system, 0.5));
+      observer.emit(intersection(about, 0.25), intersection(work, 0.5));
     });
 
-    expect(screen.getByRole('link', { name: 'SYSTEM' })).toHaveAttribute('aria-current', 'location');
-    expect(screen.getByRole('link', { name: 'PROFILE' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'WORK' })).toHaveAttribute('aria-current', 'location');
+    expect(screen.getByRole('link', { name: 'ABOUT' })).not.toHaveAttribute('aria-current');
   });
 
   it('skips missing sections and disconnects the observer on unmount', () => {

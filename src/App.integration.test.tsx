@@ -1,9 +1,10 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { siteContent } from './content/siteContent';
 import { loadMediaManifest } from './lib/media';
 import { loadPortraitSequenceCached } from './features/hero/portraitSequenceCache';
+import aboutCss from './features/about/AboutSection.module.css?raw';
 import capabilityCss from './features/capabilities/CapabilityGrid.module.css?raw';
 import contactCss from './features/contact/ContactSection.module.css?raw';
 import filmCss from './features/film/FeaturedFilm.module.css?raw';
@@ -11,6 +12,10 @@ import heroCss from './features/hero/HeroScrollSequence.module.css?raw';
 import introCss from './features/intro/PointerIntro.module.css?raw';
 import loaderCss from './features/loader/PortfolioLoader.module.css?raw';
 import navigationCss from './features/navigation/Navigation.module.css?raw';
+import projectCaseCss from './features/projects/ProjectCaseStudy.module.css?raw';
+import projectFlowCss from './features/projects/ProjectFlow.module.css?raw';
+import projectIndexCss from './features/projects/ProjectIndex.module.css?raw';
+import projectMediaCss from './features/projects/ProjectMediaGallery.module.css?raw';
 import workflowCss from './features/workflow/WorkflowProof.module.css?raw';
 import globalCss from './styles/global.css?raw';
 
@@ -50,7 +55,23 @@ const manifest = {
     poster: '/yu-ai-portfolio/media/film/poster.webp',
   },
   workflow: {
-    src: '/yu-ai-portfolio/media/workflow/comfyui-workflow.webp',
+    src: '/yu-ai-portfolio/media/projects/project-02/comfyui-continuity-workflow.webp',
+  },
+  projects: {
+    project02: {
+      workflow: {
+        src: '/yu-ai-portfolio/media/projects/project-02/comfyui-continuity-workflow.webp',
+        alt: 'ComfyUI 连续镜头工作流界面',
+      },
+      sceneDevelopment: {
+        src: '/yu-ai-portfolio/media/projects/project-02/scene-development.webp',
+        alt: 'Seedance 场景参考与画面开发记录',
+      },
+      continuityGeneration: {
+        src: '/yu-ai-portfolio/media/projects/project-02/continuity-generation.webp',
+        alt: 'Seedance 连续镜头生成记录',
+      },
+    },
   },
 };
 
@@ -94,8 +115,13 @@ const visualCss = [
   loaderCss,
   navigationCss,
   heroCss,
+  aboutCss,
+  projectIndexCss,
+  projectCaseCss,
   filmCss,
+  projectMediaCss,
   workflowCss,
+  projectFlowCss,
   capabilityCss,
   contactCss,
 ].join('\n');
@@ -368,7 +394,7 @@ describe('complete portfolio integration', () => {
 
   it('ties the assembled film reveal class to the preview observer state', () => {
     const { container } = render(<App />);
-    const preview = container.querySelector('#film video[aria-label]') as HTMLVideoElement;
+    const preview = container.querySelector('#project-01 video[aria-label]') as HTMLVideoElement;
     const mediaFrame = preview.parentElement as HTMLElement;
     const initialClassName = mediaFrame.className;
     const observer = IntersectionObserverStub.instances.find((instance) =>
@@ -399,44 +425,76 @@ describe('complete portfolio integration', () => {
 
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
-    ).toEqual(['home', 'profile', 'film', 'system', 'capabilities', 'contact']);
+    ).toEqual([
+      'home',
+      'profile',
+      'about',
+      'work',
+      'project-01',
+      'project-02',
+      'project-03',
+      'skills',
+      'contact',
+    ]);
   });
 
-  it('contains exactly one film, one workflow proof, and six capabilities', () => {
+  it('contains one shared film, three workflow evidence images, and four skill groups', () => {
     const { container } = render(<App />);
 
-    expect(screen.getAllByRole('heading', { name: siteContent.film.title })).toHaveLength(1);
+    expect(container.querySelector('#project-01 h2')).toHaveTextContent(siteContent.projects[0].title);
+    expect(container.querySelector('#project-02 h2')).toHaveTextContent(siteContent.projects[1].title);
+    expect(container.querySelector('#project-03 h2')).toHaveTextContent(siteContent.projects[2].title);
+    expect(container.querySelectorAll('#project-01 video')).toHaveLength(1);
+    expect(container.querySelectorAll('#project-02 video')).toHaveLength(0);
     expect(screen.getAllByAltText(/ComfyUI/)).toHaveLength(1);
-    expect(container.querySelectorAll('#capabilities article')).toHaveLength(6);
+    expect(container.querySelectorAll('#project-02 [data-project-media-gallery="true"] img'))
+      .toHaveLength(3);
+    expect(container.querySelectorAll('#skills article')).toHaveLength(4);
   });
 
-  it('omits rejected résumé and work-year content', () => {
+  it('omits rejected résumé, work-year, and invented performance claims', () => {
     const { container } = render(<App />);
 
-    expect(container).not.toHaveTextContent(
-      /4\s*年工作经验|四年工作经验|下载简历|résumé|resume download|work experience/i,
-    );
+    expect(container).not.toHaveTextContent(/n8n|4\s*年工作经验|下载简历/i);
+    expect(container).not.toHaveTextContent(/效率提升|节省时间|GMV|播放量|转化率\s*\d+%/i);
     expect(container.querySelector('a[download]')).not.toBeInTheDocument();
+  });
+
+  it('exposes the five recruiter navigation anchors and the shared-output disclosure', () => {
+    const { container } = render(<App />);
+    const navigation = screen.getByRole('navigation', { name: '主导航' });
+
+    expect(within(navigation).getAllByRole('link', { name: /HOME|ABOUT|WORK|SKILLS|CONTACT/ }))
+      .toHaveLength(5);
+    expect(container.querySelector('a[href="#about"]')).toBeInTheDocument();
+    expect(container.querySelector('a[href="#work"]')).toBeInTheDocument();
+    expect(container.querySelector('a[href="#skills"]')).toBeInTheDocument();
+    expect(container.querySelector('a[href="#profile"]')).not.toBeInTheDocument();
+    expect(container.querySelector('a[href="#project-01-media"]')).toHaveTextContent(
+      'APPLIED OUTPUT · SHARED WITH PROJECT 01',
+    );
   });
 
   it('keeps critical controls and media accessibly labelled', () => {
     const { container } = render(<App />);
     const navigation = container.querySelector('nav[aria-label]') as HTMLElement;
-    const capabilitySection = container.querySelector('#capabilities') as HTMLElement;
+    const capabilitySection = container.querySelector('#skills') as HTMLElement;
     const contactSection = container.querySelector('#contact') as HTMLElement;
-    const playButton = container.querySelector('#film button[aria-haspopup="dialog"]');
-    const preview = container.querySelector('#film video[aria-label]');
+    const playButton = container.querySelector('#project-01 button[aria-haspopup="dialog"]');
+    const preview = container.querySelector('#project-01 video[aria-label]');
 
-    expect(navigation.querySelectorAll('a[href^="#"]')).toHaveLength(6);
+    expect(navigation.querySelectorAll('a[href^="#"]')).toHaveLength(5);
     expect(container.querySelector('header > a[aria-label]')).toHaveAttribute('href', '#home');
     expect(screen.getByAltText(/瞿先生.*人物/)).toBeInTheDocument();
     expect(playButton).toHaveTextContent(/播放 AI 产品视频/);
     expect(preview).toHaveAttribute('aria-label', 'AI 产品视频预览');
     expect(preview).toHaveProperty('muted', true);
-    expect(container.querySelector('#system ul[aria-label="工作流工具"]')).toBeInTheDocument();
+    expect(container.querySelector(
+      '#project-02 ul[aria-label="AI SHORT FILM WORKFLOW 工具"]',
+    )).toBeInTheDocument();
 
     const capabilityButtons = [...capabilitySection.querySelectorAll('button')];
-    expect(capabilityButtons).toHaveLength(6);
+    expect(capabilityButtons).toHaveLength(4);
     capabilityButtons.forEach((button) => {
       expect(button).toHaveAttribute('aria-pressed', 'false');
       expect(button).toHaveAccessibleName(/翻转.+技能卡/);

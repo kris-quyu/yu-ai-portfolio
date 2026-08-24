@@ -18,16 +18,28 @@ vi.mock('./features/hero/HeroScrollSequence', () => ({
   HeroScrollSequence: () => <section id="profile" />,
 }));
 
+vi.mock('./features/about/AboutSection', () => ({
+  AboutSection: () => <section id="about" />,
+}));
+
+vi.mock('./features/projects/ProjectIndex', () => ({
+  ProjectIndex: () => <section id="work" />,
+}));
+
 vi.mock('./features/film/FeaturedFilm', () => ({
-  FeaturedFilm: () => <section id="film" />,
+  FeaturedFilm: () => <section id="project-01" />,
 }));
 
 vi.mock('./features/workflow/WorkflowProof', () => ({
-  WorkflowProof: () => <section id="system" />,
+  WorkflowProof: () => <section id="project-02" />,
+}));
+
+vi.mock('./features/projects/ProjectFlow', () => ({
+  ProjectFlow: () => <section id="project-03" />,
 }));
 
 vi.mock('./features/capabilities/CapabilityGrid', () => ({
-  CapabilityGrid: () => <section id="capabilities" />,
+  CapabilityGrid: () => <section id="skills" />,
 }));
 
 vi.mock('./features/contact/ContactSection', () => ({
@@ -37,12 +49,22 @@ vi.mock('./features/contact/ContactSection', () => ({
 describe('App section order', () => {
   afterEach(cleanup);
 
-  it('mounts the intro before the existing portfolio sections', () => {
+  it('mounts the recruiter-first portfolio sections in the approved order', () => {
     const { container } = render(<App />);
 
     expect(
       [...container.querySelectorAll('main > section')].map((section) => section.id),
-    ).toEqual(['home', 'profile', 'film', 'system', 'capabilities', 'contact']);
+    ).toEqual([
+      'home',
+      'profile',
+      'about',
+      'work',
+      'project-01',
+      'project-02',
+      'project-03',
+      'skills',
+      'contact',
+    ]);
   });
 
   it('mounts one portfolio loader before navigation and main content', () => {
