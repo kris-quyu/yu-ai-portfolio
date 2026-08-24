@@ -323,6 +323,19 @@ describe('HeroScrollSequence', () => {
     expect(heroCss).toMatch(/\.staticHero\s+\.stage\s*{[^}]*height:\s*auto;/s);
   });
 
+  it('keeps the mobile static overview auto-height after the mobile cascade', () => {
+    const mobileCss = heroCss.slice(
+      heroCss.indexOf('@media (max-width: 767px)'),
+      heroCss.indexOf('@media (max-width: 390px)'),
+    );
+    const staticHeroRule = mobileCss.match(/\.staticHero\s*{([^}]*)}/s)?.[1] ?? '';
+
+    expect(staticHeroRule).toMatch(/height:\s*auto;/);
+    expect(staticHeroRule).toMatch(/min-height:\s*100svh;/);
+    expect(staticHeroRule).not.toMatch(/(?:^|[;\s])height:\s*100svh;/);
+    expect(mobileCss).not.toMatch(/\.hero\s*{[^}]*height:\s*auto;/s);
+  });
+
   it('falls back to the poster when the frame failure threshold is exceeded', async () => {
     vi.mocked(loadPortraitSequenceCached).mockRejectedValue(new Error('Portrait frame loading failed'));
 
