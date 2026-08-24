@@ -8,7 +8,7 @@ export function ProjectIndex() {
       <h2 id="work-title">SELECTED WORK</h2>
       <div className={styles.list}>
         {siteContent.projects.map((project) => {
-          const titleId = `${project.id}-title`;
+          const titleId = `${project.id}-index-title`;
 
           return (
             <article key={project.id} className={styles.item} aria-labelledby={titleId}>

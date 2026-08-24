@@ -438,6 +438,14 @@ describe('complete portfolio integration', () => {
     ]);
   });
 
+  it('keeps every assembled element id unique for unambiguous accessibility references', () => {
+    const { container } = render(<App />);
+    const ids = [...container.querySelectorAll<HTMLElement>('[id]')]
+      .map((element) => element.id);
+
+    expect(ids).toHaveLength(new Set(ids).size);
+  });
+
   it('contains one shared film, three workflow evidence images, and four skill groups', () => {
     const { container } = render(<App />);
 
