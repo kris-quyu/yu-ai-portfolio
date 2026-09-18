@@ -140,6 +140,18 @@ describe('CapabilityGrid', () => {
     expect(capabilityCss).toMatch(/\.card\[data-priority="supporting"\]\s*{[^}]*grid-column:\s*1\s*\/\s*-1/is);
   });
 
+  it('keeps the supporting growth face tall enough at desktop and mobile widths', () => {
+    expect(capabilityCss).toMatch(
+      /\.card\[data-priority="supporting"\]\s+\.cardInner\s*{[^}]*min-height:\s*30rem;/is,
+    );
+    expect(capabilityCss).toMatch(
+      /@media\s*\(max-width:\s*767px\)[\s\S]*?\.card\[data-priority="supporting"\]\s+\.cardInner\s*{[^}]*min-height:\s*34rem;/is,
+    );
+    expect(capabilityCss).toMatch(
+      /@media\s*\(max-width:\s*390px\)[\s\S]*?\.card\[data-priority="supporting"\]\s+\.cardInner\s*{[^}]*min-height:\s*38rem;/is,
+    );
+  });
+
   it('defines the required face palettes and a non-3D reduced-motion swap', () => {
     expect(capabilityCss).toMatch(/\.front\s*{[^}]*var\(--forest\)/is);
     expect(capabilityCss).toMatch(/\.front\s*{[^}]*var\(--ivory\)/is);
