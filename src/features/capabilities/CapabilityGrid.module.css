@@ -96,7 +96,7 @@
 }
 
 .card[data-priority="supporting"] .cardInner {
-  min-height: 22rem;
+  min-height: 30rem;
 }
 
 .flipped .cardInner {
@@ -279,7 +279,7 @@
   }
 
   .card[data-priority="supporting"] .cardInner {
-    min-height: 25rem;
+    min-height: 34rem;
   }
 }
 
@@ -302,6 +302,10 @@
 
   .cardInner {
     min-height: 26rem;
+  }
+
+  .card[data-priority="supporting"] .cardInner {
+    min-height: 38rem;
   }
 }
 
