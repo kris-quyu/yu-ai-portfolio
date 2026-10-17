@@ -52,6 +52,12 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
   const raf = useRef(0);
 
   useEffect(() => {
+    if (sequenceState !== 'ready' || reducedMotion || fallback || frames.length > 0) return;
+    const timeout = window.setTimeout(() => setFallback(true), 12000);
+    return () => window.clearTimeout(timeout);
+  }, [sequenceState, reducedMotion, fallback, frames.length]);
+
+  useEffect(() => {
     if (sequenceState !== 'ready') return;
 
     let current = true;
@@ -149,6 +155,26 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
   }, [fallback, reducedMotion]);
 
   useLayoutEffect(() => {
+    if (reducedMotion || fallback || sequenceState !== 'ready') return;
+    const section = sectionRef.current;
+    if (!section) return;
+    const updateProgress = ({ progress }: { progress: number }) => {
+      targetProgress.current = progress;
+      const nextStage = getHeroStageIndex(progress);
+      setActiveStage((currentStage) => currentStage === nextStage ? currentStage : nextStage);
+      railRef.current?.style.setProperty('--hero-progress', String(progress));
+    };
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: updateProgress,
+      onRefresh: updateProgress,
+    });
+    return () => trigger.kill();
+  }, [fallback, reducedMotion, sequenceState]);
+
+  useLayoutEffect(() => {
     if (reducedMotion || fallback || frames.length === 0) return;
 
     const section = sectionRef.current;
@@ -159,20 +185,6 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
       setFallback(true);
       return;
     }
-
-    const trigger = ScrollTrigger.create({
-      trigger: section,
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: ({ progress }) => {
-        targetProgress.current = progress;
-        const nextStage = getHeroStageIndex(progress);
-        setActiveStage((currentStage) =>
-          currentStage === nextStage ? currentStage : nextStage,
-        );
-        railRef.current?.style.setProperty('--hero-progress', String(progress));
-      },
-    });
 
     let running = true;
     const tick = () => {
@@ -204,7 +216,6 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
 
     return () => {
       running = false;
-      trigger.kill();
       cancelAnimationFrame(raf.current);
     };
   }, [fallback, frames, reducedMotion]);
@@ -216,7 +227,7 @@ export function HeroScrollSequence({ sequenceState = 'ready' }: HeroScrollSequen
     ? 'STATIC PORTRAIT'
     : frames.length > 0
       ? 'READY · SCROLL TO CONTROL'
-      : `LOADING ${loadProgress}%`;
+      : `LOADING ${loadProgress}% · 可继续滚动`;
   const visibleStageIndex = staticPortrait ? 3 : activeStage;
 
   return (

@@ -192,6 +192,7 @@ export function PointerIntro() {
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    if (event.target instanceof Element && event.target.closest('a, button')) return;
     if (reducedMotion) return;
     activePointerRef.current = event.pointerId;
     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -229,6 +230,7 @@ export function PointerIntro() {
       <div className={styles.content}>
         <p className={styles.kicker}>QX / CREATIVE SIGNAL 001</p>
         <div className={styles.meta}>
+          <a className={styles.workLink} href="#work">观看作品 / VIEW FILMS ↘</a>
           <p className={styles.hint}>{siteContent.intro.hint}</p>
         </div>
       </div>

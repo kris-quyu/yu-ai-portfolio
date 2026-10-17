@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { AboutSection } from './features/about/AboutSection';
 import { HeroScrollSequence } from './features/hero/HeroScrollSequence';
 import { FeaturedFilm } from './features/film/FeaturedFilm';
+import { SelectedFilms } from './features/film/SelectedFilms';
 import { Navigation } from './features/navigation/Navigation';
 import { ProjectFlow } from './features/projects/ProjectFlow';
 import { ProjectIndex } from './features/projects/ProjectIndex';
@@ -27,6 +28,7 @@ export default function App() {
       <Navigation />
       <main>
         <PointerIntro />
+        <SelectedFilms />
         <HeroScrollSequence sequenceState={portfolioReadiness} />
         <AboutSection />
         <ProjectIndex />

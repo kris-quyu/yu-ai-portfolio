@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { siteContent } from './content/siteContent';
@@ -127,6 +127,35 @@ const visualCss = [
 ].join('\n');
 
 describe('complete portfolio integration', () => {
+  it('presents four new films with posters without downloading videos on entry', () => {
+    render(<App />);
+    const previews = [...document.querySelectorAll<HTMLVideoElement>('video[data-film-preview]')];
+    expect(previews).toHaveLength(4);
+    expect(previews.every((video) => !video.hasAttribute('src'))).toBe(true);
+    expect(previews.every((video) => video.preload === 'none')).toBe(true);
+    expect(screen.getByRole('heading', { name: /BEAUTY FILM/, hidden: true })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /JEWELRY FILM/, hidden: true })).toBeInTheDocument();
+  });
+
+  it('opens a new film on demand and releases scrolling after Escape', async () => {
+    vi.useFakeTimers();
+    document.body.style.overflow = 'auto';
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /直接进入/, hidden: true }));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    const trigger = screen.getByRole('button', { name: '播放 美妆视觉短片', hidden: true });
+    fireEvent.click(trigger);
+
+    const dialog = screen.getByRole('dialog', { name: /美妆视觉短片/, hidden: true });
+    const player = within(dialog).getByLabelText('美妆视觉短片 完整视频');
+    expect(player).toHaveAttribute('src', '/media/selected/beauty.mp4');
+    expect(player).toHaveAttribute('controls');
+    expect(document.body.style.overflow).toBe('hidden');
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByRole('dialog', { name: /美妆视觉短片/, hidden: true })).not.toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('auto');
+    expect(document.querySelector('main')).not.toHaveAttribute('inert');
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     IntersectionObserverStub.instances = [];
@@ -427,9 +456,10 @@ describe('complete portfolio integration', () => {
       [...container.querySelectorAll('main > section')].map((section) => section.id),
     ).toEqual([
       'home',
+      'work',
       'profile',
       'about',
-      'work',
+      'case-studies',
       'project-01',
       'project-02',
       'project-03',

@@ -3,7 +3,7 @@ import styles from './ProjectIndex.module.css';
 
 export function ProjectIndex() {
   return (
-    <section id="work" className={styles.section} aria-labelledby="work-title">
+    <section id="case-studies" className={styles.section} aria-labelledby="work-title">
       <p className={styles.eyebrow}>WORK / 项目案例</p>
       <h2 id="work-title">SELECTED WORK</h2>
       <div className={styles.list}>

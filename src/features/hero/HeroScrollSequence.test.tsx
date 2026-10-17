@@ -112,6 +112,7 @@ describe('HeroScrollSequence', () => {
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -205,6 +206,15 @@ describe('HeroScrollSequence', () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText('剪辑、处理与工作流交付').length).toBeGreaterThan(0);
     expect(screen.getByText('04 / 04')).toBeInTheDocument();
+  });
+
+  it('keeps scroll-driven copy working while the portrait sequence is still loading', async () => {
+    render(<HeroScrollSequence />);
+    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    act(() => getScrollUpdate()({ progress: 0.56 }));
+    expect(screen.getByRole('heading', { name: 'GENERATE THE VISUALS.', hidden: true })).toBeInTheDocument();
+    expect(screen.getByText('03 / 04')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('LOADING 0%');
   });
 
   it('returns capability copy to the matching earlier phase when scroll reverses', async () => {
@@ -351,6 +361,23 @@ describe('HeroScrollSequence', () => {
     expect(screen.getByRole('status')).toHaveTextContent('STATIC PORTRAIT');
   });
 
+  it('releases the sticky loading layout when animation frames never finish loading', async () => {
+    vi.useFakeTimers();
+    let loadingSignal: AbortSignal | undefined;
+    vi.mocked(loadPortraitSequenceCached).mockImplementation(({ signal }) => {
+      loadingSignal = signal;
+      return new Promise(() => undefined);
+    });
+    render(<HeroScrollSequence />);
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    await act(() => vi.advanceTimersByTimeAsync(12000));
+
+    expect(document.querySelector('#profile')).toHaveAttribute('data-layout', 'static-overview');
+    expect(screen.getByRole('list', { name: '能力阶段概览' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('STATIC PORTRAIT');
+    expect(loadingSignal?.aborted).toBe(true);
+  });
+
   it('aborts loading on unmount and ignores stale asynchronous work', async () => {
     let signal: AbortSignal | undefined;
     let settle: ((frames: HTMLImageElement[]) => void) | undefined;
@@ -364,10 +391,11 @@ describe('HeroScrollSequence', () => {
     const { unmount } = render(<HeroScrollSequence />);
     await waitFor(() => expect(loadPortraitSequenceCached).toHaveBeenCalled());
 
+    const triggerCount = scrollTrigger.create.mock.calls.length;
     unmount();
     expect(signal?.aborted).toBe(true);
     await act(async () => settle?.([{ width: 1600, height: 900 } as HTMLImageElement]));
-    expect(scrollTrigger.create).not.toHaveBeenCalled();
+    expect(scrollTrigger.create).toHaveBeenCalledTimes(triggerCount);
   });
 
   it('sizes the canvas for DPR and cleans up ScrollTrigger and RAF', async () => {

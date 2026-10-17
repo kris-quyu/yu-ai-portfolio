@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   PortfolioLoader,
@@ -138,6 +138,30 @@ describe('PortfolioLoader', () => {
     expect(document.body.style.overflow).toBe('hidden');
     await act(() => vi.advanceTimersByTimeAsync(700));
     expect(document.body.style.overflow).toBe('auto');
+  });
+
+  it('lets visitors immediately leave a stalled load and restores scrolling and interaction', async () => {
+    vi.useFakeTimers();
+    document.body.style.overflow = 'auto';
+    const onSettled = vi.fn();
+    let loadingSignal: AbortSignal | undefined;
+    render(<>
+      <PortfolioLoader onSettled={onSettled} loadCritical={(_report, signal) => {
+        loadingSignal = signal;
+        return new Promise(() => undefined);
+      }} />
+      <a href="#work">作品</a>
+    </>);
+    await act(() => vi.advanceTimersByTimeAsync(0));
+
+    fireEvent.click(screen.getByRole('button', { name: /直接进入/, hidden: true }));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+
+    expect(document.body.style.overflow).toBe('auto');
+    expect(screen.getByRole('link', { name: '作品' })).not.toHaveAttribute('inert');
+    expect(loadingSignal?.aborted).toBe(true);
+    expect(onSettled).toHaveBeenCalledExactlyOnceWith('degraded');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('enters after critical assets without waiting for the full portrait sequence', async () => {

@@ -48,6 +48,19 @@
   letter-spacing: -.08em;
 }
 
+.skipButton {
+  position: absolute;
+  bottom: max(2rem, env(safe-area-inset-bottom));
+  min-height: 2.75rem;
+  padding: .7rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--acid);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
 @media (max-width: 390px) {
   .orb {
     width: 88vw;

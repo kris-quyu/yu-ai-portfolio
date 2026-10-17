@@ -23,7 +23,7 @@ vi.mock('./features/about/AboutSection', () => ({
 }));
 
 vi.mock('./features/projects/ProjectIndex', () => ({
-  ProjectIndex: () => <section id="work" />,
+  ProjectIndex: () => <section id="case-studies" />,
 }));
 
 vi.mock('./features/film/FeaturedFilm', () => ({
@@ -56,9 +56,10 @@ describe('App section order', () => {
       [...container.querySelectorAll('main > section')].map((section) => section.id),
     ).toEqual([
       'home',
+      'work',
       'profile',
       'about',
-      'work',
+      'case-studies',
       'project-01',
       'project-02',
       'project-03',

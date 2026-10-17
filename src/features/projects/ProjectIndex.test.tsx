@@ -44,7 +44,7 @@ describe('ProjectIndex', () => {
 
   it('provides the work fragment target with an accessible heading relationship', () => {
     const { container } = render(<ProjectIndex />);
-    const section = container.querySelector('section#work');
+    const section = container.querySelector('section#case-studies');
 
     expect(section).toHaveAttribute('aria-labelledby', 'work-title');
     expect(screen.getByRole('heading', { name: 'SELECTED WORK' })).toHaveAttribute('id', 'work-title');

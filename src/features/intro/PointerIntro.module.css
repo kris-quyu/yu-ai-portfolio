@@ -129,6 +129,15 @@
   background: rgb(243 241 232 / 48%);
 }
 
+.workLink {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 2.75rem;
+  color: var(--forest);
+  text-underline-offset: 0.5rem;
+}
+
 .titleStage {
   position: absolute;
   z-index: 1;

@@ -123,6 +123,8 @@ export function PortfolioLoader({
   const [state, setState] = useState<LoaderState>('modal');
   const [visible, setVisible] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const skipButtonRef = useRef<HTMLButtonElement>(null);
+  const skipLoadingRef = useRef<() => void>(() => undefined);
   const titleId = useId();
 
   useEffect(() => {
@@ -135,6 +137,8 @@ export function PortfolioLoader({
 
   useEffect(() => {
     let current = true;
+    const controller = new AbortController();
+    skipLoadingRef.current = () => controller.abort();
     let revealTimeout: number | undefined;
     setPercent(0);
     void loadPortfolio({
@@ -142,9 +146,14 @@ export function PortfolioLoader({
       maximumMs: 6000,
       onProgress: setPercent,
       loadCritical,
+      signal: controller.signal,
     }).then((result) => {
       if (!current) return;
       onSettled?.(result);
+      if (controller.signal.aborted) {
+        setVisible(false);
+        return;
+      }
       setState('revealing');
       revealTimeout = window.setTimeout(() => {
         if (current) setVisible(false);
@@ -153,6 +162,7 @@ export function PortfolioLoader({
 
     return () => {
       current = false;
+      controller.abort();
       if (revealTimeout !== undefined) window.clearTimeout(revealTimeout);
     };
   }, [loadCritical, onSettled]);
@@ -180,9 +190,14 @@ export function PortfolioLoader({
       )
       .map((element) => ({ element, wasInert: element.hasAttribute('inert') }));
     const keepFocusInside = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        skipLoadingRef.current();
+        return;
+      }
       if (event.key !== 'Tab') return;
       event.preventDefault();
-      loader.focus();
+      skipButtonRef.current?.focus();
     };
 
     siblings.forEach(({ element }) => element.setAttribute('inert', ''));
@@ -222,6 +237,14 @@ export function PortfolioLoader({
         <strong>{percent}%</strong>
         <span>{loadingTopics[topic]}</span>
       </div>
+      <button
+        ref={skipButtonRef}
+        type="button"
+        className={styles.skipButton}
+        onClick={() => skipLoadingRef.current()}
+      >
+        直接进入 / SKIP ↗
+      </button>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 export type PortfolioLoadResult = 'ready' | 'degraded';
 
 export interface LoadPortfolioOptions {
+  signal?: AbortSignal;
   minimumMs: number;
   maximumMs: number;
   onProgress: (percent: number) => void;
@@ -15,6 +16,7 @@ const delay = (milliseconds: number) => new Promise<void>((resolve) => {
 });
 
 export async function loadPortfolio({
+  signal,
   minimumMs,
   maximumMs,
   onProgress,
@@ -29,7 +31,10 @@ export async function loadPortfolio({
   };
 
   const critical = Promise.resolve()
-    .then(() => loadCritical(report, controller.signal))
+    .then(() => {
+      if (controller.signal.aborted) throw new DOMException('Aborted', 'AbortError');
+      return loadCritical(report, controller.signal);
+    })
     .then(() => {
       if (!finished) onProgress(100);
       return 'ready' as const;
@@ -40,16 +45,27 @@ export async function loadPortfolio({
   const maximum = new Promise<PortfolioLoadResult>((resolve) => {
     timeoutId = setTimeout(() => resolve('degraded'), Math.max(0, maximumMs));
   });
+  let cancel: (() => void) | undefined;
+  const cancelled = new Promise<PortfolioLoadResult>((resolve) => {
+    cancel = () => {
+      controller.abort();
+      resolve('degraded');
+    };
+    signal?.addEventListener('abort', cancel, { once: true });
+    if (signal?.aborted) cancel();
+  });
 
   try {
     const result = await Promise.race([
       Promise.all([critical, minimum]).then(([result]) => result),
       maximum,
+      cancelled,
     ]);
     finished = true;
     if (result === 'degraded') controller.abort();
     return result;
   } finally {
     if (timeoutId !== undefined) clearTimeout(timeoutId);
+    if (cancel) signal?.removeEventListener('abort', cancel);
   }
 }
