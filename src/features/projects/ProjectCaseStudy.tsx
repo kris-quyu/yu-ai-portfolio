@@ -8,6 +8,7 @@ export interface ProjectCaseStudyProps {
   sectionRef?: Ref<HTMLElement>;
   className?: string;
   active?: boolean;
+  lead?: ReactNode;
 }
 
 const detailBlocks = (project: ProjectContent) => [
@@ -36,6 +37,7 @@ export function ProjectCaseStudy({
   sectionRef,
   className,
   active,
+  lead,
 }: ProjectCaseStudyProps) {
   const sectionClassName = className ? `${styles.section} ${className}` : styles.section;
 
@@ -67,6 +69,7 @@ export function ProjectCaseStudy({
         </header>
 
         <div className={styles.narrative} data-project-narrative>
+          {lead && <div className={styles.lead}>{lead}</div>}
           {detailBlocks(project).map((block) => (
             <article key={block.id} className={styles.detailBlock}>
               <h3>{block.heading}</h3>

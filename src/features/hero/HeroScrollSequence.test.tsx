@@ -435,7 +435,7 @@ describe('HeroScrollSequence', () => {
     const poster = await screen.findByAltText('瞿先生动画人物');
     const canvas = screen.getByLabelText('滚动控制的动画人物');
 
-    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    await waitFor(() => expect(nextFrame).toBeTypeOf('function'));
     expect(canvas).toHaveAttribute('aria-hidden', 'true');
     expect(poster).not.toHaveAttribute('aria-hidden');
 
@@ -461,7 +461,7 @@ describe('HeroScrollSequence', () => {
 
     render(<HeroScrollSequence />);
     const poster = await screen.findByAltText('瞿先生动画人物');
-    await waitFor(() => expect(scrollTrigger.create).toHaveBeenCalled());
+    await waitFor(() => expect(nextFrame).toBeTypeOf('function'));
 
     act(() => nextFrame?.(16));
     expect(poster).toHaveAttribute('aria-hidden', 'true');

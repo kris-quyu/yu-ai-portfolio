@@ -108,6 +108,19 @@
   border-bottom: 1px solid var(--line);
 }
 
+.lead {
+  padding-block: 1.5rem 2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.lead > div > p {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+}
+
 .detailBlock p,
 .detailBlock ul {
   margin: 1rem 0 0;

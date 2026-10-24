@@ -42,6 +42,13 @@
   transform: scale(1.015);
 }
 
+.gallery[data-native-aspect='true'] .trigger img {
+  aspect-ratio: auto;
+  object-fit: contain;
+  opacity: 1;
+  transform: none;
+}
+
 .expand {
   position: absolute;
   right: 0.8rem;

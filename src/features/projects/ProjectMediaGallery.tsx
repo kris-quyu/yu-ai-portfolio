@@ -5,9 +5,11 @@ import styles from './ProjectMediaGallery.module.css';
 
 export interface ProjectMediaGalleryProps {
   items: readonly MediaEvidence[];
+  nativeAspect?: boolean;
 }
 
 const evidenceCaption = (item: MediaEvidence) => {
+  if (item.caption) return item.caption;
   if (item.alt.startsWith('ComfyUI')) {
     return '证明参考素材、镜头分组和连续性控制被组织在同一套工作流中。';
   }
@@ -20,7 +22,7 @@ const evidenceCaption = (item: MediaEvidence) => {
   return '项目制作过程中的真实媒体证据。';
 };
 
-export function ProjectMediaGallery({ items }: ProjectMediaGalleryProps) {
+export function ProjectMediaGallery({ items, nativeAspect = false }: ProjectMediaGalleryProps) {
   const [active, setActive] = useState<MediaEvidence | null>(null);
   const [failed, setFailed] = useState<Set<string>>(() => new Set());
   const [dialogFailedSrc, setDialogFailedSrc] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function ProjectMediaGallery({ items }: ProjectMediaGalleryProps) {
   }, [active, close]);
 
   return (
-    <div className={styles.gallery} data-project-media-gallery="true">
+    <div className={styles.gallery} data-project-media-gallery="true" data-native-aspect={nativeAspect}>
       {items.map((item, index) => {
         const hasFailed = failed.has(item.src);
         return (

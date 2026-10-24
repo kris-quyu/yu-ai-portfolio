@@ -159,6 +159,26 @@ describe('complete portfolio integration', () => {
     expect(link.getAttribute('rel')).toMatch(/noopener/);
     expect(enterprise).not.toHaveTextContent(/独立全栈|正式投产|生产环境已上线/);
   });
+
+  it('shows the enterprise screenshot before the case narrative and expands it without losing the test-stage caption', async () => {
+    vi.useFakeTimers();
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /直接进入/, hidden: true }));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    const enterprise = document.querySelector('#project-04') as HTMLElement;
+    const narrative = enterprise.querySelector('[data-project-narrative]') as HTMLElement;
+    const screenshot = within(enterprise).getByAltText('金梦湾水质监测平台测试界面');
+    expect(narrative.firstElementChild).toContainElement(screenshot);
+    expect(screenshot).toHaveAttribute('src', '/media/projects/project-04/water-monitoring-dashboard.webp');
+    expect(enterprise).toHaveTextContent('设备联调阶段');
+    fireEvent.click(within(enterprise).getByRole('button', { name: '放大 金梦湾水质监测平台测试界面', hidden: true }));
+    const dialog = screen.getByRole('dialog', { name: '金梦湾水质监测平台测试界面', hidden: true });
+    expect(within(dialog).getByAltText('金梦湾水质监测平台测试界面')).toHaveAttribute('src', '/media/projects/project-04/water-monitoring-dashboard.webp');
+    expect(dialog).toHaveTextContent('PLC 反馈尚在联调');
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByRole('dialog', { name: '金梦湾水质监测平台测试界面', hidden: true })).not.toBeInTheDocument();
+    expect(document.body.style.overflow).not.toBe('hidden');
+  });
   it('presents five films with posters without downloading videos on entry', () => {
     render(<App />);
     const previews = [...document.querySelectorAll<HTMLVideoElement>('video[data-film-preview]')];

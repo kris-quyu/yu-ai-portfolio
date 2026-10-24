@@ -1,6 +1,7 @@
 export interface MediaEvidence {
   src: string;
   alt: string;
+  caption?: string;
 }
 
 export interface MediaManifest {
