@@ -1,6 +1,6 @@
 export type SectionId = 'home' | 'about' | 'work' | 'skills' | 'contact';
-export type ProjectId = 'project-01' | 'project-02' | 'project-03';
-export type ProjectStatus = 'COMPLETED' | 'IN DEVELOPMENT';
+export type ProjectId = 'project-01' | 'project-02' | 'project-03' | 'project-04';
+export type ProjectStatus = 'COMPLETED' | 'IN DEVELOPMENT' | 'TEST VERSION / 企业测试版';
 export type WorkflowStageStatus = 'COMPLETED' | 'EXPERIMENTAL' | 'PLANNED';
 
 export interface HeroStage {
@@ -19,7 +19,7 @@ export interface BilingualCopy {
 
 export interface ProjectContent {
   id: ProjectId;
-  number: '01' | '02' | '03';
+  number: '01' | '02' | '03' | '04';
   title: string;
   titleZh: string;
   status: ProjectStatus;
@@ -30,6 +30,7 @@ export interface ProjectContent {
   tools: readonly string[];
   role: readonly string[];
   result: string;
+  externalLink?: { href: string; label: string };
   sharedOutput?: { label: string; href: '#project-01-media' };
 }
 
@@ -105,14 +106,14 @@ export interface SiteContent {
   contact: ContactDetails & { eyebrow: string; titleLines: readonly string[] };
 }
 
-const positioning = '使用 ComfyUI、AI 图像与视频模型、Python / API 和自动化工具，连接内容策划、素材生成、视频制作与交付。';
+const positioning = '使用 ComfyUI、AI 图像与视频模型、Python / API 和自动化工具，连接内容策划、素材生成、视频制作与交付；同时参与企业 Web 前端开发、接口辅助对接与设备联调。';
 
 export const siteContent: SiteContent = {
   intro: {
     title: "HELLO, I'M YU",
     reveal: '你好，我是宇',
-    annotation: 'AIGC CONTENT PRODUCTION / AI WORKFLOW',
-    annotationZh: 'AIGC 内容生产 · AI 工作流 · 自动化应用',
+    annotation: 'AIGC CONTENT & DIGITAL APPLICATIONS',
+    annotationZh: 'AIGC 内容制作 · AI 工作流 · 企业数字化应用',
     hint: '移动鼠标探索 · 向下滚动查看更多',
   },
   navigation: [
@@ -123,7 +124,7 @@ export const siteContent: SiteContent = {
     { id: 'contact', label: 'CONTACT' },
   ],
   hero: {
-    eyebrow: 'AIGC CONTENT PRODUCTION / AI WORKFLOW',
+    eyebrow: 'AIGC CONTENT & DIGITAL APPLICATIONS',
     titleLines: ['BUILDING', 'CREATIVE', 'WORKFLOWS.'],
     summary: positioning,
     positioning,
@@ -164,7 +165,7 @@ export const siteContent: SiteContent = {
     ],
   },
   about: {
-    statement: '我关注的不是单次生成图片或视频，而是如何把 AI 工具组合成完整的内容生产流程。从产品资料和内容目标出发，独立完成选题、脚本、分镜、AI 图像与视频生成、素材筛选和后期剪辑，并持续尝试将 Python、API 与自动化能力接入生产流程。',
+    statement: '我关注的是 AI 工具与技术在真实业务中的应用。从产品资料和内容目标出发，独立完成选题、脚本、分镜、AI 图像与视频生成、素材筛选和后期剪辑，已独立完成恩济堂品牌合作短片并交付。在企业数字化项目中，负责金梦湾水质监测测试系统的前端开发，辅助后端接口对接，并参与传感器接入与联动控制调试。持续将内容制作、网页开发与工程调试能力用于具体项目。',
     practiceAreas: [
       'AI 图像生成',
       'AI 视频生成',
@@ -173,8 +174,11 @@ export const siteContent: SiteContent = {
       'Python / API',
       'AI 电商内容生产',
       '视频剪辑与视觉处理',
+      'Web 前端开发',
+      '后端接口辅助对接',
+      '传感器与联动控制调试',
     ],
-    targetDirection: 'AIGC / AI 内容生产 / AI 工作流 / AI 应用',
+    targetDirection: 'AIGC / AI 内容制作 / AI 工作流 / AI 应用 / 企业数字化应用',
   },
   projects: [
     {
@@ -240,6 +244,21 @@ export const siteContent: SiteContent = {
       role: ['梳理内容生产阶段', '尝试素材处理和流程串联', '持续完善可复用的内容生产模板'],
       result: '已形成真实的阶段化工作流说明；稳定的端到端自动化输出仍在持续开发。',
     },
+    {
+      id: 'project-04',
+      number: '04',
+      title: 'ENTERPRISE MONITORING SYSTEM',
+      titleZh: '金梦湾水质监测测试系统',
+      status: 'TEST VERSION / 企业测试版',
+      summary: '为企业开发水质监测测试系统前端，辅助后端接口对接，并参与传感器接入和联动控制调试。',
+      tags: ['WEB FRONTEND', 'API INTEGRATION SUPPORT', 'SENSOR TESTING', 'CONTROL TESTING'],
+      problem: '水质监测需要将数据展示、设备状态与控制操作组织在一致的业务界面中，并验证前后端与传感器之间的信息衔接。',
+      solution: '围绕企业测试需求完成前端开发，辅助对接后端接口，配合传感器接入与联动控制调试，逐步检查界面、数据与设备链路的衔接。',
+      tools: ['Web 前端', 'API 接口对接（辅助）', '传感器接入调试', '联动控制调试'],
+      role: ['前端开发', '辅助后端接口对接', '传感器接入调试', '联动控制调试'],
+      result: '形成可访问的企业测试版本，并参与前端界面、后端接口和设备联动的协同调试。',
+      externalLink: { href: 'https://www.jinmengwan.com/', label: '查看测试系统 / VISIT TEST SYSTEM ↗' },
+    },
   ],
   contentWorkflow: {
     steps: [
@@ -292,14 +311,14 @@ export const siteContent: SiteContent = {
     {
       id: 'engineering',
       index: '04',
-      title: 'OTHER ENGINEERING',
-      titleZh: '工程补充',
-      summary: '作为内容生产方向的工程补充能力，不作为项目主视觉。',
-      tools: ['C/C++', 'OpenCV', 'CAD / UG/NX', '单片机', '传感器', 'PLC / HMI 基础'],
+      title: 'WEB / ENGINEERING',
+      titleZh: '前端开发与工程联调',
+      summary: '以企业水质监测测试系统为实践，完成前端开发，辅助接口对接，并参与传感器及联动控制调试。',
+      tools: ['Web 前端', 'API 辅助对接', '传感器接入调试', '联动控制调试', 'C/C++', 'OpenCV', 'CAD / UG/NX', '单片机', 'PLC / HMI 基础'],
       priority: 'supporting',
-      mastered: { zh: '基础编程、视觉处理与硬件调试', en: 'Foundational programming, visual processing, hardware debugging' },
-      growing: { zh: '软硬件原型与视觉识别应用', en: 'Hardware-software prototyping and computer vision' },
-      next: { zh: '将工程能力用于内容工具与自动化辅助', en: 'Apply engineering skills to content tools and automation support' },
+      mastered: { zh: 'Web 前端开发与基础编程', en: 'Web frontend development and programming foundations' },
+      growing: { zh: '接口辅助对接、传感器与联动控制调试', en: 'API integration support, sensor and control testing' },
+      next: { zh: '完善企业测试系统的稳定性与交付文档', en: 'Improve test-system reliability and delivery documentation' },
     },
   ],
   film: {

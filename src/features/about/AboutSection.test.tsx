@@ -9,9 +9,9 @@ describe('AboutSection', () => {
     render(<AboutSection />);
 
     expect(screen.getByRole('heading', { name: 'ABOUT' })).toBeInTheDocument();
-    expect(screen.getByText(/我关注的不是单次生成图片或视频/)).toBeInTheDocument();
+    expect(screen.getByText(/我关注的是 AI 工具与技术在真实业务中的应用/)).toBeInTheDocument();
     expect(screen.getByRole('list', { name: '主要实践方向' })).toHaveTextContent('AI 图像生成');
-    expect(screen.getByText('AIGC / AI 内容生产 / AI 工作流 / AI 应用')).toBeInTheDocument();
+    expect(screen.getByText('AIGC / AI 内容制作 / AI 工作流 / AI 应用 / 企业数字化应用')).toBeInTheDocument();
   });
 
   it('provides the about fragment target with an accessible heading relationship', () => {

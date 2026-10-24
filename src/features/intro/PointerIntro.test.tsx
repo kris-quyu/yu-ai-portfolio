@@ -64,9 +64,9 @@ describe('PointerIntro', () => {
     expect(screen.getByRole('heading', { name: "HELLO, I'M YU" })).toBeInTheDocument();
     expect(screen.getByText('你好，我是宇')).toBeInTheDocument();
     expect(
-      screen.getByText('AIGC CONTENT PRODUCTION / AI WORKFLOW'),
+      screen.getByText('AIGC CONTENT & DIGITAL APPLICATIONS'),
     ).toBeInTheDocument();
-    expect(screen.getByText('AIGC 内容生产 · AI 工作流 · 自动化应用')).toBeInTheDocument();
+    expect(screen.getByText('AIGC 内容制作 · AI 工作流 · 企业数字化应用')).toBeInTheDocument();
     expect(screen.queryByText('AI CONTENT CREATOR / HANGZHOU')).not.toBeInTheDocument();
     expect(screen.getByText('移动鼠标探索 · 向下滚动查看更多')).toBeInTheDocument();
   });
@@ -139,7 +139,7 @@ describe('PointerIntro', () => {
 
     const title = screen.getByRole('heading', { name: "HELLO, I'M YU" });
     const annotation = screen.getByText(
-      'AIGC CONTENT PRODUCTION / AI WORKFLOW',
+      'AIGC CONTENT & DIGITAL APPLICATIONS',
     );
 
     expect(title.parentElement).toContainElement(annotation);

@@ -21,10 +21,10 @@ describe('CapabilityGrid', () => {
     expect(within(articles[0]).getByRole('heading', { name: 'AI / AIGC' })).toBeInTheDocument();
     expect(within(articles[1]).getByRole('heading', { name: 'AUTOMATION' })).toBeInTheDocument();
     expect(within(articles[2]).getByRole('heading', { name: 'CONTENT / DESIGN' })).toBeInTheDocument();
-    expect(within(articles[3]).getByRole('heading', { name: 'OTHER ENGINEERING' })).toBeInTheDocument();
+    expect(within(articles[3]).getByRole('heading', { name: 'WEB / ENGINEERING' })).toBeInTheDocument();
     expect(within(articles[1]).getByText('自动化')).toBeVisible();
     expect(within(articles[2]).getByText('内容与设计')).toBeVisible();
-    expect(within(articles[3]).getByText('工程补充')).toBeVisible();
+    expect(within(articles[3]).getByText('前端开发与工程联调')).toBeVisible();
     expect(within(articles[0]).getByText('ComfyUI')).toBeVisible();
     expect(within(articles[1]).getByText('FFmpeg')).toBeVisible();
     expect(within(articles[1]).getAllByText(/实验/)).not.toHaveLength(0);

@@ -57,6 +57,7 @@ describe('App section order', () => {
     ).toEqual([
       'home',
       'work',
+      'project-04',
       'profile',
       'about',
       'case-studies',

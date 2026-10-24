@@ -5,9 +5,9 @@ describe('no-JavaScript fallback and metadata', () => {
   it('describes the public YU portfolio with recruiter-facing metadata', () => {
     const document = new DOMParser().parseFromString(html, 'text/html');
 
-    expect(document.title).toBe('YU｜AIGC 内容生产与 AI 工作流作品集');
+    expect(document.title).toBe('YU｜AIGC 内容制作与企业数字化应用作品集');
     expect(document.querySelector('meta[name="description"]')?.getAttribute('content'))
-      .toBe('AIGC 内容生产、AI 视频、ComfyUI、Python/API 与自动化工作流个人作品集。');
+      .toBe('AIGC 内容制作、AI 工作流、品牌合作视频与企业数字化应用作品集，涵盖 Web 前端、API 辅助对接和设备联调。');
   });
 
   it('keeps all three truthful projects, shared evidence, and contacts readable without JavaScript', () => {
@@ -17,7 +17,7 @@ describe('no-JavaScript fallback and metadata', () => {
 
     expect(fallback).not.toBeNull();
     expect(fallbackText).toContain('QX / AI LAB · AIGC CONTENT & AI WORKFLOW');
-    expect(fallbackText).toContain('AIGC 内容生产 / AI 工作流');
+    expect(fallbackText).toContain('AIGC 内容制作 / 企业数字化应用');
     expect(fallbackText).toContain('PROJECT 01 · AI PRODUCT FILM · COMPLETED');
     expect(fallbackText).toContain('PROJECT 02 · AI SHORT FILM WORKFLOW · COMPLETED');
     expect(fallbackText).toContain('与 Project 01 共用同一支成片');

@@ -6,6 +6,7 @@ import { SelectedFilms } from './features/film/SelectedFilms';
 import { Navigation } from './features/navigation/Navigation';
 import { ProjectFlow } from './features/projects/ProjectFlow';
 import { ProjectIndex } from './features/projects/ProjectIndex';
+import { EnterpriseProject } from './features/projects/EnterpriseProject';
 import { WorkflowProof } from './features/workflow/WorkflowProof';
 import { CapabilityGrid } from './features/capabilities/CapabilityGrid';
 import { ContactSection } from './features/contact/ContactSection';
@@ -29,6 +30,7 @@ export default function App() {
       <main>
         <PointerIntro />
         <SelectedFilms />
+        <EnterpriseProject />
         <HeroScrollSequence sequenceState={portfolioReadiness} />
         <AboutSection />
         <ProjectIndex />

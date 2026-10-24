@@ -25,8 +25,16 @@
 }
 .heading h2 span { color: var(--accent); }
 .introduction { max-width: 24rem; margin: 0; color: var(--muted); line-height: 1.8; font-size: 0.9rem; }
+.introduction p { margin: 0; }
+.introduction a { display: inline-flex; align-items: center; min-height: 2.75rem; margin-top: 0.5rem; color: var(--accent); text-underline-offset: 0.4rem; }
 .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1rem, 2vw, 2rem); }
 .film { min-width: 0; }
+.featured { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; margin-bottom: 2rem; }
+.featured .filmCopy { max-width: 40rem; }
+.featured h3 { font-size: clamp(2rem, 4.5vw, 4.5rem); }
+.featured .summary { font-size: 1rem; }
+.delivery { margin-block: 1.5rem; color: var(--accent); font-size: 0.8rem; line-height: 1.8; }
+.role { font-size: 0.85rem; line-height: 1.8; color: var(--ivory); }
 .poster {
   position: relative;
   display: block;
@@ -96,6 +104,7 @@
 }
 @media (max-width: 540px) {
   .grid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+  .featured { grid-template-columns: minmax(0, 1fr); gap: 1rem; margin-bottom: 1rem; }
   .poster { max-height: 72svh; aspect-ratio: auto; height: min(150vw, 72svh); }
   .film h3 { font-size: 1.7rem; }
   .overlay { padding: 0.5rem; }

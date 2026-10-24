@@ -77,14 +77,18 @@ export function SelectedFilms() {
     <section id="work" className={styles.section} aria-labelledby="selected-films-title">
       <div className={styles.heading}>
         <div>
-          <p className={styles.eyebrow}>SELECTED FILMS / 精选成片</p>
+          <p className={styles.eyebrow}>SELECTED FILMS / 品牌合作与精选成片</p>
           <h2 id="selected-films-title">MADE WITH AI.<br /><span>DIRECTED BY ME.</span></h2>
         </div>
-        <p className={styles.introduction}>从内容策划、AI 图像与视频生成到后期剪辑，独立完成。<br />CONCEPT · GENERATION · EDITING</p>
+        <div className={styles.introduction}>
+          <p>从品牌内容策划、拍摄、AI 生成到后期剪辑，独立完成。<br />CONCEPT · PRODUCTION · DELIVERY</p>
+          <a href="#project-04">企业系统项目 / WEB & DEVICE TESTING ↗</a>
+        </div>
       </div>
       <div className={styles.grid}>
         {selectedFilms.map((film, index) => (
-          <article key={film.id} className={styles.film}
+          <article key={film.id} className={`${styles.film} ${film.client ? styles.featured : ''}`}
+            aria-labelledby={`film-${film.id}-title`}
             onMouseEnter={() => { if (!reducedMotion) setPreview(film.id); }}
             onMouseLeave={() => setPreview(null)}>
             <button type="button" className={styles.poster} aria-label={`播放 ${film.titleZh}`}
@@ -100,14 +104,18 @@ export function SelectedFilms() {
                 src={preview === film.id && !active && !reducedMotion ? filmAsset(film, '-preview.mp4') : undefined}
                 poster={filmAsset(film, '.webp')} muted loop playsInline preload="none" aria-hidden="true"
                 onError={() => setPreview((current) => current === film.id ? null : current)} />
-              <span className={styles.topline} aria-hidden="true"><span>0{index + 1} / AI FILM</span><span>{film.duration}</span></span>
+              <span className={styles.topline} aria-hidden="true"><span>0{index + 1} / {film.client ? 'BRAND FILM' : 'AI FILM'}</span><span>{film.duration}</span></span>
               <span className={styles.play} aria-hidden="true">↗</span>
               <span className={styles.watch} aria-hidden="true">观看成片 / WATCH FILM</span>
             </button>
-            <p className={styles.focus}>{film.focus}</p>
-            <h3>{film.title}<span lang="zh-CN">{film.titleZh}</span></h3>
-            <p className={styles.summary}>{film.summary}</p>
-            <p className={styles.tags}>AI IMAGE · AI VIDEO · EDITING</p>
+            <div className={styles.filmCopy}>
+              <p className={styles.focus}>{film.focus}</p>
+              <h3 id={`film-${film.id}-title`}>{film.title}<span lang="zh-CN">{film.titleZh}</span></h3>
+              {film.delivery && <p className={styles.delivery}>{film.client} · {film.delivery}</p>}
+              <p className={styles.summary}>{film.summary}</p>
+              {film.roleLabel && <p className={styles.role}>{film.roleLabel}</p>}
+              <p className={styles.tags}>{film.tags?.join(' · ') ?? 'AI IMAGE · AI VIDEO · EDITING'}</p>
+            </div>
           </article>
         ))}
       </div>
@@ -118,7 +126,7 @@ export function SelectedFilms() {
         }}>
           <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="selected-film-dialog-title">
             <header className={styles.dialogHeader}>
-              <div><p>{active.title}</p><h2 id="selected-film-dialog-title">{active.titleZh}</h2></div>
+              <div><p>{active.title}</p><h2 id="selected-film-dialog-title">{active.titleZh}</h2>{active.delivery && <p>{active.delivery}</p>}</div>
               <button ref={closeRef} type="button" onClick={close} aria-label="关闭视频">关闭 / CLOSE ×</button>
             </header>
             {!failed && <video ref={playerRef} className={styles.player}
@@ -127,7 +135,7 @@ export function SelectedFilms() {
               onLoadedData={() => setReady(true)} onCanPlay={() => setReady(true)}
               onWaiting={() => setReady(false)} onError={() => { setFailed(true); setReady(false); }} />}
             <footer className={styles.dialogFooter}>
-              <p role="status">{failed ? '视频暂时无法播放，可直接打开视频文件。' : !ready ? '视频加载中，可稍候、直接打开或关闭返回。' : '独立完成 / CONCEPT · AI GENERATION · EDITING'}</p>
+              <p role="status">{failed ? '视频暂时无法播放，可直接打开视频文件。' : !ready ? '视频加载中，可稍候、直接打开或关闭返回。' : active.roleLabel ?? '独立完成 / CONCEPT · AI GENERATION · EDITING'}</p>
               <a href={filmAsset(active, '.mp4')} target="_blank" rel="noreferrer">直接打开 / OPEN VIDEO ↗</a>
             </footer>
           </div>

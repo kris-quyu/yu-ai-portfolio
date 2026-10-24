@@ -5,9 +5,22 @@ export interface SelectedFilm {
   summary: string;
   focus: string;
   duration: string;
+  client?: string;
+  delivery?: string;
+  roleLabel?: string;
+  tags?: readonly string[];
 }
 
 export const selectedFilms: readonly SelectedFilm[] = [
+  {
+    id: 'enjitang', title: 'ENJITANG BRAND FILM', titleZh: '恩济堂品牌合作短片', duration: '00:24',
+    client: '恩济堂',
+    delivery: '已交付 · 未发布（品牌端） / DELIVERED · BRAND RELEASE PENDING',
+    roleLabel: '策划 · 拍摄 · AI 生成 · 剪辑 / CONCEPT · SHOOTING · AI GENERATION · EDITING',
+    summary: '围绕恩济堂纯梨膏产品，独立完成内容策划、拍摄、AI 生成与后期剪辑，将产品信息转化为生活场景中的短视频表达。',
+    focus: '品牌合作 / BRAND COLLABORATION',
+    tags: ['BRAND CONTENT', 'SHOOTING', 'AI GENERATION', 'EDITING'],
+  },
   {
     id: 'beauty', title: 'BEAUTY FILM', titleZh: '美妆视觉短片', duration: '00:20',
     summary: '通过黑白空间、人物镜头与产品特写，建立统一的美妆视觉表达。',

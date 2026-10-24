@@ -56,6 +56,11 @@ export function ProjectCaseStudy({
           </h2>
           <p className={styles.status}>{project.status}</p>
           <p className={styles.summary}>{project.summary}</p>
+          {project.externalLink && (
+            <a className={styles.externalLink} href={project.externalLink.href} target="_blank" rel="noopener noreferrer">
+              {project.externalLink.label}
+            </a>
+          )}
           <ul className={styles.tags} aria-label={`${project.title} 标签`}>
             {project.tags.map((tag) => <li key={tag}>{tag}</li>)}
           </ul>

@@ -3,13 +3,13 @@ import { siteContent } from './siteContent';
 
 describe('siteContent', () => {
   it('defines the recruiter-facing direction and five anchors', () => {
-    expect(siteContent.intro.annotation).toBe('AIGC CONTENT PRODUCTION / AI WORKFLOW');
-    expect(siteContent.intro.annotationZh).toBe('AIGC 内容生产 · AI 工作流 · 自动化应用');
+    expect(siteContent.intro.annotation).toBe('AIGC CONTENT & DIGITAL APPLICATIONS');
+    expect(siteContent.intro.annotationZh).toBe('AIGC 内容制作 · AI 工作流 · 企业数字化应用');
     expect(siteContent.navigation.map(({ id }) => id)).toEqual([
       'home', 'about', 'work', 'skills', 'contact',
     ]);
     expect(siteContent.hero.positioning).toBe(
-      '使用 ComfyUI、AI 图像与视频模型、Python / API 和自动化工具，连接内容策划、素材生成、视频制作与交付。',
+      '使用 ComfyUI、AI 图像与视频模型、Python / API 和自动化工具，连接内容策划、素材生成、视频制作与交付；同时参与企业 Web 前端开发、接口辅助对接与设备联调。',
     );
     expect(siteContent.hero.keywords).toEqual([
       'AI VIDEO', 'COMFYUI', 'AI WORKFLOW', 'AUTOMATION', 'AI IMAGE', 'PYTHON / API',
@@ -23,13 +23,13 @@ describe('siteContent', () => {
   });
 
   it('models the approved About statement and truthful skill groups', () => {
-    expect(siteContent.about.statement).toContain('我关注的不是单次生成图片或视频');
+    expect(siteContent.about.statement).toContain('我关注的是 AI 工具与技术在真实业务中的应用');
     expect(siteContent.about.statement).toContain('独立完成选题、脚本、分镜、AI 图像与视频生成');
     expect(siteContent.about.practiceAreas).toEqual([
       'AI 图像生成', 'AI 视频生成', 'ComfyUI 工作流', '内容策划与分镜',
-      'Python / API', 'AI 电商内容生产', '视频剪辑与视觉处理',
+      'Python / API', 'AI 电商内容生产', '视频剪辑与视觉处理', 'Web 前端开发', '后端接口辅助对接', '传感器与联动控制调试',
     ]);
-    expect(siteContent.about.targetDirection).toBe('AIGC / AI 内容生产 / AI 工作流 / AI 应用');
+    expect(siteContent.about.targetDirection).toBe('AIGC / AI 内容制作 / AI 工作流 / AI 应用 / 企业数字化应用');
     expect(siteContent.skillGroups.map(({ id, priority }) => ({ id, priority }))).toEqual([
       { id: 'aigc', priority: 'core' },
       { id: 'automation', priority: 'core' },
@@ -41,16 +41,18 @@ describe('siteContent', () => {
     expect(`${automation.mastered.zh}${automation.growing.zh}${automation.next.zh}`).toMatch(/FFmpeg.*实验|实验.*FFmpeg/);
   });
 
-  it('defines three truthful case studies and shared evidence', () => {
+  it('defines four truthful case studies and shared evidence', () => {
     expect(siteContent.projects.map(({ id, status }) => ({ id, status }))).toEqual([
       { id: 'project-01', status: 'COMPLETED' },
       { id: 'project-02', status: 'COMPLETED' },
       { id: 'project-03', status: 'IN DEVELOPMENT' },
+      { id: 'project-04', status: 'TEST VERSION / 企业测试版' },
     ]);
     expect(siteContent.projects.map(({ title, titleZh }) => ({ title, titleZh }))).toEqual([
       { title: 'AI PRODUCT FILM', titleZh: 'AI 产品宣传片' },
       { title: 'AI SHORT FILM WORKFLOW', titleZh: 'AI 连续镜头制作工作流' },
       { title: 'AI CONTENT WORKFLOW', titleZh: 'AI 内容生产工作流' },
+      { title: 'ENTERPRISE MONITORING SYSTEM', titleZh: '金梦湾水质监测测试系统' },
     ]);
     expect(siteContent.projects[1].tools).toEqual([
       'ComfyUI', 'MiniMax H3', 'Seedance', 'AI Image', 'AI Video', 'LLM', 'Video Editing',

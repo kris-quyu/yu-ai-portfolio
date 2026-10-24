@@ -6,11 +6,11 @@ import { ProjectIndex } from './ProjectIndex';
 describe('ProjectIndex', () => {
   afterEach(cleanup);
 
-  it('renders three selected-work articles linked to their case-study fragments', () => {
+  it('renders four selected-work articles linked to their case-study fragments', () => {
     render(<ProjectIndex />);
 
     expect(screen.getByRole('heading', { name: 'SELECTED WORK' })).toBeInTheDocument();
-    expect(screen.getAllByRole('article')).toHaveLength(3);
+    expect(screen.getAllByRole('article')).toHaveLength(4);
     expect(screen.getByRole('link', { name: /AI PRODUCT FILM.*VIEW CASE STUDY/i }))
       .toHaveAttribute('href', '#project-01');
     expect(screen.getByRole('link', { name: /AI SHORT FILM WORKFLOW.*VIEW CASE STUDY/i }))

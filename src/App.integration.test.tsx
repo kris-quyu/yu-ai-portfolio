@@ -127,10 +127,42 @@ const visualCss = [
 ].join('\n');
 
 describe('complete portfolio integration', () => {
-  it('presents four new films with posters without downloading videos on entry', () => {
+  it('opens the delivered but unpublished Enjitang film as the first featured work', async () => {
+    vi.useFakeTimers();
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /直接进入/, hidden: true }));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(document.querySelector('video[data-film-preview]')).toHaveAttribute('data-film-preview', 'enjitang');
+    const collaboration = screen.getByRole('article', { name: /ENJITANG BRAND FILM/, hidden: true });
+    expect(collaboration).toHaveTextContent('已交付 · 未发布');
+    expect(collaboration).toHaveTextContent('策划 · 拍摄 · AI 生成 · 剪辑');
+    fireEvent.click(within(collaboration).getByRole('button', { name: /播放/, hidden: true }));
+    const dialog = screen.getByRole('dialog', { name: '恩济堂品牌合作短片', hidden: true });
+    expect(within(dialog).getByLabelText('恩济堂品牌合作短片 完整视频'))
+      .toHaveAttribute('src', '/media/selected/enjitang.mp4');
+    expect(dialog).toHaveTextContent('未发布');
+  });
+
+  it('links to the enterprise test system and identifies frontend ownership and integration support', () => {
+    const { container } = render(<App />);
+    const enterprise = container.querySelector('#project-04') as HTMLElement;
+    expect(enterprise).not.toBeNull();
+    expect(enterprise).toHaveTextContent('金梦湾水质监测测试系统');
+    expect(enterprise).toHaveTextContent('TEST VERSION');
+    expect(enterprise).toHaveTextContent('前端开发');
+    expect(enterprise).toHaveTextContent('辅助后端接口对接');
+    expect(enterprise).toHaveTextContent('传感器接入调试');
+    expect(enterprise).toHaveTextContent('联动控制调试');
+    const link = within(enterprise).getByRole('link', { name: /查看测试系统/, hidden: true });
+    expect(link).toHaveAttribute('href', 'https://www.jinmengwan.com/');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link.getAttribute('rel')).toMatch(/noopener/);
+    expect(enterprise).not.toHaveTextContent(/独立全栈|正式投产|生产环境已上线/);
+  });
+  it('presents five films with posters without downloading videos on entry', () => {
     render(<App />);
     const previews = [...document.querySelectorAll<HTMLVideoElement>('video[data-film-preview]')];
-    expect(previews).toHaveLength(4);
+    expect(previews).toHaveLength(5);
     expect(previews.every((video) => !video.hasAttribute('src'))).toBe(true);
     expect(previews.every((video) => video.preload === 'none')).toBe(true);
     expect(screen.getByRole('heading', { name: /BEAUTY FILM/, hidden: true })).toBeInTheDocument();
@@ -457,6 +489,7 @@ describe('complete portfolio integration', () => {
     ).toEqual([
       'home',
       'work',
+      'project-04',
       'profile',
       'about',
       'case-studies',
