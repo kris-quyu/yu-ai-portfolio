@@ -27,6 +27,25 @@ afterEach(() => {
 });
 
 describe('ContactSection', () => {
+  it('copies the public WeChat ID and announces success', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    setClipboard(writeText);
+    render(<ContactSection />);
+    expect(screen.getByText('qxy13123986103')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '复制微信号' }));
+    expect(writeText).toHaveBeenCalledWith('qxy13123986103');
+    expect(screen.getByRole('status')).toHaveTextContent('微信号已复制');
+  });
+
+  it('offers manual WeChat copying when clipboard access fails', async () => {
+    const user = userEvent.setup();
+    setClipboard();
+    render(<ContactSection />);
+    await user.click(screen.getByRole('button', { name: '复制微信号' }));
+    expect(screen.getByRole('textbox', { name: '手动复制联系方式' })).toHaveValue('qxy13123986103');
+    expect(screen.getByRole('textbox', { name: '手动复制联系方式' })).toHaveFocus();
+  });
   it('renders usable email and phone links without prohibited resume content', () => {
     render(<ContactSection />);
 

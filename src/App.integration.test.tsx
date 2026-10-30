@@ -179,14 +179,38 @@ describe('complete portfolio integration', () => {
     expect(screen.queryByRole('dialog', { name: '金梦湾水质监测平台测试界面', hidden: true })).not.toBeInTheDocument();
     expect(document.body.style.overflow).not.toBe('hidden');
   });
-  it('presents five films with posters without downloading videos on entry', () => {
+  it('presents six films with posters without downloading videos on entry', () => {
     render(<App />);
     const previews = [...document.querySelectorAll<HTMLVideoElement>('video[data-film-preview]')];
-    expect(previews).toHaveLength(5);
+    expect(previews).toHaveLength(6);
     expect(previews.every((video) => !video.hasAttribute('src'))).toBe(true);
     expect(previews.every((video) => video.preload === 'none')).toBe(true);
     expect(screen.getByRole('heading', { name: /BEAUTY FILM/, hidden: true })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /JEWELRY FILM/, hidden: true })).toBeInTheDocument();
+  });
+
+  it('plays only the public OES excerpt and routes private case requests to contact after closing', async () => {
+    vi.useFakeTimers();
+    const { container } = render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /直接进入/, hidden: true }));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    const cards = screen.getAllByRole('article', { hidden: true });
+    const oes = screen.getByRole('article', { name: /OES COOKWARE/, hidden: true });
+    expect(cards.indexOf(oes)).toBe(cards.indexOf(screen.getByRole('article', { name: /ENJITANG BRAND FILM/, hidden: true })) + 1);
+    expect(oes).toHaveAttribute('data-format', 'landscape');
+    expect(oes).toHaveTextContent('品牌委托');
+    expect(oes).toHaveTextContent('节选展示');
+    expect(oes).toHaveTextContent('不含代言人');
+    expect(within(oes).getByRole('link', { name: /微信联系/, hidden: true })).toHaveAttribute('href', '#contact');
+    fireEvent.click(within(oes).getByRole('button', { name: /播放/, hidden: true }));
+    const dialog = screen.getByRole('dialog', { name: 'OES 砂锅｜产品信息流广告', hidden: true });
+    expect(within(dialog).getByLabelText('OES 砂锅｜产品信息流广告 公开节选')).toHaveAttribute('src', '/media/selected/oes-excerpt.mp4');
+    expect(dialog).toHaveTextContent('静音节选');
+    expect(within(dialog).getByRole('link', { name: /打开节选/, hidden: true })).toHaveAttribute('href', '/media/selected/oes-excerpt.mp4');
+    fireEvent.click(within(dialog).getByRole('link', { name: /微信联系/, hidden: true }));
+    expect(screen.queryByRole('dialog', { hidden: true })).not.toBeInTheDocument();
+    expect(document.body.style.overflow).not.toBe('hidden');
+    expect(container).not.toHaveAttribute('inert');
   });
 
   it('opens a new film on demand and releases scrolling after Escape', async () => {
@@ -595,7 +619,7 @@ describe('complete portfolio integration', () => {
       .toHaveTextContent(siteContent.contact.email);
     expect(contactSection.querySelector(`a[href="tel:${siteContent.contact.phone}"]`))
       .toHaveTextContent(siteContent.contact.phone);
-    expect(contactSection.querySelectorAll('button')).toHaveLength(2);
+    expect(contactSection.querySelectorAll('button')).toHaveLength(3);
     expect(contactSection.querySelector('[role="status"]')).toHaveAttribute(
       'aria-live',
       'polite',

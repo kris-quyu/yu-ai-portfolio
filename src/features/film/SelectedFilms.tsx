@@ -88,6 +88,7 @@ export function SelectedFilms() {
       <div className={styles.grid}>
         {selectedFilms.map((film, index) => (
           <article key={film.id} className={`${styles.film} ${film.client ? styles.featured : ''}`}
+            id={film.id === 'oes-excerpt' ? 'oes' : undefined} data-format={film.format}
             aria-labelledby={`film-${film.id}-title`}
             onMouseEnter={() => { if (!reducedMotion) setPreview(film.id); }}
             onMouseLeave={() => setPreview(null)}>
@@ -106,7 +107,7 @@ export function SelectedFilms() {
                 onError={() => setPreview((current) => current === film.id ? null : current)} />
               <span className={styles.topline} aria-hidden="true"><span>0{index + 1} / {film.client ? 'BRAND FILM' : 'AI FILM'}</span><span>{film.duration}</span></span>
               <span className={styles.play} aria-hidden="true">↗</span>
-              <span className={styles.watch} aria-hidden="true">观看成片 / WATCH FILM</span>
+              <span className={styles.watch} aria-hidden="true">{film.excerpt ? '观看节选 / WATCH EXCERPT' : '观看成片 / WATCH FILM'}</span>
             </button>
             <div className={styles.filmCopy}>
               <p className={styles.focus}>{film.focus}</p>
@@ -115,6 +116,12 @@ export function SelectedFilms() {
               <p className={styles.summary}>{film.summary}</p>
               {film.roleLabel && <p className={styles.role}>{film.roleLabel}</p>}
               <p className={styles.tags}>{film.tags?.join(' · ') ?? 'AI IMAGE · AI VIDEO · EDITING'}</p>
+              {film.disclosure && <p className={styles.disclosure}>{film.disclosure}</p>}
+              {film.process && <details className={styles.process}>
+                <summary>制作过程 / PRODUCTION PROCESS ↘</summary>
+                <ol>{film.process.map((step) => <li key={step.title}><h4>{step.title}</h4><p>{step.description}</p></li>)}</ol>
+              </details>}
+              {film.excerpt && <a className={styles.caseLink} href="#contact">微信联系 · 了解完整案例 / CONTACT VIA WECHAT ↗</a>}
             </div>
           </article>
         ))}
@@ -124,19 +131,21 @@ export function SelectedFilms() {
         <div ref={overlayRef} className={styles.overlay} onClick={(event) => {
           if (event.target === event.currentTarget) close();
         }}>
-          <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="selected-film-dialog-title">
+          <div className={styles.dialog} data-format={active.format} role="dialog" aria-modal="true" aria-labelledby="selected-film-dialog-title">
             <header className={styles.dialogHeader}>
               <div><p>{active.title}</p><h2 id="selected-film-dialog-title">{active.titleZh}</h2>{active.delivery && <p>{active.delivery}</p>}</div>
               <button ref={closeRef} type="button" onClick={close} aria-label="关闭视频">关闭 / CLOSE ×</button>
             </header>
             {!failed && <video ref={playerRef} className={styles.player}
               src={filmAsset(active, '.mp4')} poster={filmAsset(active, '.webp')}
-              aria-label={`${active.titleZh} 完整视频`} controls autoPlay playsInline preload="metadata"
+              aria-label={`${active.titleZh} ${active.excerpt ? '公开节选' : '完整视频'}`} controls autoPlay playsInline preload="metadata"
               onLoadedData={() => setReady(true)} onCanPlay={() => setReady(true)}
               onWaiting={() => setReady(false)} onError={() => { setFailed(true); setReady(false); }} />}
             <footer className={styles.dialogFooter}>
               <p role="status">{failed ? '视频暂时无法播放，可直接打开视频文件。' : !ready ? '视频加载中，可稍候、直接打开或关闭返回。' : active.roleLabel ?? '独立完成 / CONCEPT · AI GENERATION · EDITING'}</p>
-              <a href={filmAsset(active, '.mp4')} target="_blank" rel="noreferrer">直接打开 / OPEN VIDEO ↗</a>
+              {active.disclosure && <p>{active.disclosure}</p>}
+              <a href={filmAsset(active, '.mp4')} target="_blank" rel="noreferrer">{active.excerpt ? '打开节选 / OPEN EXCERPT ↗' : '直接打开 / OPEN VIDEO ↗'}</a>
+              {active.excerpt && <a href="#contact" onClick={close}>微信联系 · 了解完整案例 ↗</a>}
             </footer>
           </div>
         </div>, document.body,

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { siteContent } from '../../content/siteContent';
 import styles from './ContactSection.module.css';
 
-type ContactLabel = '邮箱' | '电话';
+type ContactLabel = '邮箱' | '电话' | '微信号';
 
 const copyFailureMessage = '复制失败，请按 Ctrl+C 手动复制';
 
@@ -58,6 +58,14 @@ export function ContactSection() {
       </div>
 
       <div className={styles.actions} aria-label="联系方式">
+        <div className={styles.actionRow}>
+          <span className={styles.contactLink} aria-label={`微信号 ${siteContent.contact.wechat}`}>
+            {siteContent.contact.wechat}
+          </span>
+          <button type="button" className={styles.copyButton} onClick={() => void copy('微信号', siteContent.contact.wechat)}>
+            复制微信号
+          </button>
+        </div>
         <div className={styles.actionRow}>
           <a className={styles.contactLink} href={`mailto:${siteContent.contact.email}`}>
             {siteContent.contact.email}

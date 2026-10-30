@@ -68,6 +68,7 @@ export interface ContactDetails {
   name: string;
   city: string;
   phone: string;
+  wechat: string;
   email: string;
 }
 
@@ -365,6 +366,7 @@ export const siteContent: SiteContent = {
     name: '瞿先生',
     city: '杭州',
     phone: '13123986103',
+    wechat: 'qxy13123986103',
     email: '1282736393@qq.com',
   },
 };
